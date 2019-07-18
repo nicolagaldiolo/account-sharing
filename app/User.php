@@ -105,4 +105,12 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     {
         return [];
     }
+
+    public function sharings(){
+        return $this->belongsToMany(Sharing::class);
+    }
+
+    public function sharingOnwers(){
+        return $this->hasMany(Sharing::class, 'owner_id');
+    }
 }
