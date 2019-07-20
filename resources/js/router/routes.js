@@ -13,6 +13,13 @@ export default [
   { path: '/email/resend', name: 'verification.resend', component: page('auth/verification/resend.vue') },
 
   { path: '/home', name: 'home', component: page('home.vue') },
+
+  { path: '/categories', name: 'categories', component: page('home.vue') },
+  { path: '/category/:category_id', name: 'category.show', component: page('categories/show.vue') },
+  { path: '/category/:category_id/sharing/:sharing_id', name: 'sharing.show', component: page('sharings/show.vue') },
+
+  { path: '/sharing/create', name: 'sharing.create', component: page('sharings/create.vue') },
+
   { path: '/settings',
     component: page('settings/index.vue'),
     children: [

@@ -18,6 +18,13 @@
         </ul>
 
         <ul class="navbar-nav ml-auto">
+
+          <li v-if="user" class="nav-item">
+            <router-link :to="{ name: 'sharing.create' }" class="nav-link">
+              Crea Condivisione
+            </router-link>
+          </li>
+
           <!-- Authenticated -->
           <li v-if="user" class="nav-item dropdown">
             <a class="nav-link dropdown-toggle text-dark"

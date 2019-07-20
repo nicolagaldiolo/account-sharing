@@ -16,10 +16,11 @@ class CreateSharingsTable extends Migration
         Schema::create('sharings', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name');
-            $table->text('description');
+            $table->text('description')->nullable();
             $table->tinyInteger('visibility')->unsigned()->default(1);
             $table->integer('capacity')->nullable();
             $table->decimal('price', 10, 2)->nullable();
+            $table->string('image')->nullable();
             $table->bigInteger('category_id')->unsigned();
             $table->bigInteger('owner_id')->unsigned();
             $table->timestamps();

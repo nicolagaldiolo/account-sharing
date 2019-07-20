@@ -20,6 +20,8 @@ Route::group(['middleware' => 'auth:api'], function () {
         return $request->user();
     });
 
+    Route::resource('categories', 'Categories\CategoriesController');
+    Route::resource('sharings', 'Sharings\SharingsController');
     Route::patch('settings/profile', 'Settings\ProfileController@update');
     Route::patch('settings/password', 'Settings\PasswordController@update');
 });
