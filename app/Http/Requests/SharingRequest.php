@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Category;
 use App\Enums\SharingVisibility;
 use BenSampo\Enum\Rules\EnumValue;
 use Illuminate\Foundation\Http\FormRequest;
@@ -25,13 +26,19 @@ class SharingRequest extends FormRequest
      */
     public function rules()
     {
+
+        $category = Category::where('id', $this->input('category_id'))->first();
+        $max_price = ($category->price > 0) ? '|max:' . $category->price : '';
+        $max_capacity = ($category->capacity > 0) ? '|max:' . $category->capacity : '';
+
         return [
-            'name'          => 'required',
-            'description'   => 'sometimes',
-            'visibility'    => ['required', new EnumValue(SharingVisibility::class, false)],
-            'capacity'      => 'required',
-            'price'         => 'required',
-            'category_id'   => 'required',
+            'name'                  => 'required|max:255',
+            'description'           => 'sometimes|max:750',
+            'visibility'            => ['required', new EnumValue(SharingVisibility::class, false)],
+            'capacity'              => 'required|numeric' . $max_capacity,
+            'price'                 => 'required|numeric' . $max_price,
+            'category_id'           => 'required|exists:categories,id',
+            'renewal_frequency_id'  => 'required|exists:renewal_frequencies,id'
         ];
     }
 }

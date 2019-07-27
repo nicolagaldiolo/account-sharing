@@ -3,6 +3,10 @@
 namespace App\Http\Controllers\Categories;
 
 use App\Category;
+use App\Enums\RenewalFrequencies;
+use App\Enums\SharingVisibility;
+use App\RenewalFrequency;
+use App\Sharing;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -13,10 +17,29 @@ class CategoriesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $categories = Category::all();
-        return $categories;
+        $embed = ($request->has('embed') ? explode(',', $request->input('embed')) : []);
+
+        $appends = [];
+
+        if(in_array('renewal_frequencies', $embed)){
+            $appends['renewal_frequencies'] = RenewalFrequency::all();
+        };
+
+        if(in_array('sharings', $embed)){
+            $appends['sharings'] = Sharing::all();
+        };
+
+        if(in_array('sharings_visibility', $embed)){
+            $appends['sharings_visibility'] = SharingVisibility::toSelectArray();
+        };
+
+        $data = [
+            'categories' => Category::all(),
+        ];
+
+        return array_merge($data, $appends);
     }
 
     /**

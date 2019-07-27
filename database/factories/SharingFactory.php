@@ -15,6 +15,9 @@ $factory->define(Sharing::class, function (Faker $faker) {
         'capacity' => $faker->numberBetween(1,5),
         'price' => $faker->randomFloat(2, 0, 20),
         'image' => $faker->imageUrl(),
+        'renewal_frequency_id' => function(){
+            return factory(\App\RenewalFrequency::class)->create();
+        },
         'category_id' => function(){
             return factory(\App\Category::class)->create();
         },

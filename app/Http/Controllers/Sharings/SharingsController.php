@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Sharings;
 
+use App\Enums\SharingStatus;
 use App\Http\Requests\SharingRequest;
 use App\Sharing;
 use Illuminate\Http\Request;
@@ -15,10 +16,34 @@ class SharingsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //$sharings = Sharing::PublicAvailable()->with('owner')->get();
-        $sharings = Sharing::with('owner')->get();
+
+        $param = $request->input('type', '');
+
+        switch ($param){
+            case 'pending':
+                $sharings = Auth::user()->sharings()->pending()->get();
+                break;
+            case 'approved':
+                $sharings = Auth::user()->sharings()->approved()->get();
+                break;
+            case 'owner':
+                // manipolo i dati tornati raggruppando gli utenti per stato della relazione con sharing(es: pendind: utenti..., joined: utenti...)
+                $sharings = Auth::user()->sharingOwners()->with('users')->get()->each(function($sharing){
+                    $sharing['sharing_status'] = collect(SharingStatus::getInstances())->each(function($sharingStatus) use($sharing){
+                        $sharingStatus->users = $sharing->users->where('pivot.status', $sharingStatus->value)->values();
+                    });
+                });
+                break;
+            case 'joined':
+                $sharings = Auth::user()->sharings()->joined()->get();
+                break;
+            default:
+                $sharings = Sharing::public()->get();
+                break;
+        }
+
         return $sharings;
     }
 
@@ -41,7 +66,7 @@ class SharingsController extends Controller
     public function store(SharingRequest $request)
     {
         $user = $request->user();
-        return $user->sharingOnwers()->create($request->validated());
+        return $user->sharingOwners()->create($request->validated());
     }
 
     /**
@@ -52,7 +77,7 @@ class SharingsController extends Controller
      */
     public function show(Sharing $sharing)
     {
-        return $sharing->load('category', 'owner', 'activeUsers');
+        return $sharing->load('category', 'activeUsers');
     }
 
     /**
@@ -76,6 +101,18 @@ class SharingsController extends Controller
     public function update(Request $request, $id)
     {
         //
+    }
+
+    public function transition(Request $request, Sharing $sharing, $transition)
+    {
+        $user = $request->user();
+        $user->sharings()->syncWithoutDetaching([$sharing->id => ['status' => $transition]]);
+    }
+
+    public function requestToManage()
+    {
+        $status = 1;
+        return Auth::user()->sharingOwners()->byStatus($status)->get();
     }
 
     /**

@@ -3,24 +3,26 @@ import * as types from '../mutation-types'
 
 // state
 export const state = {
-  categories: [],
+  data: {},
   category: {}
 }
 
 // getters
 export const getters = {
-  categories: state => state.categories,
-  category: state => state.category
+  category: state => state.category,
+  categories: state => state.data.categories,
+  renewal_frequencies: state => state.data.renewal_frequencies,
+  sharings_visibility: state => state.data.sharings_visibility,
 }
 
 // mutations
 export const mutations = {
-  [types.FETCH_CATEGORIES_SUCCESS] (state, { categories }) {
-    state.categories = categories
+  [types.FETCH_CATEGORIES_SUCCESS] (state, { data }) {
+    state.data = data
   },
 
   [types.FETCH_CATEGORIES_FAILURE] (state) {
-    state.categories = []
+    state.data = {}
   },
 
   [types.FETCH_CATEGORY_SUCCESS] (state, { category }) {
@@ -35,10 +37,11 @@ export const mutations = {
 // actions
 export const actions = {
 
-  async fetchCategories ({ commit }) {
+  async fetchCategories ({ commit }, embed = []) {
     try {
-      const { data } = await axios.get('/api/categories')
-      commit(types.FETCH_CATEGORIES_SUCCESS, { categories: data })
+      let params = (embed.length > 0) ? `?embed=${embed.join(',')}` : '';
+      const { data } = await axios.get('/api/categories' + params);
+      commit(types.FETCH_CATEGORIES_SUCCESS, { data: data })
     } catch (e) {
       commit(types.FETCH_CATEGORIES_FAILURE)
     }

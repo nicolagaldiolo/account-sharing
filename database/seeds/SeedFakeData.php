@@ -22,6 +22,8 @@ class SeedFakeData extends Seeder
             'password' => bcrypt(env('DEMOPASS', 'password'))
         ])->merge(factory(\App\User::class, 9)->create());
 
+        $renewalFrequencies = collect([]);
+
         collect([
             [
                 'value' => 1,
@@ -31,8 +33,8 @@ class SeedFakeData extends Seeder
                 'value' => 1,
                 'type' => RenewalFrequencies::Years
             ]
-        ])->each(function($item){
-            factory(RenewalFrequency::class)->create($item);
+        ])->each(function($item) use ($renewalFrequencies){
+            $renewalFrequencies->push(factory(RenewalFrequency::class)->create($item));
         });
 
         collect([
@@ -41,14 +43,17 @@ class SeedFakeData extends Seeder
             ['name' => 'Apple Music'],
             ['name' => 'Spotify Family'],
             ['name' => 'Custom'],
-        ])->each(function($item) use($users){
+        ])->each(function($item) use($users, $renewalFrequencies){
             $factory = factory(Category::class)->create($item);
 
-            collect(array_fill(0, 5, ''))->each(function() use($factory, $users){
+            collect(array_fill(0, 5, ''))->each(function() use($factory, $users, $renewalFrequencies){
+
+                $renewalFrequency = $renewalFrequencies->random(1)->pluck('id')->first();
                 $owner = $users->random(1)->pluck('id')->first();
                 factory(Sharing::class)->create([
                     'name' => $factory->name,
                     'price' => $factory->price,
+                    'renewal_frequency_id' => $renewalFrequency,
                     'category_id' => $factory->id,
                     'owner_id' => $owner
                 ])->each(function($sharing) use($users){

@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Enums\SharingStatus;
 use App\Notifications\VerifyEmail;
 use App\Notifications\ResetPassword;
 use Tymon\JWTAuth\Contracts\JWTSubject;
@@ -107,10 +108,10 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     }
 
     public function sharings(){
-        return $this->belongsToMany(Sharing::class);
+        return $this->belongsToMany(Sharing::class)->withPivot('status');
     }
 
-    public function sharingOnwers(){
+    public function sharingOwners(){
         return $this->hasMany(Sharing::class, 'owner_id');
     }
 }

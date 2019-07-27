@@ -20,8 +20,26 @@
         <ul class="navbar-nav ml-auto">
 
           <li v-if="user" class="nav-item">
-            <router-link :to="{ name: 'sharing.create' }" class="nav-link">
+            <router-link :to="{ name: 'sharing.requests' }" class="nav-link">
               Crea Condivisione
+            </router-link>
+          </li>
+
+          <li v-if="user" class="nav-item">
+            <router-link :to="{ name: 'home' }" class="nav-link">
+              Naviga
+            </router-link>
+          </li>
+
+          <li v-if="user" class="nav-item">
+            <router-link :to="{ name: 'sharings' }" class="nav-link">
+              Miei Gruppi
+            </router-link>
+          </li>
+
+          <li v-if="user" class="nav-item">
+            <router-link :to="{ name: 'feed' }" class="nav-link">
+              Richieste
             </router-link>
           </li>
 

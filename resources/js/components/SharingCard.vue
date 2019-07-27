@@ -13,7 +13,7 @@
       <h5 class="card-title">{{sharing.name}}</h5>
     </div>
     <div class="card-footer">
-      <small class="text-muted">{{sharing.availability}}/{{sharing.capacity}} disponibili</small>
+      <small class="text-muted"></small>
     </div>
   </div>
 </template>

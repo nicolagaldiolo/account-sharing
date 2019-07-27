@@ -20,8 +20,15 @@ Route::group(['middleware' => 'auth:api'], function () {
         return $request->user();
     });
 
+    // Categories
     Route::resource('categories', 'Categories\CategoriesController');
+
+    // Sharings
     Route::resource('sharings', 'Sharings\SharingsController');
+    Route::patch('sharings/{sharing}/transitions/{transition}', 'Sharings\SharingsController@transition')->name('sharings.transition');
+    Route::get('sharing-requests', 'Sharings\SharingsController@requestToManage')->name('sharing.requests');
+
+    // Settings
     Route::patch('settings/profile', 'Settings\ProfileController@update');
     Route::patch('settings/password', 'Settings\PasswordController@update');
 });

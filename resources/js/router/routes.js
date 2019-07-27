@@ -18,7 +18,27 @@ export default [
   { path: '/category/:category_id', name: 'category.show', component: page('categories/show.vue') },
   { path: '/category/:category_id/sharing/:sharing_id', name: 'sharing.show', component: page('sharings/show.vue') },
 
-  { path: '/sharing/create', name: 'sharing.create', component: page('sharings/create.vue') },
+  { path: '/sharing/create', name: 'sharing.requests', component: page('sharings/create.vue') },
+
+  { path: '/sharings',
+    component: page('sharings/index.vue'),
+    children: [
+      { path: '', name: 'sharings', redirect: { name: 'sharings.pending' } },
+      { path: 'pending', name: 'sharings.pending', component: page('sharings/lists.vue'), props: { type: 'pending' } },
+      { path: 'approved', name: 'sharings.approved', component: page('sharings/lists.vue'), props: { type: 'approved' } },
+      { path: 'joined', name: 'sharings.joined', component: page('sharings/lists.vue'), props: { type: 'joined' } },
+      { path: 'owner', name: 'sharings.owner', component: page('sharings/owner.vue'), props: { type: 'owner' } }
+    ]
+  },
+
+  { path: '/feed',
+    component: page('feed/index.vue'),
+    children: [
+      { path: '', name: 'feed', redirect: { name: 'feed.requests' } },
+      { path: 'requests', name: 'feed.requests', component: page('feed/requests.vue') },
+      { path: 'notifications', name: 'feed.notifications', component: page('feed/notifications.vue') }
+    ]
+  },
 
   { path: '/settings',
     component: page('settings/index.vue'),

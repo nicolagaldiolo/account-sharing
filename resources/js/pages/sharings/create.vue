@@ -16,9 +16,21 @@
           <form @submit.prevent="create" @keydown="form.onKeydown($event)">
             <!--<alert-success :form="form" :message="$t('info_updated')" />-->
 
+            <!-- Renewal frequency -->
+            <div class="form-group row">
+              <label class="col-md-3 col-form-label text-md-right">{{ $t('renewal_frequency') }}</label>
+              <div class="col-md-7">
+                <select v-model="form.renewal_frequency_id" :class="{ 'is-invalid': form.errors.has('renewal_frequency_id') }" class="form-control" name="renewal_frequency_id">
+                  <option value="">Scegli una frequenza di rinnovo</option>
+                  <option v-for="renewal_frequency in renewal_frequencies" :key="renewal_frequency.id" :value="renewal_frequency.id">{{renewal_frequency.frequency}}</option>
+                </select>
+                <has-error :form="form" field="renewal_frequency_id" />
+              </div>
+            </div>
+
             <!-- Name -->
             <div class="form-group row">
-              <label class="col-md-3 col-form-label text-md-right">Nome del servizio {{ $t('name') }}</label>
+              <label class="col-md-3 col-form-label text-md-right">{{ $t('service_name') }}</label>
               <div class="col-md-7">
                 <input v-model="form.name" :class="{ 'is-invalid': form.errors.has('name') }" class="form-control" type="text" name="name">
                 <has-error :form="form" field="name" />
@@ -56,7 +68,10 @@
             <div class="form-group row">
               <label class="col-md-3 col-form-label text-md-right">Visibilità</label>
               <div class="col-md-7">
-                <input v-model="form.visibility" :class="{ 'is-invalid': form.errors.has('visibility') }" class="form-control" type="text" name="visibility">
+                <select v-model="form.visibility" :class="{ 'is-invalid': form.errors.has('visibility') }" class="form-control" name="visibility">
+                  <option value="">Scegli la visibilità</option>
+                  <option v-for="(visibility, index) in sharings_visibility" :key="index" :value="index">{{visibility}}</option>
+                </select>
                 <has-error :form="form" field="visibility" />
               </div>
             </div>
@@ -92,6 +107,7 @@
         price: '',
         capacity: '',
         visibility: '',
+        renewal_frequency_id: '',
         category_id: ''
       })
     }),
@@ -110,16 +126,18 @@
 
         // Redirect to sharing.
         this.$router.push({ name: 'sharing.show', params: { category_id: this.form.category_id, sharing_id: data.id }})
-
       }
     },
 
     created() {
-      this.$store.dispatch('categories/fetchCategories');
+      this.$store.dispatch('categories/fetchCategories', ['renewal_frequencies', 'sharings_visibility']);
+      console.log(this.embeds);
     },
 
     computed: mapGetters({
-      categories: 'categories/categories'
+      categories: 'categories/categories',
+      renewal_frequencies: 'categories/renewal_frequencies',
+      sharings_visibility: 'categories/sharings_visibility'
     })
   }
 </script>

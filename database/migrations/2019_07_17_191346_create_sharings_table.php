@@ -21,11 +21,13 @@ class CreateSharingsTable extends Migration
             $table->integer('capacity')->nullable();
             $table->decimal('price', 10, 2)->nullable();
             $table->string('image')->nullable();
+            $table->bigInteger('renewal_frequency_id')->unsigned();
             $table->bigInteger('category_id')->unsigned();
             $table->bigInteger('owner_id')->unsigned();
             $table->timestamps();
             $table->softDeletes();
 
+            $table->foreign('renewal_frequency_id')->on('renewal_frequencies')->references('id');
             $table->foreign('category_id')->on('categories')->references('id');
             $table->foreign('owner_id')->on('users')->references('id');
         });
