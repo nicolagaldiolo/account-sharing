@@ -25,8 +25,10 @@ Route::group(['middleware' => 'auth:api'], function () {
 
     // Sharings
     Route::resource('sharings', 'Sharings\SharingsController');
+    //Route::patch('sharings/{sharing}/transitions/{transition}', 'Sharings\SharingsController@transition')->name('sharings.transition');
+    //Route::get('sharing-requests', 'Sharings\SharingsController@requestToManage')->name('sharing.requests');
+
     Route::patch('sharings/{sharing}/transitions/{transition}', 'Sharings\SharingsController@transition')->name('sharings.transition');
-    Route::get('sharing-requests', 'Sharings\SharingsController@requestToManage')->name('sharing.requests');
 
     // Settings
     Route::patch('settings/profile', 'Settings\ProfileController@update');

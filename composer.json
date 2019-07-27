@@ -12,6 +12,7 @@
         "laravel/framework": "5.8.*",
         "laravel/socialite": "^4.0",
         "laravel/tinker": "^1.0",
+        "sebdesign/laravel-state-machine": "^1.4",
         "tymon/jwt-auth": "^1.0.0-rc.4.1"
     },
     "require-dev": {

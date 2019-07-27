@@ -103,17 +103,24 @@ class SharingsController extends Controller
         //
     }
 
+
+
     public function transition(Request $request, Sharing $sharing, $transition)
     {
-        $user = $request->user();
-        $user->sharings()->syncWithoutDetaching([$sharing->id => ['status' => $transition]]);
+        $stateMachine = \StateMachine::get($sharing, 'sharing');
+        //return $stateMachine->getState();
+        return $stateMachine->getPossibleTransitions();
+        //$user = $request->user();
+        //$user->sharings()->syncWithoutDetaching([$sharing->id => ['status' => $transition]]);
     }
 
+    /*
     public function requestToManage()
     {
         $status = 1;
         return Auth::user()->sharingOwners()->byStatus($status)->get();
     }
+    */
 
     /**
      * Remove the specified resource from storage.
