@@ -21,7 +21,7 @@
                                 <h6>{{sharing.sharing_status.Pending.description}}</h6>
                                 <ul class="list-group">
                                     <li v-for="user in sharing.sharing_status.Pending.users" :key="user.id" class="list-group-item">
-                                        <manage-sharing-user :user="user" :buttons="true"/>
+                                        <manage-sharing-user :user="user" :sharing="sharing" :buttons="true"/>
                                     </li>
                                 </ul>
                             </div>
@@ -30,7 +30,7 @@
                                 <h6>{{sharing.sharing_status.Approved.description}}</h6>
                                 <ul class="list-group">
                                     <li v-for="user in sharing.sharing_status.Approved.users" :key="user.id" class="list-group-item">
-                                        <manage-sharing-user :user="user" :buttons="true"/>
+                                        <manage-sharing-user :user="user" :sharing="sharing" :buttons="true"/>
                                     </li>
                                 </ul>
                             </div>
@@ -39,7 +39,7 @@
                                 <h6>{{sharing.sharing_status.Refused.description}}</h6>
                                 <ul class="list-group">
                                     <li v-for="user in sharing.sharing_status.Refused.users" :key="user.id" class="list-group-item">
-                                        <manage-sharing-user :user="user" :buttons="true"/>
+                                        <manage-sharing-user :user="user" :sharing="sharing" :buttons="true"/>
                                     </li>
                                 </ul>
                             </div>

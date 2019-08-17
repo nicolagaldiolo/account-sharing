@@ -21,41 +21,41 @@
 </style>
 
 <script>
-    import { mapGetters } from 'vuex'
-    import SharingCard from '~/components/SharingCard';
+import { mapGetters } from 'vuex'
+import SharingCard from '~/components/SharingCard';
 
-    export default {
-        components: {
-            SharingCard
-        },
-        middleware: 'auth',
+export default {
+    components: {
+        SharingCard
+    },
+    middleware: 'auth',
 
-        props: {
-            type: {
-                type: String,
-                default: ''
-            }
-        },
+    props: {
+        type: {
+            type: String,
+            default: ''
+        }
+    },
 
-        watch: {
-            type: function(){
-                return this.getData();
-            }
-        },
+    watch: {
+        type: function(){
+            return this.getData();
+        }
+    },
 
-        methods: {
-            getData: function () {
-                this.$store.dispatch('sharings/fetchSharings', this.type);
-            }
-        },
+    methods: {
+        getData: function () {
+            this.$store.dispatch('sharings/fetchSharings', this.type);
+        }
+    },
 
-        created() {
-            this.getData();
-        },
+    created() {
+        this.getData();
+    },
 
-        computed: mapGetters({
-            sharings: 'sharings/sharings',
-        }),
+    computed: mapGetters({
+        sharings: 'sharings/sharings',
+    }),
 
-    }
+}
 </script>

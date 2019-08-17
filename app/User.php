@@ -108,7 +108,11 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     }
 
     public function sharings(){
-        return $this->belongsToMany(Sharing::class)->withPivot('status');
+        return $this->belongsToMany(Sharing::class)
+            ->using(SharingUser::class)
+            ->as('sharing_status')
+            ->withPivot(['status','id'])
+            ->withTimestamps();
     }
 
     public function sharingOwners(){

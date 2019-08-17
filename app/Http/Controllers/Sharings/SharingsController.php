@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers\Sharings;
 
+use App\Category;
+use App\Enums\PaymentStatus;
 use App\Enums\SharingStatus;
 use App\Http\Requests\SharingRequest;
 use App\Sharing;
+use App\SharingUser;
+use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -30,16 +34,13 @@ class SharingsController extends Controller
                 break;
             case 'owner':
                 // manipolo i dati tornati raggruppando gli utenti per stato della relazione con sharing(es: pendind: utenti..., joined: utenti...)
-                $sharings = Auth::user()->sharingOwners()->with('users')->get()->each(function($sharing){
-                    $sharing['sharing_status'] = collect(SharingStatus::getInstances())->each(function($sharingStatus) use($sharing){
-                        $sharingStatus->users = $sharing->users->where('pivot.status', $sharingStatus->value)->values();
-                    });
-                });
+                $sharings = $this->getSharingOwners();
                 break;
             case 'joined':
                 $sharings = Auth::user()->sharings()->joined()->get();
                 break;
             default:
+                logger("Entro qui");
                 $sharings = Sharing::public()->get();
                 break;
         }
@@ -77,7 +78,13 @@ class SharingsController extends Controller
      */
     public function show(Sharing $sharing)
     {
-        return $sharing->load('category', 'activeUsers');
+
+        $sharing->load(['category', 'activeUsers', 'users' => function($query) {
+            return $query->where('users.id', Auth::id());
+        }]);
+
+        return $sharing;
+
     }
 
     /**
@@ -107,11 +114,55 @@ class SharingsController extends Controller
 
     public function transition(Request $request, Sharing $sharing, $transition)
     {
+
+        $sharing = Auth::user()->sharings()->where('sharings.id', $sharing->id)->first()->sharing_status;
         $stateMachine = \StateMachine::get($sharing, 'sharing');
-        //return $stateMachine->getState();
-        return $stateMachine->getPossibleTransitions();
-        //$user = $request->user();
-        //$user->sharings()->syncWithoutDetaching([$sharing->id => ['status' => $transition]]);
+
+        if($stateMachine->can($transition)) {
+            $stateMachine->apply($transition);
+            return tap($sharing)->save();
+        }
+        return $sharing;
+
+    }
+
+    public function transitionUser(Request $request, Sharing $sharing, User $user, $transition)
+    {
+
+        $sharing_status = $user->sharings()->where('sharings.id', $sharing->id)->first()->sharing_status;
+        $stateMachine = \StateMachine::get($sharing_status, 'sharing');
+
+        if($stateMachine->can($transition)) {
+            $stateMachine->apply($transition);
+            $sharing_status->save();
+        }
+        return $this->getSharingOwners($sharing->id);
+    }
+
+    public function join(Request $request, Sharing $sharing)
+    {
+        Auth::user()->sharings()->syncWithoutDetaching([$sharing->id]);
+        return $sharing;
+    }
+
+    public function payment(Request $request, Sharing $sharing)
+    {
+        $sharing = Auth::user()->sharings()->where('sharings.id', $sharing->id)->first();
+
+        if(!is_null($sharing)){
+            $next_payment = $sharing->calcNextPayment();
+            $sharingUser = $sharing->sharing_status;
+
+            $stateMachine = \StateMachine::get($sharingUser, 'sharing');
+            if($stateMachine->can('pay')){
+                $sharingUser->payments()->create([
+                    'status' => PaymentStatus::Successful,
+                    'expire_on' => $next_payment
+                ]);
+                $stateMachine->apply('pay');
+                $sharingUser->save();
+            }
+        }
     }
 
     /*
@@ -131,5 +182,22 @@ class SharingsController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    protected function getSharingOwners($id = null)
+    {
+        $sharings = Auth::user()->sharingOwners();
+        if($id) $sharings->whereId($id);
+
+        return $sharings->with('users')->get()->each(function($sharing){
+            $sharing['sharing_status'] = collect(SharingStatus::getInstances())->each(function($sharingStatus) use($sharing){
+
+                $users = $sharing->users->where('sharing_status.status', $sharingStatus->value)->each(function($user) use($sharing){
+                    $sharing_obj = $user->sharings()->whereSharingId($sharing->id)->first()->sharing_status;
+                    $user->possible_transitions = \StateMachine::get($sharing_obj, 'sharing')->getPossibleTransitions();
+                });
+                $sharingStatus->users = $users->values();
+            });
+        });
     }
 }

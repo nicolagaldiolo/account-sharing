@@ -39,6 +39,18 @@ export const mutations = {
 
   [types.FETCH_SHARING_REQUESTS_FAILURE] (state) {
     state.sharingRequests = []
+  },
+
+  [types.UPDATE_SHARING] (state, { sharing }) {
+    state.sharing = sharing
+  },
+
+  [types.SYNC_SHARINGS] (state, { sharing }) {
+    let data = sharing[0]
+    let indexOfData = state.sharings.map(e => e.id).indexOf(data.id)
+    let sharings = state.sharings.filter(item => item.id !== data.id)
+    sharings.splice(indexOfData, 0, data)
+    state.sharings = sharings
   }
 }
 
@@ -53,6 +65,15 @@ export const actions = {
       commit(types.FETCH_SHARINGS_FAILURE)
     }
   },
+
+  updateSharing ({ commit }, payload) {
+    commit(types.UPDATE_SHARING, payload)
+  },
+
+  syncSharings ({ commit }, payload) {
+    commit(types.SYNC_SHARINGS, payload)
+  },
+
   async fetchSharing ({ commit }, id) {
     try {
       const { data } = await axios.get('/api/sharings/' + id)

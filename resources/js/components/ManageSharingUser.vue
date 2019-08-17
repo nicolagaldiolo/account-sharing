@@ -7,24 +7,37 @@
       </div>
     </div>
     <div v-if="buttons">
-      <a href="" class="btn btn-primary btn-sm">Accetta</a>
-      <a href="" class="btn btn-outline-primary btn-sm">Rifiuta</a>
+      <a v-for="(item, index) in user.possible_transitions" :key="index" @click.prevent="transition(item)" href="#" class="btn btn-primary btn-sm">{{item}}</a>
     </div>
   </div>
 </template>
 
 <script>
-export default {
-  name: 'ManageSharingUser',
-  props: {
-    user: {
-      type: Object,
-      default: null
+  import axios from 'axios'
+
+  export default {
+    name: 'ManageSharingUser',
+    props: {
+      sharing: {
+        type: Object,
+        default: null
+      },
+      user: {
+        type: Object,
+        default: null
+      },
+      buttons: {
+        type: Boolean,
+        default: false
+      }
     },
-    buttons: {
-      type: Boolean,
-      default: false
+
+    methods: {
+      transition : function(transition) {
+        axios.patch(`/api/sharings/${this.sharing.id}/user/${this.user.id}/transition-user/${transition}`).then((response) => {
+          this.$store.dispatch('sharings/syncSharings', { sharing: response.data })
+        });
+      }
     }
   }
-}
 </script>

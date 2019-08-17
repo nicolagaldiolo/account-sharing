@@ -26,74 +26,76 @@
       </div>
     </section>
     <div class="container">
-      <a @click="transition" class="btn btn-primary btn-lg btn-block">Entra nel gruppo</a>
-      <!--<div class="row">
-      </div>-->
+      <div v-if="owner || joined">
+        <a v-if="availability" class="btn btn-primary btn-lg btn-block">Invita altra gente</a>
+      </div>
+      <div v-else-if="foreign">
+        <a @click="joinGroup" class="btn btn-primary btn-lg btn-block">Entra nel gruppo</a>
+      </div>
+      <div v-else>
+        <div v-if="sharing.sharing_state_machine.transitions.length">
+          <a v-for="(transition, index) in sharing.sharing_state_machine.transitions" :key="index" @click="doTransition(transition.value)" class="btn btn-primary btn-lg btn-block">
+            {{transition.metadata.title}}
+          </a>
+        </div>
+        <div v-else class="alert alert-primary text-center" role="alert">
+          {{sharing.sharing_state_machine.status.metadata.title}}
+        </div>
+      </div>
+    </div>
+
+    <div v-if="owner || joined">
+      <h2>Sono il proprietario o faccio parte del gruppo</h2>
     </div>
 
   </div>
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
-  import axios from 'axios'
+import { mapGetters } from 'vuex'
+import axios from 'axios'
 
-  export default {
-    middleware: 'auth',
+export default {
+  middleware: 'auth',
 
-    created() {
-      this.$store.dispatch('sharings/fetchSharing', this.$route.params.sharing_id);
+  created () {
+    this.$store.dispatch('sharings/fetchSharing', this.$route.params.sharing_id)
+  },
+
+  computed: {
+    ...mapGetters({
+      sharing: 'sharings/sharing',
+      user: 'auth/user'
+    }),
+    availability: function () {
+      return this.sharing.availability > 0
+    },
+    owner: function () {
+      return this.user.id === this.sharing.owner_id
+    },
+    foreign: function () {
+      return this.sharing.sharing_state_machine === null
+    },
+    joined: function () {
+      return this.sharing.sharing_state_machine && this.sharing.sharing_state_machine.status.value === 3
+    },
+  },
+
+  methods: {
+
+    joinGroup () {
+      axios.post(`/api/sharings/${this.sharing.id}/join`).then((response) => {
+        this.$store.dispatch('sharings/updateSharing', { sharing: response.data })
+      })
     },
 
-    computed: mapGetters({
-      sharing: 'sharings/sharing',
-    }),
-
-    methods: {
-
-      transition() {
-        console.log("Eccolo");
-        axios.patch(`/api/sharings/${this.sharing.id}/transitions/0`).then((response) => {
-          console.log(response);
-        });
-      }
-      /*async create () {
-        const { data } = await this.form.post('/api/sharings')
-
-        console.log(data);
-        return;
-        // Redirect to sharing.
-        //this.$router.push({ name: 'sharing.show', params: { category_id: this.form.category_id, sharing_id: data.id }})
-      }*/
+    doTransition (transition) {
+      axios.patch(`/api/sharings/${this.sharing.id}/transitions/${transition}`).then((response) => {
+        this.$store.dispatch('sharings/updateSharing', { sharing: response.data })
+      })
     }
   }
-
-
-  /*
-  e.preventDefault();
-
-let currentObj = this;
-
-this.axios.post('http://localhost:8000/yourPostApi', {
-
-name: this.name,
-
-description: this.description
-
-})
-
-.then(function (response) {
-
-currentObj.output = response.data;
-
-})
-
-.catch(function (error) {
-
-currentObj.output = error;
-
-});
-   */
+}
 </script>
 
 <style scoped>

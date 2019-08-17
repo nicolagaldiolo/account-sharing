@@ -3,19 +3,36 @@
 return [
     'sharing' => [
         // class of your domain object
-        'class' => \App\Sharing::class,
+        'class' => \App\SharingUser::class,
 
         // name of the graph (default is "default")
-        'graph' => 'sharing',
+        //'graph' => 'sharing',
 
         // property of your object holding the actual state (default is "state")
-        'property_path' => 'pivot.status',
+        'property_path' => 'status',
 
-        //'metadata' => [
-        //    'title' => 'Graph A',
-        //],
+        'metadata' => [
+            'title' => 'Article State Machine',
+        ],
 
-        'states' => \App\Enums\SharingStatus::getValues(),
+        'states' => [
+            [
+                'name' => \App\Enums\SharingStatus::Pending,
+                'metadata' => ['title' => 'Richiesta in stato di pending'],
+            ],
+            [
+                'name' => \App\Enums\SharingStatus::Approved,
+                'metadata' => ['title' => 'Richiesta approvata'],
+            ],
+            [
+                'name' => \App\Enums\SharingStatus::Refused,
+                'metadata' => ['title' => 'Richiesta rifiutata'],
+            ],
+            [
+                'name' => \App\Enums\SharingStatus::Joined,
+                'metadata' => ['title' => 'Fai parte di questo gruppo'],
+            ],
+        ],
 
         // list of all possible states
         /*'states' => [
@@ -39,22 +56,44 @@ return [
             'approve' => [
                 'from' => [\App\Enums\SharingStatus::Pending, \App\Enums\SharingStatus::Refused],
                 'to' => \App\Enums\SharingStatus::Approved,
+                'metadata' => ['title' => 'Approva la richiesta'],
             ],
             'refuses' => [
                 'from' =>  [\App\Enums\SharingStatus::Pending, \App\Enums\SharingStatus::Approved],
                 'to' => \App\Enums\SharingStatus::Refused,
+                'metadata' => ['title' => 'Rifiuta la richiesta'],
             ],
-            'join' => [
+            'pay' => [
                 'from' => [\App\Enums\SharingStatus::Approved],
                 'to' => \App\Enums\SharingStatus::Joined,
+                'metadata' => ['title' => 'Paga il servizio'],
             ]
         ],
 
         // list of all callbacks
-        /*'callbacks' => [
+        'callbacks' => [
             // will be called when testing a transition
             'guard' => [
-                'guard_on_submitting' => [
+                'guard_on_approving' => [
+                    // call the callback on a specific transition
+                    'on' => 'approve',
+                    // will check the ability on the gate or the class policy
+                    'can' => 'manage-own-sharing',
+                ],
+                'guard_on_refusing' => [
+                    // call the callback on a specific transition
+                    'on' => 'refuses',
+                    // will check the ability on the gate or the class policy
+                    'can' => 'manage-own-sharing',
+                ],
+                'guard_on_payment' => [
+                    // call the callback on a specific transition
+                    'on' => 'pay',
+                    // will check the ability on the gate or the class policy
+                    'can' => 'pay-sharing',
+                ],
+
+                /*'guard_on_submitting' => [
                     // call the callback on a specific transition
                     'on' => 'submit_changes',
                     // will call the method of this class
@@ -68,6 +107,7 @@ return [
                     // will check the ability on the gate or the class policy
                     'can' => 'approve',
                 ],
+                */
             ],
 
             // will be called before applying a transition
@@ -76,6 +116,5 @@ return [
             // will be called after applying a transition
             'after' => [],
         ],
-        */
-    ],
+    ]
 ];

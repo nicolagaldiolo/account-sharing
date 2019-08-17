@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -23,6 +24,15 @@ class AuthServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->registerPolicies();
+
+        Gate::define('manage-own-sharing', function($user, $sharingUser){
+            $sharingUser = $sharingUser->load('sharing');
+            return $user->id === $sharingUser->sharing->owner_id;
+        });
+
+        Gate::define('pay-sharing', function($user, $sharingUser){
+            return $user->id === $sharingUser->user_id;
+        });
 
         //
     }
