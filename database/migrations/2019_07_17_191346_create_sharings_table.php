@@ -27,6 +27,7 @@ class CreateSharingsTable extends Migration
             $table->timestamps();
             $table->softDeletes();
 
+            //$table->unique( ['category_id','owner_id'] ); // Non imposto nessun vincolo in quanto posso creare infinite condivisioni di categoria custom
             $table->foreign('renewal_frequency_id')->on('renewal_frequencies')->references('id');
             $table->foreign('category_id')->on('categories')->references('id');
             $table->foreign('owner_id')->on('users')->references('id');

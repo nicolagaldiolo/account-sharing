@@ -16,14 +16,16 @@ class SeedFakeData extends Seeder
     public function run()
     {
 
+        // Creo gli utenti
         $users = factory(\App\User::class, 1)->create([
             'name' => env('DEMOUSER', 'Demo'),
             'email' => env('DEMOEMAIL', 'demouser@example.com'),
             'password' => bcrypt(env('DEMOPASS', 'password'))
         ])->merge(factory(\App\User::class, 9)->create());
 
-        $renewalFrequencies = collect([]);
 
+        // Creo le frequenze di rinnovo
+        $renewalFrequencies = collect([]);
         collect([
             [
                 'value' => 1,
@@ -37,33 +39,74 @@ class SeedFakeData extends Seeder
             $renewalFrequencies->push(factory(RenewalFrequency::class)->create($item));
         });
 
+        // Creo le categorie
+        $categories = collect([]);
         collect([
-            ['name' => 'Netflix Premium'],
-            ['name' => 'Amazon Music'],
-            ['name' => 'Apple Music'],
-            ['name' => 'Spotify Family'],
-            ['name' => 'Custom'],
-        ])->each(function($item) use($users, $renewalFrequencies){
-            $factory = factory(Category::class)->create($item);
-
-            collect(array_fill(0, 5, ''))->each(function() use($factory, $users, $renewalFrequencies){
-
-                $renewalFrequency = $renewalFrequencies->random(1)->pluck('id')->first();
-                $owner = $users->random(1)->pluck('id')->first();
-                factory(Sharing::class)->create([
-                    'name' => $factory->name,
-                    'price' => $factory->price,
-                    'renewal_frequency_id' => $renewalFrequency,
-                    'category_id' => $factory->id,
-                    'owner_id' => $owner
-                ])->each(function($sharing) use($users){
-                    $userIds = $users->random(2)->pluck('id')->mapWithKeys(function($item){
-                        return [$item => ['status' => rand(SharingStatus::Pending, SharingStatus::Joined)]];
-                    });
-                    $sharing->users()->sync($userIds);
-                });
-            });
-
+            [
+                'name' => 'Netflix Premium',
+                'customizable' => false,
+            ],
+            [
+                'name' => 'Amazon Music',
+                'customizable' => false,
+            ],
+            [
+                'name' => 'Apple Music',
+                'customizable' => false,
+            ],
+            [
+                'name' => 'Spotify Family',
+                'customizable' => false,
+            ],
+            [
+                'name' => 'Custom',
+                'customizable' => true,
+            ],
+        ])->each(function($item) use($categories){
+            $categories->push(factory(Category::class)->create($item));
         });
+
+
+        // Creo le condivisioni
+        $users->each(function($me) use($categories, $renewalFrequencies, $users){
+            $categories->each(function($category) use($me, $renewalFrequencies, $users){
+                $sharings = factory(Sharing::class)->create([
+                    'name' => $category->name,
+                    'price' => $category->price,
+                    'renewal_frequency_id' => $renewalFrequencies->random(1)->pluck('id')->first(),
+                    'category_id' => $category->id,
+                    'owner_id' => $me->id
+                ])->each(function($sharing) use($me, $users){
+
+                    // Per ogni condivisione assegno degli utenti random come joiner e mi assicuro di togliere l'utente corrente
+                    $usersWithoutMe = $users->reject(function($value) use($me){
+                        return $value->id === $me->id;
+                    })->random(5)->pluck('id')->mapWithKeys(function($item){
+                        $sharingStatus = SharingStatus::getValues();
+                        $status = rand(min($sharingStatus), max($sharingStatus));
+                        return [$item => ['status' => $status]];
+                    });
+
+                    $sharing->users()->sync($usersWithoutMe);
+                });
+
+            });
+        });
+
+        // Per ogni condivisione in stato di join creo 2 pagamenti
+        \App\SharingUser::whereStatus(SharingStatus::Joined)->get()->each(function($item){
+
+            factory(\App\Renewal::class, 1)->create([
+                'sharing_user_id' => $item->id,
+                'status' => \App\Enums\RenewalStatus::Confirmed,
+                'expire_on' => \Carbon\Carbon::now()->endOfMonth()
+            ]);
+            factory(\App\Renewal::class, 1)->create([
+                'sharing_user_id' => $item->id,
+                'status' => \App\Enums\RenewalStatus::Pending,
+                'expire_on' => \Carbon\Carbon::now()->addMonth()->endOfMonth()
+            ]);
+        });
+
     }
 }

@@ -3,15 +3,17 @@
 namespace App\Http\Controllers\Sharings;
 
 use App\Category;
-use App\Enums\PaymentStatus;
+use App\Enums\RenewalStatus;
 use App\Enums\SharingStatus;
 use App\Http\Requests\SharingRequest;
 use App\Sharing;
 use App\SharingUser;
 use App\User;
+use const http\Client\Curl\AUTH_ANY;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 
 class SharingsController extends Controller
 {
@@ -40,7 +42,6 @@ class SharingsController extends Controller
                 $sharings = Auth::user()->sharings()->joined()->get();
                 break;
             default:
-                logger("Entro qui");
                 $sharings = Sharing::public()->get();
                 break;
         }
@@ -79,12 +80,30 @@ class SharingsController extends Controller
     public function show(Sharing $sharing)
     {
 
-        $sharing->load(['category', 'activeUsers', 'users' => function($query) {
-            return $query->where('users.id', Auth::id());
-        }]);
+        $sharing->load(['category']);
+        $sharing->sharing_state_machine = $this->getSharingStateMachineAttribute($sharing);
+
+        $sharing->active_users = $sharing->activeUsers()->get()->each(function($user) use($sharing){
+
+            if(Auth::id() === $sharing->owner_id || Auth::id() == $user->id ) {
+                $renewal = $user->sharings()->where('sharings.id', $sharing->id)->first()->sharing_status->renewals()->orderBy('id', 'desc')->first();
+                if ($renewal) {
+                    $user->manageable = true;
+                    $user->renewalInfo = [
+                        'renewalStatus' => $renewal->status,
+                        'renewalDate' => $renewal->expire_on,
+                    ];
+                    $user->refundInfo = [
+                        'day_limit' => $renewal->expire_on->subDays(config('custom.day_refund_limit'))
+                    ];
+                }
+            }else{
+                $user->manageable = false;
+            }
+            return $user;
+        });
 
         return $sharing;
-
     }
 
     /**
@@ -114,13 +133,34 @@ class SharingsController extends Controller
 
     public function transition(Request $request, Sharing $sharing, $transition)
     {
+        $sharing = Auth::user()->sharings()->where('sharings.id', $sharing->id)->first();
+        $sharingUser = $sharing->sharing_status;
 
-        $sharing = Auth::user()->sharings()->where('sharings.id', $sharing->id)->first()->sharing_status;
-        $stateMachine = \StateMachine::get($sharing, 'sharing');
+        $stateMachine = \StateMachine::get($sharingUser, 'sharing');
 
         if($stateMachine->can($transition)) {
-            $stateMachine->apply($transition);
-            return tap($sharing)->save();
+            switch ($transition){
+                case 'pay':
+                    $next_renewal = $sharing->calcNextRenewal();
+                    $sharingUser->renewals()->create([
+                        'status' => RenewalStatus::Confirmed,
+                        'expire_on' => $next_renewal
+                    ]);
+                    $sharingUser->renewals()->create([
+                        'status' => RenewalStatus::Pending,
+                        'expire_on' => $sharing->calcNextRenewal($next_renewal)
+                    ]);
+                    // da capire se la transazione di salvataggio va fatta così oppure sia meglio
+                    // creare un nuovo state machine e condizione il cambiamento di stato solo al pagamento completato,
+                    // ora invece il controllo non c'è.
+                    $stateMachine->apply($transition);
+                    $sharingUser->save();
+                    break;
+                default:
+                    $stateMachine->apply($transition);
+                    $sharingUser->save();
+                    break;
+            }
         }
         return $sharing;
 
@@ -145,33 +185,17 @@ class SharingsController extends Controller
         return $sharing;
     }
 
-    public function payment(Request $request, Sharing $sharing)
+    public function left(Request $request, Sharing $sharing)
     {
-        $sharing = Auth::user()->sharings()->where('sharings.id', $sharing->id)->first();
+        $sharing = Auth::user()->sharings()->where('sharings.id', $sharing->id)->first()->sharing_status->renewals()->whereStatus(RenewalStatus::Pending)->orderBy('id', 'desc')->first()->update([
+            'status' => RenewalStatus::Stopped
+        ]);
 
-        if(!is_null($sharing)){
-            $next_payment = $sharing->calcNextPayment();
-            $sharingUser = $sharing->sharing_status;
 
-            $stateMachine = \StateMachine::get($sharingUser, 'sharing');
-            if($stateMachine->can('pay')){
-                $sharingUser->payments()->create([
-                    'status' => PaymentStatus::Successful,
-                    'expire_on' => $next_payment
-                ]);
-                $stateMachine->apply('pay');
-                $sharingUser->save();
-            }
-        }
+        dd($sharing);
+
+        //$stateMachine = \StateMachine::get($sharingUser, 'sharing');
     }
-
-    /*
-    public function requestToManage()
-    {
-        $status = 1;
-        return Auth::user()->sharingOwners()->byStatus($status)->get();
-    }
-    */
 
     /**
      * Remove the specified resource from storage.
@@ -200,4 +224,27 @@ class SharingsController extends Controller
             });
         });
     }
+
+    public function getSharingStateMachineAttribute($item){
+        $sharing = Auth::user()->sharings()->where('sharings.id', $item->id)->first();
+
+        if(!is_null($sharing)){
+            $stateMachine = \StateMachine::get($sharing->sharing_status, 'sharing');
+            return [
+                'status' => [
+                    'value' => $stateMachine->getState(),
+                    'metadata' => $stateMachine->metadata('state'),
+                ],
+                'transitions' => collect([])->merge(collect($stateMachine->getPossibleTransitions())->map(function($value) use($stateMachine){
+                    return [
+                        'value' => $value,
+                        'metadata' => $stateMachine->metadata()->transition($value)
+                    ];
+                }))->all(), // altrimenti non mi torna un array;
+            ];
+        }else{
+            return null;
+        }
+    }
+
 }

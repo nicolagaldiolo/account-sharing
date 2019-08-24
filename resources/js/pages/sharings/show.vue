@@ -30,11 +30,11 @@
         <a v-if="availability" class="btn btn-primary btn-lg btn-block">Invita altra gente</a>
       </div>
       <div v-else-if="foreign">
-        <a @click="joinGroup" class="btn btn-primary btn-lg btn-block">Entra nel gruppo</a>
+        <a @click.prevent="joinGroup" class="btn btn-primary btn-lg btn-block">Entra nel gruppo</a>
       </div>
       <div v-else>
         <div v-if="sharing.sharing_state_machine.transitions.length">
-          <a v-for="(transition, index) in sharing.sharing_state_machine.transitions" :key="index" @click="doTransition(transition.value)" class="btn btn-primary btn-lg btn-block">
+          <a v-for="(transition, index) in sharing.sharing_state_machine.transitions" :key="index" @click.prevent="doTransition(transition.value)" class="btn btn-primary btn-lg btn-block">
             {{transition.metadata.title}}
           </a>
         </div>
@@ -45,7 +45,36 @@
     </div>
 
     <div v-if="owner || joined">
-      <h2>Sono il proprietario o faccio parte del gruppo</h2>
+      <div class="container mt-4">
+        <div class="row">
+          <div v-if="sharing.active_users.length" class="col-md-4">
+            <h4>Membri del gruppo</h4>
+
+
+            <member-item :user="sharing.owner" :isAdmin="true"/>
+            <div v-for="(user, index) in sharing.active_users" :key="index" class="media text-muted pt-3">
+              <member-item :user="user"/>
+            </div>
+
+
+
+            <!--<div class="mt-4">
+              <hr>
+              <a @click.prevent="leaveGroup" href="#" class="btn btn-outline-secondary btn-block">Abbandona gruppo</a>
+              <hr>
+              <small>Il prossimo rinnovo sarà il <strong>{{sharing.renewalInfo.renewalDate | moment("D MMMM YYYY")}}</strong></small>
+              <hr>
+              <small>Se vuoi chiedere un rimborso il giorno limite è il <strong>{{sharing.refundInfo.day_limit | moment("D MMMM YYYY")}}</strong></small>
+            </div>
+            -->
+
+
+          </div>
+          <div class="col-md-8">
+            <h4>Chat del gruppo</h4>
+          </div>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -54,9 +83,13 @@
 <script>
 import { mapGetters } from 'vuex'
 import axios from 'axios'
+import MemberItem from '~/components/MemberItem'
 
 export default {
   middleware: 'auth',
+  components: {
+    MemberItem
+  },
 
   created () {
     this.$store.dispatch('sharings/fetchSharing', this.$route.params.sharing_id)
@@ -65,13 +98,13 @@ export default {
   computed: {
     ...mapGetters({
       sharing: 'sharings/sharing',
-      user: 'auth/user'
+      authUser: 'auth/user'
     }),
     availability: function () {
       return this.sharing.availability > 0
     },
     owner: function () {
-      return this.user.id === this.sharing.owner_id
+      return this.authUser.id === this.sharing.owner_id
     },
     foreign: function () {
       return this.sharing.sharing_state_machine === null
@@ -87,6 +120,15 @@ export default {
       axios.post(`/api/sharings/${this.sharing.id}/join`).then((response) => {
         this.$store.dispatch('sharings/updateSharing', { sharing: response.data })
       })
+    },
+
+    leaveGroup () {
+      axios.patch(`/api/sharings/${this.sharing.id}/left`).then((response) => {
+        console.log(response);
+        //this.$store.dispatch('sharings/updateSharing', { sharing: response.data })
+      })
+      //console.log("Ok abbandono");
+      return false;
     },
 
     doTransition (transition) {

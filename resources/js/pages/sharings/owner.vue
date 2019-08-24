@@ -6,6 +6,7 @@
                 <div class="col-md-10">
                     <div class="card-body">
                         <h5 class="card-title">{{sharing.name}} <small>{{sharing.availability}}/{{sharing.capacity}} disponibili</small></h5>
+                        <router-link :to="{ name: 'sharing.show', params: { category_id: sharing.category_id, sharing_id: sharing.id } }">Visualizza scheda</router-link>
                         <p class="card-text">
 
                             <div v-if="sharing.sharing_status.Joined.users.length > 0">

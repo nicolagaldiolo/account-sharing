@@ -20,6 +20,7 @@ class CreateCategoriesTable extends Migration
             $table->integer('capacity')->nullable();
             $table->decimal('price', 10, 2)->nullable();
             $table->string('image')->nullable();
+            $table->boolean('customizable')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

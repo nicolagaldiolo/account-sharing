@@ -4,11 +4,21 @@
       <div class="container">
         <h1 class="jumbotron-heading">Crea condivisione</h1>
         <p class="lead text-muted">Something short and leading about the collection below—its contents, the creator, etc. Make it short and sweet, but not too short so folks don’t simply skip over it entirely.</p>
+
+        <alert-error :form="form" :message="message"></alert-error>
+
       </div>
     </section>
     <div class="container">
       <div v-if="!Object.keys(category).length" class="list-group text-center">
-        <a v-for="category in categories" :key="category.id" href="#" @click.prevent="setCategory(category)" class="list-group-item list-group-item-action">{{ category.name }}</a>
+
+        <div v-for="category in categories" :key="category.id">
+          <a v-if="category.available" href="#" @click.prevent="setCategory($event, category)" class="list-group-item list-group-item-action">{{ category.name }}</a>
+          <a v-else href="#" class="list-group-item list-group-item-action disabled">{{ category.name }}</a>
+        </div>
+
+
+
       </div>
 
       <div v-if="Object.keys(category).length">
@@ -76,6 +86,14 @@
               </div>
             </div>
 
+            <!-- Category -->
+            <div class="form-group row">
+              <div class="col-md-7 offset-md-3">
+                <input v-model="form.category_id" :class="{ 'is-invalid': form.errors.has('category_id') }" class="form-control" type="hidden" name="category_id">
+                <has-error :form="form" field="category_id" />
+              </div>
+            </div>
+
             <!-- Submit Button -->
             <div class="form-group row">
               <div class="col-md-9 ml-md-auto">
@@ -100,7 +118,7 @@
     middleware: 'auth',
 
     data: () => ({
-      category : {},
+      category: {},
       form: new Form({
         name: '',
         description: '',
@@ -113,7 +131,7 @@
     }),
 
     methods: {
-      setCategory (category) {
+      setCategory (event, category) {
         this.category = category;
 
         this.form.keys().forEach(key => {

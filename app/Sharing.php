@@ -16,7 +16,7 @@ class Sharing extends Model
     use SoftDeletes;
 
     protected $guarded = [];
-    protected $appends = ['availability', 'visility_list','sharing_state_machine'];
+    protected $appends = ['availability', 'visility_list'];
 
     /*
      * Scopes
@@ -56,59 +56,30 @@ class Sharing extends Model
         return $this->belongsTo(User::class, 'owner_id', 'id');
     }
 
-
     public function renewalFrequency(){
         return $this->belongsTo(RenewalFrequency::class);
-    }
-
-    public function getSharingStateMachineAttribute(){
-        $sharing = Auth::user()->sharings()->where('sharings.id', $this->id)->first();
-
-        if(!is_null($sharing)){
-            $stateMachine = \StateMachine::get($sharing->sharing_status, 'sharing');
-            return [
-                'status' => [
-                    'value' => $stateMachine->getState(),
-                    'metadata' => $stateMachine->metadata('state'),
-                ],
-                'transitions' => collect([])->merge(collect($stateMachine->getPossibleTransitions())->map(function($value) use($stateMachine){
-                    return [
-                        'value' => $value,
-                        'metadata' => $stateMachine->metadata()->transition($value)
-                    ];
-                }))->all(), // altrimenti non mi torna un array;
-            ];
-        }else{
-            return null;
-        }
     }
 
     public function getVisilityListAttribute()
     {
         return SharingVisibility::toSelectArray();
     }
-    //public function scopePublicAvailable($query){
-    //    logger($this->availability);
-    //    return $query
-    //        ->where('visibility', SharingVisibility::Public),
-    //        ->where()
-    //}
 
-    public function calcNextPayment()
+    public function calcNextRenewal($current = null)
     {
         $renewalFrequency = $this->renewalFrequency;
-
+        $date = ($current instanceof Carbon) ? $current : Carbon::now();
         $expires_on = null;
 
         switch ($renewalFrequency->type){
             case RenewalFrequencies::Weeks:
-                $expires_on = Carbon::now()->addWeek($renewalFrequency->value)->endOfDay();
+                $expires_on = $date->addWeek($renewalFrequency->value)->endOfDay();
                 break;
             case RenewalFrequencies::Months:
-                $expires_on = Carbon::now()->addMonth($renewalFrequency->value)->endOfDay();
+                $expires_on = $date->addMonth($renewalFrequency->value)->endOfDay();
                 break;
             case RenewalFrequencies::Years:
-                $expires_on = Carbon::now()->addYear($renewalFrequency->value)->endOfDay();
+                $expires_on = $date->addYear($renewalFrequency->value)->endOfDay();
                 break;
         }
 

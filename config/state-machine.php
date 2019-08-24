@@ -32,6 +32,10 @@ return [
                 'name' => \App\Enums\SharingStatus::Joined,
                 'metadata' => ['title' => 'Fai parte di questo gruppo'],
             ],
+            [
+                'name' => \App\Enums\SharingStatus::Left,
+                'metadata' => ['title' => 'Hai abbandonato questo gruppo'],
+            ],
         ],
 
         // list of all possible states

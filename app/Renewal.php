@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Payment extends Model
+class Renewal extends Model
 {
 
     protected $fillable = ['status', 'expire_on'];

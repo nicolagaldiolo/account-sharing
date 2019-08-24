@@ -9,6 +9,7 @@ use App\RenewalFrequency;
 use App\Sharing;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class CategoriesController extends Controller
 {
@@ -35,8 +36,14 @@ class CategoriesController extends Controller
             $appends['sharings_visibility'] = SharingVisibility::toSelectArray();
         };
 
+        // Se ho già creato una condivisione con quella categoria o la categoria non è customizable non posso creare altre condivisioni dello stesso tipo
+        $mycategories = Auth::user()->sharingOwners()->get()->pluck('category_id');
+        $categories = Category::all()->each(function($category) use($mycategories){
+            $category->available = !$mycategories->contains($category->id) || $category->customizable;
+        });
+
         $data = [
-            'categories' => Category::all(),
+            'categories' => $categories,
         ];
 
         return array_merge($data, $appends);

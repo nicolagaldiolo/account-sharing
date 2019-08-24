@@ -12,5 +12,6 @@ $factory->define(Category::class, function (Faker $faker) {
         'price' => $faker->randomFloat(2, 0, 20),
         'image' => $faker->imageUrl(),
         'capacity' => $faker->numberBetween(1,5),
+        'customizable' => $faker->boolean(20)
     ];
 });
