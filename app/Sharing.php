@@ -73,13 +73,13 @@ class Sharing extends Model
 
         switch ($renewalFrequency->type){
             case RenewalFrequencies::Weeks:
-                $expires_on = $date->addWeek($renewalFrequency->value)->endOfDay();
+                $expires_on = $date->addWeekNoOverflow($renewalFrequency->value)->endOfDay();
                 break;
             case RenewalFrequencies::Months:
-                $expires_on = $date->addMonth($renewalFrequency->value)->endOfDay();
+                $expires_on = $date->addMonthNoOverflow($renewalFrequency->value)->endOfDay();
                 break;
             case RenewalFrequencies::Years:
-                $expires_on = $date->addYear($renewalFrequency->value)->endOfDay();
+                $expires_on = $date->addYearNoOverflow($renewalFrequency->value)->endOfDay();
                 break;
         }
 

@@ -29,7 +29,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     //Route::get('sharing-requests', 'Sharings\SharingsController@requestToManage')->name('sharing.requests');
 
     Route::post('sharings/{sharing}/join', 'Sharings\SharingsController@join')->name('sharings.join');
-    Route::patch('sharings/{sharing}/left', 'Sharings\SharingsController@left')->name('sharings.left');
+    Route::patch('sharings/{sharing}/user/{user}/action/{action}', 'Sharings\SharingsController@renewalAction')->name('sharings.renewal.action');
     Route::patch('sharings/{sharing}/transitions/{transition}', 'Sharings\SharingsController@transition')->name('sharings.transition');
     Route::patch('sharings/{sharing}/user/{user}/transition-user/{transition}', 'Sharings\SharingsController@transitionUser')->name('sharings.user.transition');
 

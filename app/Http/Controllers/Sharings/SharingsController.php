@@ -79,31 +79,7 @@ class SharingsController extends Controller
      */
     public function show(Sharing $sharing)
     {
-
-        $sharing->load(['category']);
-        $sharing->sharing_state_machine = $this->getSharingStateMachineAttribute($sharing);
-
-        $sharing->active_users = $sharing->activeUsers()->get()->each(function($user) use($sharing){
-
-            if(Auth::id() === $sharing->owner_id || Auth::id() == $user->id ) {
-                $renewal = $user->sharings()->where('sharings.id', $sharing->id)->first()->sharing_status->renewals()->orderBy('id', 'desc')->first();
-                if ($renewal) {
-                    $user->manageable = true;
-                    $user->renewalInfo = [
-                        'renewalStatus' => $renewal->status,
-                        'renewalDate' => $renewal->expire_on,
-                    ];
-                    $user->refundInfo = [
-                        'day_limit' => $renewal->expire_on->subDays(config('custom.day_refund_limit'))
-                    ];
-                }
-            }else{
-                $user->manageable = false;
-            }
-            return $user;
-        });
-
-        return $sharing;
+        return $this->getSharing($sharing);
     }
 
     /**
@@ -133,6 +109,8 @@ class SharingsController extends Controller
 
     public function transition(Request $request, Sharing $sharing, $transition)
     {
+        // Sistemare questa cosa
+        // sono costretto a fare la query per avere i dati in più che mi servono per lo sharing
         $sharing = Auth::user()->sharings()->where('sharings.id', $sharing->id)->first();
         $sharingUser = $sharing->sharing_status;
 
@@ -144,11 +122,11 @@ class SharingsController extends Controller
                     $next_renewal = $sharing->calcNextRenewal();
                     $sharingUser->renewals()->create([
                         'status' => RenewalStatus::Confirmed,
-                        'expire_on' => $next_renewal
+                        'expires_at' => $next_renewal
                     ]);
                     $sharingUser->renewals()->create([
                         'status' => RenewalStatus::Pending,
-                        'expire_on' => $sharing->calcNextRenewal($next_renewal)
+                        'expires_at' => $sharing->calcNextRenewal($next_renewal)
                     ]);
                     // da capire se la transazione di salvataggio va fatta così oppure sia meglio
                     // creare un nuovo state machine e condizione il cambiamento di stato solo al pagamento completato,
@@ -185,16 +163,22 @@ class SharingsController extends Controller
         return $sharing;
     }
 
-    public function left(Request $request, Sharing $sharing)
+    public function renewalAction(Request $request, Sharing $sharing, User $user, $action)
     {
-        $sharing = Auth::user()->sharings()->where('sharings.id', $sharing->id)->first()->sharing_status->renewals()->whereStatus(RenewalStatus::Pending)->orderBy('id', 'desc')->first()->update([
-            'status' => RenewalStatus::Stopped
-        ]);
+        switch ($action) {
+            case 'left':
+                $user->sharings()->where('sharings.id', $sharing->id)->first()->sharing_status->renewals()->whereStatus(RenewalStatus::Pending)->orderBy('id', 'desc')->first()->update([
+                    'status' => RenewalStatus::Stopped
+                ]);
+                break;
+            case 'restore':
+                $user->sharings()->where('sharings.id', $sharing->id)->first()->sharing_status->renewals()->whereStatus(RenewalStatus::Stopped)->orderBy('id', 'desc')->first()->update([
+                    'status' => RenewalStatus::Pending
+                ]);
+                break;
+        }
 
-
-        dd($sharing);
-
-        //$stateMachine = \StateMachine::get($sharingUser, 'sharing');
+        return $this->getSharing($sharing);
     }
 
     /**
@@ -206,6 +190,33 @@ class SharingsController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    protected function getSharing(Sharing $sharing)
+    {
+
+        $sharing->load(['category']);
+        $sharing->sharing_state_machine = $this->getSharingStateMachineAttribute($sharing);
+
+        $sharing->active_users = $sharing->activeUsers()->get()->each(function($user) use($sharing){
+
+            if(Auth::id() === $sharing->owner_id || Auth::id() == $user->id ) {
+                $renewal = $user->sharings()->where('sharings.id', $sharing->id)->first()->sharing_status->renewals()->orderBy('expires_at', 'desc')->first();
+                if ($renewal) {
+                    $user->manageable = true;
+                    $user->renewalInfo = [
+                        'renewal_status' => $renewal->status,
+                        'renewal_date' => $renewal->expire_on,
+                        'refund_day_limit' => $renewal->expire_on->subDays(config('custom.day_refund_limit'))
+                    ];
+                }
+            }else{
+                $user->manageable = false;
+            }
+            return $user;
+        });
+
+        return $sharing;
     }
 
     protected function getSharingOwners($id = null)

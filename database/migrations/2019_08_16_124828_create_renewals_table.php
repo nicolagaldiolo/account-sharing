@@ -17,7 +17,8 @@ class CreateRenewalsTable extends Migration
             $table->bigIncrements('id');
             $table->tinyInteger('status')->unsigned()->default(\App\Enums\RenewalStatus::Pending);
             $table->bigInteger('sharing_user_id')->unsigned();
-            $table->dateTime('expire_on');
+            $table->dateTime('starts_at');
+            $table->dateTime('expires_at');
             $table->timestamps();
             $table->softDeletes();
 

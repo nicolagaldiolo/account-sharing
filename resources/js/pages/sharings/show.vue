@@ -51,9 +51,9 @@
             <h4>Membri del gruppo</h4>
 
 
-            <member-item :user="sharing.owner" :isAdmin="true"/>
+            <member-item :user="sharing.owner" :sharing="sharing" :isAdmin="true"/>
             <div v-for="(user, index) in sharing.active_users" :key="index" class="media text-muted pt-3">
-              <member-item :user="user"/>
+              <member-item :user="user" :sharing="sharing"/>
             </div>
 
 
@@ -120,15 +120,6 @@ export default {
       axios.post(`/api/sharings/${this.sharing.id}/join`).then((response) => {
         this.$store.dispatch('sharings/updateSharing', { sharing: response.data })
       })
-    },
-
-    leaveGroup () {
-      axios.patch(`/api/sharings/${this.sharing.id}/left`).then((response) => {
-        console.log(response);
-        //this.$store.dispatch('sharings/updateSharing', { sharing: response.data })
-      })
-      //console.log("Ok abbandono");
-      return false;
     },
 
     doTransition (transition) {

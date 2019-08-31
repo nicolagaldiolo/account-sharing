@@ -69,26 +69,28 @@ class SeedFakeData extends Seeder
 
         // Creo le condivisioni
         $users->each(function($me) use($categories, $renewalFrequencies, $users){
+
             $categories->each(function($category) use($me, $renewalFrequencies, $users){
-                $sharings = factory(Sharing::class)->create([
+
+                $sharing = factory(Sharing::class)->create([
                     'name' => $category->name,
                     'price' => $category->price,
                     'renewal_frequency_id' => $renewalFrequencies->random(1)->pluck('id')->first(),
                     'category_id' => $category->id,
                     'owner_id' => $me->id
-                ])->each(function($sharing) use($me, $users){
+                ]);
 
-                    // Per ogni condivisione assegno degli utenti random come joiner e mi assicuro di togliere l'utente corrente
-                    $usersWithoutMe = $users->reject(function($value) use($me){
-                        return $value->id === $me->id;
-                    })->random(5)->pluck('id')->mapWithKeys(function($item){
-                        $sharingStatus = SharingStatus::getValues();
-                        $status = rand(min($sharingStatus), max($sharingStatus));
-                        return [$item => ['status' => $status]];
-                    });
+                // Per ogni condivisione assegno degli utenti random come joiner e mi assicuro di togliere l'utente corrente
 
-                    $sharing->users()->sync($usersWithoutMe);
+                $usersWithoutMe = $users->reject(function($value) use($me){
+                    return $value->id === $me->id;
+                })->random(5)->pluck('id')->mapWithKeys(function($item){
+                    $sharingStatus = SharingStatus::getValues();
+                    $status = rand(min($sharingStatus), max($sharingStatus));
+                    return [$item => ['status' => $status]];
                 });
+
+                $sharing->users()->sync($usersWithoutMe);
 
             });
         });
@@ -99,12 +101,15 @@ class SeedFakeData extends Seeder
             factory(\App\Renewal::class, 1)->create([
                 'sharing_user_id' => $item->id,
                 'status' => \App\Enums\RenewalStatus::Confirmed,
-                'expire_on' => \Carbon\Carbon::now()->endOfMonth()
+                'starts_at' => \Carbon\Carbon::now()->startOfMonth(),
+                'expires_at' => \Carbon\Carbon::now()->endOfMonth()
+
             ]);
             factory(\App\Renewal::class, 1)->create([
                 'sharing_user_id' => $item->id,
                 'status' => \App\Enums\RenewalStatus::Pending,
-                'expire_on' => \Carbon\Carbon::now()->addMonth()->endOfMonth()
+                'starts_at' => \Carbon\Carbon::now()->addMonthNoOverflow()->startOfMonth(),
+                'expires_at' => \Carbon\Carbon::now()->addMonthNoOverflow()->endOfMonth()
             ]);
         });
 

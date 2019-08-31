@@ -12,6 +12,7 @@ $factory->define(Renewal::class, function (Faker $faker) {
         'sharing_user_id' => function(){
             return factory(\App\SharingUser::class)->create()->id;
         },
-        'expire_on' => $faker->dateTimeBetween($startDate = 'now', $endDate = '+30 days')
+        'starts_at' => $faker->dateTimeBetween($startDate = '-30 days', $endDate = 'now'),
+        'expires_at' => $faker->dateTimeBetween($startDate = 'now', $endDate = '+30 days')
     ];
 });
