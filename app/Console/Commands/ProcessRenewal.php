@@ -7,14 +7,14 @@ use App\Renewal;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 
-class UpdateRenewal extends Command
+class ProcessRenewal extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'renewal:update';
+    protected $signature = 'renewal:process';
 
     /**
      * The console command description.
@@ -50,7 +50,7 @@ class UpdateRenewal extends Command
 
                 $item->sharingUser->renewals()->create([
                     'status' => RenewalStatus::Pending,
-                    'starts_at' => $item->expires_at->startOfDay(),
+                    'starts_at' => $item->expires_at->addDay()->startOfDay(),
                     'expires_at' => $item->sharingUser->sharing->calcNextRenewal($item->expires_at)
                 ]);
             }

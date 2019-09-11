@@ -12,14 +12,14 @@
         <div class="d-flex justify-content-between align-items-center w-100">
           <strong class="text-gray-dark">{{user.name}}</strong>
 
-          <a v-if="user.manageable && user.renewalInfo.renewal_status != 2" href="#" @click.prevent="renewalAction('left')" class="btn btn-danger btn-sm">Lascia il gruppo</a>
-          <a v-if="user.manageable && user.renewalInfo.renewal_status == 2" href="#" @click.prevent="renewalAction('restore')" class="btn btn-secondary btn-sm">Torna nel gruppo</a>
+          <a v-if="this.renewalInfo && user.renewalInfo.renewal_status != 2" href="#" @click.prevent="renewalAction('left')" class="btn btn-danger btn-sm">Lascia il gruppo</a>
+          <a v-if="this.renewalInfo && user.renewalInfo.renewal_status == 2" href="#" @click.prevent="renewalAction('restore')" class="btn btn-secondary btn-sm">Torna nel gruppo</a>
 
         </div>
 
-        <span class="d-block">Membro dal {{ user.created_at | moment("D MMMM YYYY") }} --- DATO FAKE</span>
+        <span v-if="user.joiner_since" class="d-block">Membro dal {{ user.joiner_since | moment("D MMMM YYYY") }}</span>
 
-        <div v-if="user.manageable">
+        <div v-if="this.renewalInfo">
           <div v-if="user.renewalInfo.renewal_status == 2">
             <small>Verrà rimosso il {{user.renewalInfo.renewal_date | moment("D MMMM YYYY")}} (Giorno limite per rimborso il <strong>{{user.renewalInfo.refund_day_limit | moment("D MMMM YYYY")}}</strong>)</small>
           </div>
@@ -52,6 +52,13 @@ export default {
       default: false
     }
   },
+
+  computed: {
+    renewalInfo: function () {
+      return this.user.renewalInfo && Object.keys(this.user.renewalInfo).length > 0
+    }
+  },
+
   methods: {
     renewalAction (action) {
       axios.patch(`/api/sharings/${this.sharing.id}/user/${this.user.id}/action/${action}`).then((response) => {

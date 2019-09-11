@@ -26,7 +26,6 @@ export const mutations = {
   },
 
   [types.FETCH_SHARING_SUCCESS] (state, { sharing }) {
-    console.log("Popolo lo stato");
     state.sharing = sharing
   },
 
@@ -43,9 +42,7 @@ export const mutations = {
   },
 
   [types.UPDATE_SHARING] (state, { sharing }) {
-    console.log("Chiamo questo metodo");
     state.sharing = sharing
-    console.log("Ho aggiornato lo stato");
   },
 
   [types.SYNC_SHARINGS] (state, { sharing }) {

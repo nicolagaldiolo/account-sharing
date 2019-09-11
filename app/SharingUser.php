@@ -2,10 +2,19 @@
 
 namespace App;
 
+use Iben\Statable\Statable;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class SharingUser extends Pivot
 {
+
+    use Statable;
+
+    protected function getGraph()
+    {
+        return 'sharing';
+    }
+
 
     public $incrementing = true;
 

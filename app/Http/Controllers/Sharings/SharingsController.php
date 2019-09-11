@@ -9,6 +9,7 @@ use App\Http\Requests\SharingRequest;
 use App\Sharing;
 use App\SharingUser;
 use App\User;
+use Carbon\Carbon;
 use const http\Client\Curl\AUTH_ANY;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -119,15 +120,21 @@ class SharingsController extends Controller
         if($stateMachine->can($transition)) {
             switch ($transition){
                 case 'pay':
+
                     $next_renewal = $sharing->calcNextRenewal();
-                    $sharingUser->renewals()->create([
+
+                    $current_renewal = $sharingUser->renewals()->create([
                         'status' => RenewalStatus::Confirmed,
+                        'starts_at' => Carbon::now()->startOfDay(),
                         'expires_at' => $next_renewal
                     ]);
+
                     $sharingUser->renewals()->create([
                         'status' => RenewalStatus::Pending,
+                        'starts_at' => $current_renewal->expires_at->addDay()->startOfDay(),
                         'expires_at' => $sharing->calcNextRenewal($next_renewal)
                     ]);
+
                     // da capire se la transazione di salvataggio va fatta così oppure sia meglio
                     // creare un nuovo state machine e condizione il cambiamento di stato solo al pagamento completato,
                     // ora invece il controllo non c'è.
@@ -201,18 +208,21 @@ class SharingsController extends Controller
         $sharing->active_users = $sharing->activeUsers()->get()->each(function($user) use($sharing){
 
             if(Auth::id() === $sharing->owner_id || Auth::id() == $user->id ) {
-                $renewal = $user->sharings()->where('sharings.id', $sharing->id)->first()->sharing_status->renewals()->orderBy('expires_at', 'desc')->first();
+                $sharing_status = $user->sharings()->where('sharings.id', $sharing->id)->first()->sharing_status;
+
+                $state_history = $sharing_status->stateHistory()->whereTo(3)->latest()->first();
+                if($state_history) $user->joiner_since = $state_history->created_at;
+
+                $renewal = $sharing_status->renewals()->orderBy('expires_at', 'desc')->first();
                 if ($renewal) {
-                    $user->manageable = true;
                     $user->renewalInfo = [
                         'renewal_status' => $renewal->status,
-                        'renewal_date' => $renewal->expire_on,
-                        'refund_day_limit' => $renewal->expire_on->subDays(config('custom.day_refund_limit'))
+                        'renewal_date' => $renewal->expires_at,
+                        'refund_day_limit' => $renewal->expires_at->subDays(config('custom.day_refund_limit'))
                     ];
                 }
-            }else{
-                $user->manageable = false;
             }
+
             return $user;
         });
 
