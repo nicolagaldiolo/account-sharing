@@ -11,6 +11,11 @@
 |
 */
 
+Route::get('/stripe', 'StripeController@paymentMethods')->name('stripe-payment-Methods')->middleware('auth');
+
 Route::get('{path}', function () {
     return view('index');
 })->where('path', '(.*)');
+
+
+

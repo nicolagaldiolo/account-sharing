@@ -9,6 +9,7 @@
         "bensampo/laravel-enum": "^1.21",
         "fideloper/proxy": "^4.0",
         "iben12/laravel-statable": "^0.1.0",
+        "laravel/cashier": "^10.2",
         "laravel/dusk": "^5.1",
         "laravel/framework": "5.8.*",
         "laravel/socialite": "^4.0",

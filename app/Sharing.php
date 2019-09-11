@@ -47,6 +47,10 @@ class Sharing extends Model
             ->withTimestamps();
     }
 
+    public function chats(){
+        return $this->hasMany(Chats::class);
+    }
+
     public function activeUsers(){
         return $this->belongsToMany(User::class)
             ->whereStatus(SharingStatus::Joined);

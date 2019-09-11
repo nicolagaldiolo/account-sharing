@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Sharings;
 
 use App\Category;
+use App\Chats;
 use App\Enums\RenewalStatus;
 use App\Enums\SharingStatus;
 use App\Http\Requests\SharingRequest;
@@ -202,7 +203,7 @@ class SharingsController extends Controller
     protected function getSharing(Sharing $sharing)
     {
 
-        $sharing->load(['category']);
+        $sharing->load(['category', 'chats.user']);
         $sharing->sharing_state_machine = $this->getSharingStateMachineAttribute($sharing);
 
         $sharing->active_users = $sharing->activeUsers()->get()->each(function($user) use($sharing){
@@ -225,6 +226,8 @@ class SharingsController extends Controller
 
             return $user;
         });
+
+        //$sharing->chats = Chats::all();
 
         return $sharing;
     }
