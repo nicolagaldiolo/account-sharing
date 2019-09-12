@@ -48,7 +48,7 @@ class Sharing extends Model
     }
 
     public function chats(){
-        return $this->hasMany(Chats::class);
+        return $this->hasMany(Chat::class);
     }
 
     public function activeUsers(){

@@ -112,7 +112,7 @@ class SeedFakeData extends Seeder
                 'expires_at' => \Carbon\Carbon::now()->addMonthNoOverflow()->endOfMonth()
             ]);
 
-            factory(\App\Chats::class, 3)->create([
+            factory(\App\Chat::class, 3)->create([
                 'sharing_id' => $item->sharing_id,
                 'user_id' => $item->user_id
             ]);

@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers\Sharings;
 
-use App\Chats;
+use App\Chat;
+use App\Http\Requests\ChatRequest;
+use App\Sharing;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class ChatsController extends Controller
 {
@@ -33,18 +37,28 @@ class ChatsController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(ChatRequest $request, Sharing $sharing)
     {
-        //
+
+        $this->authorize('viewAny', [Chat::class, $sharing]);
+
+        //Creo la Chat, associo le chiavi esterne e salvo
+        $chat = new Chat($request->validated());
+        $chat
+            ->sharing()->associate($sharing)
+            ->user()->associate(Auth::user())
+            ->save();
+
+        return $chat;
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Chats  $chats
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Chats $chats)
+    public function show($id)
     {
         //
     }
@@ -52,10 +66,10 @@ class ChatsController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Chats  $chats
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Chats $chats)
+    public function edit($id)
     {
         //
     }
@@ -64,10 +78,10 @@ class ChatsController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Chats  $chats
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Chats $chats)
+    public function update(Request $request, $id)
     {
         //
     }
@@ -75,10 +89,10 @@ class ChatsController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Chats  $chats
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Chats $chats)
+    public function destroy($id)
     {
         //
     }

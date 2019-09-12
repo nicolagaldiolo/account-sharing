@@ -2,20 +2,17 @@
 
 namespace App\Http\Controllers\Sharings;
 
-use App\Category;
-use App\Chats;
+use App\Chat;
 use App\Enums\RenewalStatus;
 use App\Enums\SharingStatus;
 use App\Http\Requests\SharingRequest;
 use App\Sharing;
-use App\SharingUser;
 use App\User;
 use Carbon\Carbon;
-use const http\Client\Curl\AUTH_ANY;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Gate;
 
 class SharingsController extends Controller
 {
@@ -203,7 +200,8 @@ class SharingsController extends Controller
     protected function getSharing(Sharing $sharing)
     {
 
-        $sharing->load(['category', 'chats.user']);
+        $sharing->load('category');
+
         $sharing->sharing_state_machine = $this->getSharingStateMachineAttribute($sharing);
 
         $sharing->active_users = $sharing->activeUsers()->get()->each(function($user) use($sharing){
@@ -227,7 +225,46 @@ class SharingsController extends Controller
             return $user;
         });
 
-        //$sharing->chats = Chats::all();
+        if (Gate::allows('viewAnyChats', [Chat::class, $sharing])) {
+
+            $sharing->load(['category', 'chats' => function ($query) {
+                return $query->oldest();
+            }, 'chats.user']);
+
+            if ($sharing->chats && $sharing->chats->isNotEmpty()) {
+                $sharing->chats_grouped = $sharing->chats->groupBy(function ($chat) {
+                    return $chat->created_at->toDateString();
+                });
+
+
+                /*
+                $test = $sharing->chats->groupBy(function($chat){
+                    return $chat->created_at->toDateTimeString();
+                });
+                $sharing->chats_grouped = collect([])->values();
+                $data = [
+                    ['2019-05-11 17:22:17' => collect([['foo' => 10],['foo' => 20],['foo' => 30]])->all()],
+                    ['2019-05-10 17:22:17' => collect(['foo' => 10],['foo2' => 210],['foo3' => 30])->values()],
+                    ['2019-05-09 17:22:17' => collect(['foo' => 10],['foo2' => 10],['foo3' => 10])->values()],
+                ];
+                $data2 = collect([
+                    ['foo' => 10], ['foo' => 10], ['foo' => 20], ['foo' => 40]]);
+                $collection = collect([
+                    [['account_id' => 'account-x10', 'product' => 'Chair'],
+                    ['account_id' => 'account-x10', 'product' => 'Bookcase'],
+                    ['account_id' => 'account-x11', 'product' => 'Desk']],
+                ]);
+
+                $grouped = $collection->groupBy('account_id');
+
+                $sharing->pippo = $data; //$grouped->toArray();
+
+                //dd($sharing->chats_grouped);
+                //$sharing->pippo = $sharing->chats_grouped->mapsWithKeys
+                //dd($sharing);
+                */
+            }
+        }
 
         return $sharing;
     }

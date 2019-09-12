@@ -71,39 +71,7 @@
 
           </div>
           <div class="col-md-8">
-            <h4>Chat del gruppo</h4>
-
-            <div v-if="sharing.chats.length" class="mesgs">
-              <div class="msg_history">
-                <div v-for="chat in sharing.chats" :key="chat.id">
-                  <div v-if="chat.user.id !== authUser.id" class="incoming_msg">
-                    <div class="incoming_msg_img">
-                      <img class="rounded-circle" :src="chat.user.photo_url">
-                    </div>
-                    <div class="received_msg">
-                      <div class="received_withd_msg">
-                        <p>{{ chat.message }}</p>
-                        <span class="time_date"> 11:01 AM    |    June 9</span></div>
-                    </div>
-                  </div>
-                  <div v-else class="outgoing_msg">
-                    <div class="outgoing_msg_img">
-                      <img class="rounded-circle" :src="chat.user.photo_url">
-                    </div>
-                    <div class="sent_msg">
-                      <p>{{ chat.message }}</p>
-                      <span class="time_date"> 11:01 AM    |    June 9</span> </div>
-                  </div>
-                </div>
-              </div>
-              <div class="type_msg">
-                <div class="input_msg_write">
-                  <input type="text" class="write_msg" placeholder="Type a message">
-                  <button class="msg_send_btn" type="button"><i class="fa fa-paper-plane-o" aria-hidden="true"></i></button>
-                </div>
-              </div>
-            </div>
-            <h1 v-else>Nessun messaggio in chat</h1>
+            <Chat :authUser="authUser" :sharing="sharing"/>
           </div>
         </div>
       </div>
@@ -116,11 +84,13 @@
 import { mapGetters } from 'vuex'
 import axios from 'axios'
 import MemberItem from '~/components/MemberItem'
+import Chat from '~/components/Chat'
 
 export default {
   middleware: 'auth',
   components: {
-    MemberItem
+    MemberItem,
+    Chat
   },
 
   created () {
@@ -132,6 +102,7 @@ export default {
       sharing: 'sharings/sharing',
       authUser: 'auth/user'
     }),
+
     availability: function () {
       return this.sharing.availability > 0
     },
@@ -147,13 +118,11 @@ export default {
   },
 
   methods: {
-
     joinGroup () {
       axios.post(`/api/sharings/${this.sharing.id}/join`).then((response) => {
         this.$store.dispatch('sharings/updateSharing', { sharing: response.data })
       })
     },
-
     doTransition (transition) {
       axios.patch(`/api/sharings/${this.sharing.id}/transitions/${transition}`).then((response) => {
         this.$store.dispatch('sharings/updateSharing', { sharing: response.data })
@@ -169,112 +138,4 @@ export default {
     background-repeat: no-repeat;
     background-position: center;
   }
-
-  img{ max-width:100%;}
-
-  .recent_heading h4 {
-    color: #05728f;
-    font-size: 21px;
-    margin: auto;
-  }
-  .srch_bar input{ border:1px solid #cdcdcd; border-width:0 0 1px 0; width:80%; padding:2px 0 4px 6px; background:none;}
-  .srch_bar .input-group-addon button {
-    background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
-    border: medium none;
-    padding: 0;
-    color: #707070;
-    font-size: 18px;
-  }
-  .srch_bar .input-group-addon { margin: 0 0 0 -27px;}
-
-  .chat_ib h5{ font-size:15px; color:#464646; margin:0 0 8px 0;}
-  .chat_ib h5 span{ font-size:13px; float:right;}
-  .chat_ib p{ font-size:14px; color:#989898; margin:auto}
-
-
-  .outgoing_msg_img{
-    order: 1;
-    padding-left: 10px;
-  }
-
-  .outgoing_msg_img,
-  .incoming_msg_img {
-    display: inline-block;
-    width: 6%;
-  }
-  .received_msg {
-    display: inline-block;
-    padding: 0 0 0 10px;
-    vertical-align: top;
-    width: 92%;
-  }
-  .received_withd_msg p {
-    background: #ebebeb none repeat scroll 0 0;
-    border-radius: 3px;
-    color: #646464;
-    font-size: 14px;
-    margin: 0;
-    padding: 5px 10px 5px 12px;
-    width: 100%;
-  }
-  .time_date {
-    color: #747474;
-    display: block;
-    font-size: 12px;
-    margin: 8px 0 0;
-  }
-  .received_withd_msg { width: 57%;}
-
-  .sent_msg p {
-    background: #05728f none repeat scroll 0 0;
-    border-radius: 3px;
-    font-size: 14px;
-    margin: 0; color:#fff;
-    padding: 5px 10px 5px 12px;
-    width:100%;
-  }
-  .incoming_msg,
-  .outgoing_msg{
-    overflow:hidden;
-    margin:26px 0 0 0;
-  }
-
-  .outgoing_msg {
-    display: flex;
-    justify-content: flex-end;
-  }
-
-  .sent_msg {
-    float: right;
-    width: 46%;
-  }
-  .input_msg_write input {
-    background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
-    border: medium none;
-    color: #4c4c4c;
-    font-size: 15px;
-    min-height: 48px;
-    width: 100%;
-  }
-
-  .type_msg {border-top: 1px solid #c4c4c4;position: relative;}
-  .msg_send_btn {
-    background: #05728f none repeat scroll 0 0;
-    border: medium none;
-    border-radius: 50%;
-    color: #fff;
-    cursor: pointer;
-    font-size: 17px;
-    height: 33px;
-    position: absolute;
-    right: 0;
-    top: 11px;
-    width: 33px;
-  }
-
-  .msg_history {
-    height: 516px;
-    overflow-y: auto;
-  }
-
 </style>

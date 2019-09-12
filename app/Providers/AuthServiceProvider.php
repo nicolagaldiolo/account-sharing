@@ -13,7 +13,7 @@ class AuthServiceProvider extends ServiceProvider
      * @var array
      */
     protected $policies = [
-        'App\Model' => 'App\Policies\ModelPolicy',
+        'App\Chat' => 'App\Policies\ChatPolicy',
     ];
 
     /**
@@ -25,6 +25,7 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
+        /*
         Gate::define('manage-own-sharing', function($user, $sharingUser){
             $sharingUser = $sharingUser->load('sharing');
             return $user->id === $sharingUser->sharing->owner_id;
@@ -33,7 +34,6 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('pay-sharing', function($user, $sharingUser){
             return $user->id === $sharingUser->user_id;
         });
-
-        //
+        */
     }
 }

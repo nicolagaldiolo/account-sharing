@@ -120,6 +120,6 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     }
 
     public function chats(){
-        return $this->hasMany(Chats::class);
+        return $this->hasMany(Chat::class);
     }
 }
