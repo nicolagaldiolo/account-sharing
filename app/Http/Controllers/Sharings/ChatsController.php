@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Sharings;
 
 use App\Chat;
+use App\Events\ChatMessageSent;
 use App\Http\Requests\ChatRequest;
 use App\Sharing;
 use Illuminate\Http\Request;
@@ -39,15 +40,17 @@ class ChatsController extends Controller
      */
     public function store(ChatRequest $request, Sharing $sharing)
     {
-
-        $this->authorize('viewAny', [Chat::class, $sharing]);
+        $this->authorize('viewAnyChats', [Chat::class, $sharing]);
+        $user = Auth::user();
 
         //Creo la Chat, associo le chiavi esterne e salvo
         $chat = new Chat($request->validated());
-        $chat
-            ->sharing()->associate($sharing)
-            ->user()->associate(Auth::user())
+
+        $chat->sharing()->associate($sharing)
+            ->user()->associate($user)
             ->save();
+
+        broadcast(new ChatMessageSent($user, $chat))->toOthers();
 
         return $chat;
     }

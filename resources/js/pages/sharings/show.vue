@@ -47,16 +47,13 @@
     <div v-if="owner || joined">
       <div class="container mt-4">
         <div class="row">
-          <div v-if="sharing.active_users.length" class="col-md-4">
+          <div class="col-md-4">
             <h4>Membri del gruppo</h4>
-
 
             <member-item :user="sharing.owner" :sharing="sharing" :isAdmin="true"/>
             <div v-for="(user, index) in sharing.active_users" :key="index" class="media text-muted pt-3">
               <member-item :user="user" :sharing="sharing"/>
             </div>
-
-
 
             <!--<div class="mt-4">
               <hr>
@@ -67,7 +64,6 @@
               <small>Se vuoi chiedere un rimborso il giorno limite è il <strong>{{sharing.refundInfo.day_limit | moment("D MMMM YYYY")}}</strong></small>
             </div>
             -->
-
 
           </div>
           <div class="col-md-8">

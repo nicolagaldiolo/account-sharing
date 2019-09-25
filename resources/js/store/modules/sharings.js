@@ -45,6 +45,10 @@ export const mutations = {
     state.sharing = sharing
   },
 
+  [types.ADD_CHAT_MESSAGE] (state, { chat }) {
+    state.sharing.chats.push(chat)
+  },
+
   [types.SYNC_SHARINGS] (state, { sharing }) {
     let data = sharing[0]
     let indexOfData = state.sharings.map(e => e.id).indexOf(data.id)
@@ -72,6 +76,10 @@ export const actions = {
 
   syncSharings ({ commit }, payload) {
     commit(types.SYNC_SHARINGS, payload)
+  },
+
+  addChatMessage ({ commit }, payload) {
+    commit(types.ADD_CHAT_MESSAGE, payload)
   },
 
   async fetchSharing ({ commit }, id) {

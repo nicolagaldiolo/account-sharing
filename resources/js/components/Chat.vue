@@ -68,6 +68,12 @@ export default {
         }
     },
 
+    created(){
+        Echo.private(`chatSharing.${this.sharing.id}`).listen('ChatMessageSent', (e) => {
+            this.$store.dispatch('sharings/addChatMessage', { chat: e.chat })
+        });
+    },
+
     computed: {
         emptyMessage: function () {
             return this.form.message === ''
@@ -77,6 +83,8 @@ export default {
     methods: {
         async postChatMessage () {
             const { data } = await this.form.post(`/api/sharings/${this.sharing.id}/chat`)
+            this.$store.dispatch('sharings/addChatMessage', { chat: data })
+            this.form.message = ''
         },
     }
 }
