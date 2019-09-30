@@ -34,6 +34,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::patch('sharings/{sharing}/user/{user}/transition-user/{transition}', 'Sharings\SharingsController@transitionUser')->name('sharings.user.transition');
 
     // Chat
+    Route::get('sharings/{sharing}/chats', 'Sharings\ChatsController@getSharingChat')->name('sharings.chats');
     Route::post('sharings/{sharing}/chat/', 'Sharings\ChatsController@store')->name('sharings.chat.store');
 
     // Settings

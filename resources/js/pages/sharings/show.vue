@@ -67,7 +67,7 @@
 
           </div>
           <div class="col-md-8">
-            <Chat :authUser="authUser" :sharing="sharing"/>
+            <Chat :authUser="authUser" :sharing="sharing" :joined="joined" :owner="owner"/>
           </div>
         </div>
       </div>
@@ -81,7 +81,6 @@ import { mapGetters } from 'vuex'
 import axios from 'axios'
 import MemberItem from '~/components/MemberItem'
 import Chat from '~/components/Chat'
-
 export default {
   middleware: 'auth',
   components: {
@@ -109,7 +108,7 @@ export default {
       return this.sharing.sharing_state_machine === null
     },
     joined: function () {
-      return this.sharing.sharing_state_machine && this.sharing.sharing_state_machine.status.value === 3
+      return this.sharing.sharing_state_machine !== null && this.sharing.sharing_state_machine.status.value === 3;
     },
   },
 

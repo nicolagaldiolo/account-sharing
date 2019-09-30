@@ -9,6 +9,7 @@ use App\Sharing;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class ChatsController extends Controller
 {
@@ -98,5 +99,12 @@ class ChatsController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function getSharingChat(Sharing $sharing)
+    {
+        $this->authorize('viewAnyChats', [Chat::class, $sharing]);
+
+        return $sharing->chats()->with('user')->latest()->paginate(15);
     }
 }

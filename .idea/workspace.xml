@@ -2,27 +2,17 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="80fbe383-e517-4357-96d8-8ee0108f1222" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/accountSharing.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/accountSharing.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Sharings/ChatsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Sharings/ChatsController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Sharings/SharingsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Sharings/SharingsController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Providers/BroadcastServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Providers/BroadcastServiceProvider.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/app.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/app.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Providers/AuthServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Providers/AuthServiceProvider.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/app.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/components/Chat.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Chat.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/pages/sharings/show.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/sharings/show.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/plugins/axios.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/plugins/axios.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/store/modules/sharings.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/store/modules/sharings.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/store/mutation-types.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/store/mutation-types.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/index.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/channels.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/channels.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/api.php" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -297,6 +287,10 @@
       <workItem from="1568738560638" duration="5770000" />
       <workItem from="1569304164656" duration="2588000" />
       <workItem from="1569385235566" duration="7022000" />
+      <workItem from="1569432032984" duration="379000" />
+      <workItem from="1569471245497" duration="13623000" />
+      <workItem from="1569531901670" duration="2817000" />
+      <workItem from="1569553413734" duration="35917000" />
     </task>
     <servers />
   </component>

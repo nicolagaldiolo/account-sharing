@@ -5,6 +5,7 @@ import * as types from '../mutation-types'
 export const state = {
   sharings: [],
   sharing: {},
+  chats: {},
   sharingRequests: []
 }
 
@@ -12,6 +13,7 @@ export const state = {
 export const getters = {
   sharings: state => state.sharings,
   sharing: state => state.sharing,
+  chats: state => state.chats,
   sharingRequests: state => state.sharingRequests
 }
 
@@ -33,6 +35,14 @@ export const mutations = {
     state.sharing = []
   },
 
+  [types.FETCH_CHATS_SUCCESS] (state, { chats }) {
+    state.chats = chats
+  },
+
+  [types.FETCH_CHATS_FAILURE] (state) {
+    state.chats = []
+  },
+
   [types.FETCH_SHARING_REQUESTS_SUCCESS] (state, { sharingRequests }) {
     state.sharingRequests = sharingRequests
   },
@@ -43,10 +53,6 @@ export const mutations = {
 
   [types.UPDATE_SHARING] (state, { sharing }) {
     state.sharing = sharing
-  },
-
-  [types.ADD_CHAT_MESSAGE] (state, { chat }) {
-    state.sharing.chats.push(chat)
   },
 
   [types.SYNC_SHARINGS] (state, { sharing }) {
@@ -78,10 +84,6 @@ export const actions = {
     commit(types.SYNC_SHARINGS, payload)
   },
 
-  addChatMessage ({ commit }, payload) {
-    commit(types.ADD_CHAT_MESSAGE, payload)
-  },
-
   async fetchSharing ({ commit }, id) {
     try {
       const { data } = await axios.get('/api/sharings/' + id)
@@ -90,6 +92,18 @@ export const actions = {
       commit(types.FETCH_SHARING_FAILURE)
     }
   },
+
+  async fetchChats ({ commit }, { id, currentPage }) {
+    try {
+      const { data } = await axios.get(`/api/sharings/${id}/chats?page=${currentPage}`)
+      commit(types.FETCH_CHATS_SUCCESS, { chats: data })
+      return true
+    } catch (e) {
+      commit(types.FETCH_CHATS_FAILURE)
+      return false
+    }
+  },
+
   async fetchSharingRequests ({ commit }) {
     try {
       const { data } = await axios.get('/api/sharing-requests/');
