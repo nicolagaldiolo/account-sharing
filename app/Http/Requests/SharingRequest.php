@@ -46,7 +46,9 @@ class SharingRequest extends FormRequest
             'capacity'              => 'required|numeric' . $max_capacity,
             'price'                 => 'required|numeric' . $max_price,
             'category_id'           => 'required|exists:categories,id',
-            'renewal_frequency_id'  => 'required|exists:renewal_frequencies,id'
+            'renewal_frequency_id'  => 'required|exists:renewal_frequencies,id',
+            'username'              => 'sometimes',
+            'password'              => 'sometimes',
         ];
     }
 }

@@ -22,5 +22,5 @@ use Illuminate\Support\Facades\Gate;
 //});
 
 Broadcast::channel('chatSharing.{sharing}', function(User $user, Sharing $sharing){
-    return Gate::allows('viewAnyChats', [Chat::class, $sharing]);
+    return Gate::allows('manage-sharing', $sharing);
 });

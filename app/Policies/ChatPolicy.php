@@ -10,19 +10,6 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 class ChatPolicy
 {
     use HandlesAuthorization;
-    
-    /**
-     * Determine whether the user can view any chats.
-     *
-     * @param  \App\User  $user
-     * @return mixed
-     */
-
-    public function viewAnyChats(User $user, Sharing $sharing)
-    {
-        $sharing->load('activeUsers');
-        return $user->id === $sharing->owner_id || $sharing->activeUsers()->get()->pluck('id')->contains($user->id);
-    }
 
     /**
      * Determine whether the user can view the chat.

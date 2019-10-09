@@ -23,14 +23,14 @@ class CreateSharingsTable extends Migration
             $table->string('image')->nullable();
             $table->bigInteger('renewal_frequency_id')->unsigned();
             $table->bigInteger('category_id')->unsigned();
-            $table->bigInteger('owner_id')->unsigned();
+            $table->string('username')->nullable();
+            $table->string('password')->nullable();
             $table->timestamps();
             $table->softDeletes();
 
             //$table->unique( ['category_id','owner_id'] ); // Non imposto nessun vincolo in quanto posso creare infinite condivisioni di categoria custom
             $table->foreign('renewal_frequency_id')->on('renewal_frequencies')->references('id');
             $table->foreign('category_id')->on('categories')->references('id');
-            $table->foreign('owner_id')->on('users')->references('id');
         });
     }
 

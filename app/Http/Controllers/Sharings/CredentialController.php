@@ -2,17 +2,20 @@
 
 namespace App\Http\Controllers\Sharings;
 
-use App\Chat;
-use App\Events\ChatMessageSent;
-use App\Http\Requests\ChatRequest;
+use App\Http\Requests\CredentialRequest;
+use App\Http\Traits\SharingTrait;
 use App\Sharing;
+use App\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Gate;
 
-class ChatsController extends Controller
+class CredentialController extends Controller
 {
+
+    use SharingTrait;
+
     /**
      * Display a listing of the resource.
      *
@@ -39,21 +42,9 @@ class ChatsController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(ChatRequest $request, Sharing $sharing)
+    public function store(Request $request)
     {
-        $this->authorize('manage-sharing', $sharing);
-        $user = Auth::user();
-
-        //Creo la Chat, associo le chiavi esterne e salvo
-        $chat = new Chat($request->validated());
-
-        $chat->sharing()->associate($sharing)
-            ->user()->associate($user)
-            ->save();
-
-        broadcast(new ChatMessageSent($user, $chat))->toOthers();
-
-        return $chat;
+        //
     }
 
     /**
@@ -85,9 +76,34 @@ class ChatsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+
+    public function update(CredentialRequest $request, Sharing $sharing)
     {
-        //
+        $sharingUser = $sharing->users()->findOrFail(Auth::id())->sharing_status;
+        $this->authorize('manage-own-sharing', $sharingUser);
+
+        $sharing->update($request->validated());
+
+        // Estraggo tutti gli utenti attivi, se sono l'admin setto la data di aggiornamento password as ora mentre
+        // per gli altri la spiano
+
+        $ids = $sharing->users->mapWithKeys(function($user, $key) {
+            $user->sharing_status->credential_updated_at = ($user->sharing_status->owner === 1) ? Carbon::now() : null;
+            return [$user->id => $user->sharing_status->only(['credential_updated_at'])];
+        })->toArray();
+
+        $sharing->activeUsers()->syncWithoutDetaching($ids);
+
+        return $this->getSharing($sharing);
+    }
+
+    public function confirm(Sharing $sharing)
+    {
+        $this->authorize('confirm-credential', $sharing);
+
+        $sharing->users()->updateExistingPivot(Auth::id(), ['credential_updated_at' => Carbon::now()]);
+
+        return $this->getSharing($sharing);
     }
 
     /**
@@ -99,12 +115,5 @@ class ChatsController extends Controller
     public function destroy($id)
     {
         //
-    }
-
-    public function getSharingChat(Sharing $sharing)
-    {
-        $this->authorize('manage-sharing', $sharing);
-
-        return $sharing->chats()->with('user')->latest()->paginate(15);
     }
 }

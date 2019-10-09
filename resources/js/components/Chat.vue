@@ -8,7 +8,11 @@
 
         <div v-if="chatsFormatted && chatsFormatted.length">
           <div v-for="(chatGroup, index) in chatsFormatted" :key="index">
-            <small style="display:block; text-align:center">{{chatGroup.date}}</small>
+
+            <div class="date">
+              <small>{{chatGroup.date}}</small>
+            </div>
+
             <div v-for="(chat, index) in chatGroup.chats" :key="index">
               <div v-if="chat.user.id !== authUser.id" class="incoming_msg">
                 <div class="incoming_msg_img">
@@ -19,8 +23,9 @@
                     <p>
                       <strong>{{ chat.user.name }}</strong><br>
                       {{ chat.message }}
+                      <span class="time_date">{{ chat.created_at | moment("h:mm a") }}</span>
                     </p>
-                    <span class="time_date">{{ chat.created_at | moment("D MMMM YYYY, h:mm a") }}</span></div>
+                  </div>
                 </div>
               </div>
               <div v-else class="outgoing_msg">
@@ -31,8 +36,9 @@
                   <p>
                     <strong>{{ chat.user.name }}</strong><br>
                     {{ chat.message }}
+                    <span class="time_date">{{ chat.created_at | moment("h:mm a") }}</span>
                   </p>
-                  <span class="time_date">{{ chat.created_at | moment("D MMMM YYYY, h:mm a") }}</span></div>
+                </div>
               </div>
             </div>
           </div>
@@ -185,6 +191,21 @@
 <style scoped>
 
   img{ max-width:100%;}
+
+  .date{
+    display:block;
+    text-align:center;
+    position: sticky;
+    top:0;
+  }
+
+  .date small{
+    background: rgba(40, 167, 69, .3);
+    padding: 2px 10px;
+    display: inline-block;
+    border-radius: 5px;
+    font-size: 60%;
+  }
 
   .recent_heading h4 {
     color: #05728f;

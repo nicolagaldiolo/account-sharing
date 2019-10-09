@@ -1,9 +1,11 @@
 <?php
 
 use App\Category;
+use App\Chat;
 use App\RenewalFrequency;
 use App\Sharing;
 use App\Enums\RenewalFrequencies;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use App\Enums\SharingStatus;
 class SeedFakeData extends Seeder
@@ -77,20 +79,39 @@ class SeedFakeData extends Seeder
                     'price' => $category->price,
                     'renewal_frequency_id' => $renewalFrequencies->random(1)->pluck('id')->first(),
                     'category_id' => $category->id,
-                    'owner_id' => $me->id
                 ]);
 
-                // Per ogni condivisione assegno degli utenti random come joiner e mi assicuro di togliere l'utente corrente
-
-                $usersWithoutMe = $users->reject(function($value) use($me){
+                // Per ogni condivisione assegno degli utenti random e mi assicuro di togliere l'utente corrente
+                $sharingUsers = $users->reject(function($value) use($me){
                     return $value->id === $me->id;
-                })->random(5)->pluck('id')->mapWithKeys(function($item){
+                })->random(4)->pluck('id')->mapWithKeys(function($item){
                     $sharingStatus = SharingStatus::getValues();
                     $status = rand(min($sharingStatus), max($sharingStatus));
-                    return [$item => ['status' => $status]];
+                    return [$item => [
+                            'status' => $status,
+                            'credential_updated_at' => Carbon::now(),
+                        ]
+                    ];
                 });
 
-                $sharing->users()->sync($usersWithoutMe);
+                // L'tente corrento lo aggiungo come joiner e owner
+                $sharingUsers->put($me->id, [
+                    'owner' => true,
+                    'status' => SharingStatus::Joined,
+                    'credential_updated_at' => Carbon::now(),
+                ]);
+
+                $sharing->users()->sync($sharingUsers);
+
+                // Per ogni utente joiner creo 5 messaggi in chat
+                $sharingUsers->filter(function ($value) {
+                    return $value['status'] === SharingStatus::Joined;
+                })->each(function($value, $key) use($sharing){
+                    factory(Chat::class, 5)->create([
+                        'sharing_id' => $sharing->id,
+                        'user_id' => $key
+                    ]);
+                });
 
             });
         });
@@ -110,11 +131,6 @@ class SeedFakeData extends Seeder
                 'status' => \App\Enums\RenewalStatus::Pending,
                 'starts_at' => \Carbon\Carbon::now()->addMonthNoOverflow()->startOfMonth(),
                 'expires_at' => \Carbon\Carbon::now()->addMonthNoOverflow()->endOfMonth()
-            ]);
-
-            factory(\App\Chat::class, 3)->create([
-                'sharing_id' => $item->sharing_id,
-                'user_id' => $item->user_id
             ]);
 
         });

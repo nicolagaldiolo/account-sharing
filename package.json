@@ -24,6 +24,7 @@
     "popper.js": "^1.15.0",
     "pusher-js": "^5.0.1",
     "sweetalert2": "^8.13.6",
+    "v-clipboard": "^2.2.2",
     "vform": "^1.0.1",
     "vue": "^2.6.10",
     "vue-i18n": "^8.12.0",

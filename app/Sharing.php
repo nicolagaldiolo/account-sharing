@@ -10,26 +10,55 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Gate;
 
 class Sharing extends Model
 {
     use SoftDeletes;
 
-    protected $guarded = [];
-    protected $appends = ['availability', 'visility_list'];
-
-    /*
-     * Scopes
-     */
-
-    protected static function boot()
+    // https://stackoverflow.com/questions/36750540/accessing-a-database-value-in-a-models-constructor-in-laravel-5-2
+    // Alla crezione del modello condiziono dimamicamente i campi che voglio nascondere previa condizione
+    public function newFromBuilder($attributes = [], $connection = null)
     {
-        parent::boot();
+        $model = parent::newFromBuilder($attributes, $connection);
+        $user = Auth::user();
+        if($user) {
+            $permitted = $user->can('manage-sharing', $model);
+            if (!$permitted) $model->setHidden($model->toevaluate);
+        }
 
-        static::addGlobalScope('onwer', function (Builder $builder){
-            $builder->with('owner');
-        });
+        return $model;
     }
+
+    protected $guarded = [];
+    protected $appends = [
+        'availability',
+        'visility_list',
+        'owner'
+    ];
+
+    protected $toevaluate = [
+        'username',
+        'password'
+    ];
+
+    public function getUsernameAttribute(){
+        return Crypt::decryptString($this->attributes['username']);
+    }
+
+    public function setUsernameAttribute($value){
+        $this->attributes['username'] = Crypt::encryptString($value);
+    }
+
+    public function getPasswordAttribute(){
+        return Crypt::decryptString($this->attributes['password']);
+    }
+
+    public function setPasswordAttribute($value){
+        $this->attributes['password'] = Crypt::encryptString($value);
+    }
+
 
     public function getAvailabilityAttribute(){
         return $this->capacity - $this->activeUsers()->count();
@@ -43,7 +72,7 @@ class Sharing extends Model
         return $this->belongsToMany(User::class)
             ->using(SharingUser::class)
             ->as('sharing_status')
-            ->withPivot(['status','id'])
+            ->withPivot(['status','id','owner','credential_updated_at'])
             ->withTimestamps();
     }
 
@@ -53,11 +82,26 @@ class Sharing extends Model
 
     public function activeUsers(){
         return $this->belongsToMany(User::class)
-            ->whereStatus(SharingStatus::Joined);
+            ->using(SharingUser::class)
+            ->as('sharing_status')
+            ->withPivot(['status','id','owner','credential_updated_at'])
+            ->whereStatus(SharingStatus::Joined)
+            ->withTimestamps();
     }
 
-    public function owner(){
-        return $this->belongsTo(User::class, 'owner_id', 'id');
+    public function activeUsersWithoutOwner(){
+        return $this->belongsToMany(User::class)
+            ->using(SharingUser::class)
+            ->as('sharing_status')
+            ->withPivot(['status','id','owner','credential_updated_at'])
+            ->whereStatus(SharingStatus::Joined)
+            ->whereOwner(null)
+            ->withTimestamps();
+    }
+
+    public function getOwnerAttribute()
+    {
+        return $this->activeUsers()->whereOwner(true)->first();
     }
 
     public function renewalFrequency(){

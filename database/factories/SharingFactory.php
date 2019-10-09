@@ -21,9 +21,7 @@ $factory->define(Sharing::class, function (Faker $faker) {
         'category_id' => function(){
             return factory(\App\Category::class)->create();
         },
-        'owner_id' => function(){
-            return factory(\App\User::class)->create();
-        }
-
+        'username' => $faker->username,
+        'password' => $faker->password,
     ];
 });

@@ -9,37 +9,37 @@
                         <router-link :to="{ name: 'sharing.show', params: { category_id: sharing.category_id, sharing_id: sharing.id } }">Visualizza scheda</router-link>
                         <p class="card-text">
 
-                            <div v-if="sharing.sharing_status.Joined.users.length > 0">
-                                <h6>{{sharing.sharing_status.Joined.description}}</h6>
+                            <div v-if="sharing.xx_sharing_by_status.Joined.users.length > 0">
+                                <h6>{{sharing.xx_sharing_by_status.Joined.description}}</h6>
                                 <ul class="list-group">
-                                    <li v-for="user in sharing.sharing_status.Joined.users" :key="user.id" class="list-group-item">
+                                    <li v-for="user in sharing.xx_sharing_by_status.Joined.users" :key="user.id" class="list-group-item">
                                         <manage-sharing-user :user="user"/>
                                     </li>
                                 </ul>
                             </div>
 
-                            <div v-if="sharing.sharing_status.Pending.users.length > 0">
-                                <h6>{{sharing.sharing_status.Pending.description}}</h6>
+                            <div v-if="sharing.xx_sharing_by_status.Pending.users.length > 0">
+                                <h6>{{sharing.xx_sharing_by_status.Pending.description}}</h6>
                                 <ul class="list-group">
-                                    <li v-for="user in sharing.sharing_status.Pending.users" :key="user.id" class="list-group-item">
+                                    <li v-for="user in sharing.xx_sharing_by_status.Pending.users" :key="user.id" class="list-group-item">
                                         <manage-sharing-user :user="user" :sharing="sharing" :buttons="true"/>
                                     </li>
                                 </ul>
                             </div>
 
-                            <div v-if="sharing.sharing_status.Approved.users.length > 0">
-                                <h6>{{sharing.sharing_status.Approved.description}}</h6>
+                            <div v-if="sharing.xx_sharing_by_status.Approved.users.length > 0">
+                                <h6>{{sharing.xx_sharing_by_status.Approved.description}}</h6>
                                 <ul class="list-group">
-                                    <li v-for="user in sharing.sharing_status.Approved.users" :key="user.id" class="list-group-item">
+                                    <li v-for="user in sharing.xx_sharing_by_status.Approved.users" :key="user.id" class="list-group-item">
                                         <manage-sharing-user :user="user" :sharing="sharing" :buttons="true"/>
                                     </li>
                                 </ul>
                             </div>
 
-                            <div v-if="sharing.sharing_status.Refused.users.length > 0">
-                                <h6>{{sharing.sharing_status.Refused.description}}</h6>
+                            <div v-if="sharing.xx_sharing_by_status.Refused.users.length > 0">
+                                <h6>{{sharing.xx_sharing_by_status.Refused.description}}</h6>
                                 <ul class="list-group">
-                                    <li v-for="user in sharing.sharing_status.Refused.users" :key="user.id" class="list-group-item">
+                                    <li v-for="user in sharing.xx_sharing_by_status.Refused.users" :key="user.id" class="list-group-item">
                                         <manage-sharing-user :user="user" :sharing="sharing" :buttons="true"/>
                                     </li>
                                 </ul>

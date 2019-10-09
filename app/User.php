@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Enums\SharingStatus;
 use App\Notifications\VerifyEmail;
 use App\Notifications\ResetPassword;
 use Laravel\Cashier\Billable;
@@ -111,12 +112,18 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
         return $this->belongsToMany(Sharing::class)
             ->using(SharingUser::class)
             ->as('sharing_status')
-            ->withPivot(['status','id'])
+            ->withPivot(['status','id','owner','credential_updated_at'])
             ->withTimestamps();
     }
 
     public function sharingOwners(){
-        return $this->hasMany(Sharing::class, 'owner_id');
+        return $this->belongsToMany(Sharing::class)
+            ->using(SharingUser::class)
+            ->as('sharing_status')
+            ->withPivot(['status','id','owner'])
+            ->withTimestamps()
+            ->whereStatus(SharingStatus::Joined)
+            ->whereOwner(true);
     }
 
     public function chats(){

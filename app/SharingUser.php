@@ -15,7 +15,6 @@ class SharingUser extends Pivot
         return 'sharing';
     }
 
-
     public $incrementing = true;
 
     protected $guarded = [];

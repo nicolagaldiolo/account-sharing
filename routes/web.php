@@ -11,7 +11,7 @@
 |
 */
 
-//Route::get('/stripe', 'StripeController@paymentMethods')->name('stripe-payment-Methods')->middleware('auth');
+//Route::get('/prova', 'Sharings\SharingsController@prova');
 
 Route::get('{path}', function () {
     return view('index');
