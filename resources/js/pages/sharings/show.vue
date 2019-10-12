@@ -30,7 +30,7 @@
         <a v-if="availability" class="btn btn-primary btn-lg btn-block">Invita altra gente</a>
       </div>
       <div v-else-if="foreign">
-        <a @click.prevent="joinGroup" class="btn btn-primary btn-lg btn-block">Entra nel gruppo</a>
+        <a @click.prevent="doTransition()" class="btn btn-primary btn-lg btn-block">Entra nel gruppo</a>
       </div>
       <div v-else>
         <div v-if="sharing.sharing_state_machine.transitions.length">
@@ -138,7 +138,15 @@ export default {
   }),
 
   created () {
-    this.$store.dispatch('sharings/fetchSharing', this.$route.params.sharing_id)
+    this.$store.dispatch('sharings/fetchSharing', this.$route.params.sharing_id);
+      window.Echo.private(`App.User.${this.authUser.id}`).notification(notifications => {
+          //console.log(notifications);
+          if(notifications.data) {
+              this.$store.dispatch('sharings/updateSharing', { sharing: notifications.data })
+              let message = (notifications.type === 'App\\Notifications\\CredentialConfirmed') ? 'Credenziali confermate' : 'Credenziali aggiornate'
+              alert(message)
+          }
+      })
   },
 
   computed: {
@@ -183,19 +191,17 @@ export default {
     credentialToggle () {
       this.showCredential = !this.showCredential
     },
-    joinGroup () {
-      axios.post(`/api/sharings/${this.sharing.id}/join`).then((response) => {
-        this.$store.dispatch('sharings/updateSharing', { sharing: response.data })
-      })
-    },
     doTransition (transition) {
-      axios.patch(`/api/sharings/${this.sharing.id}/transitions/${transition}`).then((response) => {
+      let api = (transition)
+          ? `/api/sharings/${this.sharing.id}/transitions/${transition}`
+          : `/api/sharings/${this.sharing.id}/transitions`
+        axios.patch(api).then((response) => {
         this.$store.dispatch('sharings/updateSharing', { sharing: response.data })
       })
     },
     async saveCredentials () {
         const { data } = await this.form.patch(`/api/sharings/${this.sharing.id}/credential`)
-        this.$store.dispatch('sharings/updateSharing', { sharing: data })
+        if(data) this.$store.dispatch('sharings/updateSharing', { sharing: data })
     },
     async confirmCredentials () {
         axios.post(`/api/sharings/${this.sharing.id}/credential`).then(response => {

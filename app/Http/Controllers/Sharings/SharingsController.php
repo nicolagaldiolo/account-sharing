@@ -61,10 +61,10 @@ class SharingsController extends Controller
         //
     }
 
-    public function prova()
+    public function prova(Sharing $sharing)
     {
 
-        return Sharing::find(5);
+        return $sharing;
     }
 
     /**
@@ -117,48 +117,51 @@ class SharingsController extends Controller
         //
     }
 
-
-
-    public function transition(Request $request, Sharing $sharing, $transition)
+    public function transition(Request $request, Sharing $sharing, $transition = null)
     {
-        // Sistemare questa cosa
-        // sono costretto a fare la query per avere i dati in più che mi servono per lo sharing
-        $sharing = Auth::user()->sharings()->findOrFail($sharing->id);
-        $sharingUser = $sharing->sharing_status;
+        // Cerco la relazione tra utente e sharing, se non esiste la creo
+        $userSharing = Auth::user()->sharings()->find($sharing->id);
 
-        $stateMachine = \StateMachine::get($sharingUser, 'sharing');
+        if(!$userSharing) {
+            Auth::user()->sharings()->attach($sharing->id);
+            $userSharing = Auth::user()->sharings()->find($sharing->id);
+        }
 
-        if($stateMachine->can($transition)) {
+        $sharingStatus = $userSharing->sharing_status;
+        $stateMachine = \StateMachine::get($sharingStatus, 'sharing');
+
+        if($transition && $stateMachine->can($transition)) {
             switch ($transition){
                 case 'pay':
 
-                    $next_renewal = $sharing->calcNextRenewal();
+                    $next_renewal = $userSharing->calcNextRenewal();
 
-                    $current_renewal = $sharingUser->renewals()->create([
+                    $current_renewal = $sharingStatus->renewals()->create([
                         'status' => RenewalStatus::Confirmed,
                         'starts_at' => Carbon::now()->startOfDay(),
                         'expires_at' => $next_renewal
                     ]);
 
-                    $sharingUser->renewals()->create([
+                    $sharingStatus->renewals()->create([
                         'status' => RenewalStatus::Pending,
                         'starts_at' => $current_renewal->expires_at->addDay()->startOfDay(),
-                        'expires_at' => $sharing->calcNextRenewal($next_renewal)
+                        'expires_at' => $userSharing->calcNextRenewal($next_renewal)
                     ]);
 
                     // da capire se la transazione di salvataggio va fatta così oppure sia meglio
                     // creare un nuovo state machine e condizione il cambiamento di stato solo al pagamento completato,
                     // ora invece il controllo non c'è.
                     $stateMachine->apply($transition);
-                    $sharingUser->save();
+                    $sharingStatus->save();
                     break;
                 default:
                     $stateMachine->apply($transition);
-                    $sharingUser->save();
+                    $sharingStatus->save();
                     break;
             }
         }
-        return $sharing;
+        return $this->getSharing($userSharing);
+
 
     }
 
@@ -172,12 +175,6 @@ class SharingsController extends Controller
             $sharing_status->save();
         }
         return $this->getSharingOwners($sharing->id);
-    }
-
-    public function join(Request $request, Sharing $sharing)
-    {
-        Auth::user()->sharings()->syncWithoutDetaching([$sharing->id]);
-        return $sharing;
     }
 
     public function renewalAction(Request $request, Sharing $sharing, User $user, $action)

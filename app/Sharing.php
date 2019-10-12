@@ -25,6 +25,7 @@ class Sharing extends Model
         $user = Auth::user();
         if($user) {
             $permitted = $user->can('manage-sharing', $model);
+            logger($permitted);
             if (!$permitted) $model->setHidden($model->toevaluate);
         }
 
@@ -35,7 +36,8 @@ class Sharing extends Model
     protected $appends = [
         'availability',
         'visility_list',
-        'owner'
+        'owner',
+        'sharing_state_machine'
     ];
 
     protected $toevaluate = [
@@ -102,6 +104,29 @@ class Sharing extends Model
     public function getOwnerAttribute()
     {
         return $this->activeUsers()->whereOwner(true)->first();
+    }
+
+    public function getSharingStateMachineAttribute()
+    {
+        $obj = $this->users()->find(Auth::id());
+
+        if (!is_null($obj)) {
+            $stateMachine = \StateMachine::get($obj->sharing_status, 'sharing');
+            return [
+                'status' => [
+                    'value' => $stateMachine->getState(),
+                    'metadata' => $stateMachine->metadata('state'),
+                ],
+                'transitions' => collect([])->merge(collect($stateMachine->getPossibleTransitions())->map(function ($value) use ($stateMachine) {
+                    return [
+                        'value' => $value,
+                        'metadata' => $stateMachine->metadata()->transition($value)
+                    ];
+                }))->all(), // altrimenti non mi torna un array;
+            ];
+        } else {
+            return null;
+        }
     }
 
     public function renewalFrequency(){

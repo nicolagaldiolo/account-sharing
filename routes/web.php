@@ -11,7 +11,7 @@
 |
 */
 
-//Route::get('/prova', 'Sharings\SharingsController@prova');
+//Route::get('/prova/{sharing}', 'Sharings\SharingsController@prova');
 
 Route::get('{path}', function () {
     return view('index');

@@ -17,9 +17,9 @@ use App\User;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Gate;
 
-//Broadcast::channel('App.User.{id}', function ($user, $id) {
-//    return (int) $user->id === (int) $id;
-//});
+Broadcast::channel('App.User.{id}', function ($user, $id) {
+    return (int) $user->id === (int) $id;
+});
 
 Broadcast::channel('chatSharing.{sharing}', function(User $user, Sharing $sharing){
     return Gate::allows('manage-sharing', $sharing);

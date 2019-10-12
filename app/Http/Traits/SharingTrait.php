@@ -13,7 +13,7 @@ trait SharingTrait {
 
         $sharing->load(['category', 'activeUsers', 'activeUsersWithoutOwner']);
 
-        $sharing->sharing_state_machine = $this->getSharingStateMachineAttribute($sharing);
+        //$sharing->sharing_state_machine = $this->getSharingStateMachineAttribute($sharing);
 
         /*$sharing->active_users = $sharing->activeUsers()->get()->each(function($user) use($sharing){
 
@@ -57,10 +57,11 @@ trait SharingTrait {
         });
     }
 
-    public function getSharingStateMachineAttribute($item){
+    /*public function getSharingStateMachineAttribute($item){
         $sharing = Auth::user()->sharings()->find($item->id);
 
         if(!is_null($sharing)){
+            //logger("ENTRI QUI");
             $stateMachine = \StateMachine::get($sharing->sharing_status, 'sharing');
             return [
                 'status' => [
@@ -75,7 +76,9 @@ trait SharingTrait {
                 }))->all(), // altrimenti non mi torna un array;
             ];
         }else{
+            //logger("FALLISCO");
             return null;
         }
     }
+    */
 }

@@ -4,12 +4,16 @@ namespace App\Http\Controllers\Sharings;
 
 use App\Http\Requests\CredentialRequest;
 use App\Http\Traits\SharingTrait;
+use App\Mail\CredentialConfirmed;
+use App\Mail\CredentialUpdated;
 use App\Sharing;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class CredentialController extends Controller
 {
@@ -79,6 +83,7 @@ class CredentialController extends Controller
 
     public function update(CredentialRequest $request, Sharing $sharing)
     {
+
         $sharingUser = $sharing->users()->findOrFail(Auth::id())->sharing_status;
         $this->authorize('manage-own-sharing', $sharingUser);
 
@@ -94,7 +99,12 @@ class CredentialController extends Controller
 
         $sharing->activeUsers()->syncWithoutDetaching($ids);
 
-        return $this->getSharing($sharing);
+        $sharingUpdated = $this->getSharing($sharing);
+
+        event(New \App\Events\CredentialUpdated($sharingUpdated));
+
+        return $sharingUpdated;
+
     }
 
     public function confirm(Sharing $sharing)
@@ -103,7 +113,10 @@ class CredentialController extends Controller
 
         $sharing->users()->updateExistingPivot(Auth::id(), ['credential_updated_at' => Carbon::now()]);
 
-        return $this->getSharing($sharing);
+        $sharingUpdated = $this->getSharing($sharing);
+        event(New \App\Events\CredentialConfirmed(Auth::user(), $sharingUpdated));
+
+        return $sharingUpdated;
     }
 
     /**

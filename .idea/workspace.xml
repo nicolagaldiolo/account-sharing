@@ -3,27 +3,11 @@
   <component name="ChangeListManager">
     <list default="true" id="80fbe383-e517-4357-96d8-8ee0108f1222" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Sharings/ChatsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Sharings/ChatsController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Sharings/CredentialController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Sharings/CredentialController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Sharings/SharingsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Sharings/SharingsController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Requests/SharingRequest.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Requests/SharingRequest.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Policies/ChatPolicy.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Policies/ChatPolicy.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Providers/AuthServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Providers/AuthServiceProvider.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Traits/SharingTrait.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Traits/SharingTrait.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Providers/EventServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Providers/EventServiceProvider.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Sharing.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Sharing.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/SharingUser.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/SharingUser.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/User.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/User.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/SchemaER.graphml" beforeDir="false" afterPath="$PROJECT_DIR$/database/SchemaER.graphml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/factories/ChatsFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/factories/ChatsFactory.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/factories/SharingFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/factories/SharingFactory.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/factories/SharingUserFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/factories/SharingUserFactory.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/migrations/2019_07_17_191346_create_sharings_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2019_07_17_191346_create_sharings_table.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/migrations/2019_07_18_041355_create_sharing_user_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2019_07_18_041355_create_sharing_user_table.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/seeds/SeedFakeData.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeds/SeedFakeData.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/Chat.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Chat.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/pages/sharings/owner.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/sharings/owner.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/pages/sharings/show.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/sharings/show.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/api.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/channels.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/channels.php" afterDir="false" />
@@ -219,7 +203,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="database.console.LAST_STATE" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/app/Http/Requests" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/views/emails" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -233,18 +217,18 @@
     <property name="ts.external.directory.path" value="$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/app/Http/Requests" />
-      <recent name="$PROJECT_DIR$/resources/js/components" />
-      <recent name="$PROJECT_DIR$/resources/js/pages/sharings" />
-      <recent name="$PROJECT_DIR$/resources/js/pages" />
-      <recent name="$PROJECT_DIR$/resources/js/pages/categsharingsories" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/app/Http/Controllers/Sharings" />
       <recent name="$PROJECT_DIR$/resources/js/pages/sharings" />
       <recent name="$PROJECT_DIR$/resources/js/pages/categories" />
       <recent name="$PROJECT_DIR$/database" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/resources/views/emails" />
+      <recent name="$PROJECT_DIR$/app/Http/Requests" />
+      <recent name="$PROJECT_DIR$/resources/js/components" />
+      <recent name="$PROJECT_DIR$/resources/js/pages/sharings" />
+      <recent name="$PROJECT_DIR$/resources/js/pages" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -311,7 +295,11 @@
       <workItem from="1570075712567" duration="7231000" />
       <workItem from="1570119198948" duration="6935000" />
       <workItem from="1570257806674" duration="40479000" />
-      <workItem from="1570510093767" duration="10385000" />
+      <workItem from="1570510093767" duration="16576000" />
+      <workItem from="1570682898886" duration="614000" />
+      <workItem from="1570683602457" duration="14000" />
+      <workItem from="1570683627633" duration="11556000" />
+      <workItem from="1570863922493" duration="8989000" />
     </task>
     <servers />
   </component>
