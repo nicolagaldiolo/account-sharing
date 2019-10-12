@@ -120,11 +120,13 @@ import axios from 'axios'
 import MemberItem from '~/components/MemberItem'
 import Chat from '~/components/Chat'
 import Form from 'vform'
+import VButton from "../../components/Button";
 //import auth from "../../middleware/auth"
 
 export default {
   middleware: 'auth',
   components: {
+      VButton,
     MemberItem,
     Chat
   },
