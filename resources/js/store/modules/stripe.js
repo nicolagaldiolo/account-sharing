@@ -63,9 +63,9 @@ export const actions = {
     }
   },
 
-  async addCard ({ commit }, token) {
+  async addCard ({ commit }, paymentMethod) {
     try {
-      const { data } = await axios.post('/api/settings/cards', token)
+      const { data } = await axios.post('/api/settings/cards', paymentMethod)
       commit(types.ADD_STRIPE_CARD_SUCCESS, { card: data })
     } catch (e) {
       commit(types.ADD_STRIPE_CARD_FAILURE, '')

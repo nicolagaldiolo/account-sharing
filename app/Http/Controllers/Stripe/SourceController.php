@@ -16,8 +16,28 @@ class SourceController extends Controller
      */
     public function index()
     {
-        return Stripe::getCustomer(Auth::user()->stripe_customer_id);
-        //return Stripe::allSource(Auth::user()->stripe_customer_id);
+        
+        //ASSOLUTAMENTE DA ELIMINARE, VA CENTRALIZZATA ALTROVE LA CREAZIONE DEL CUSTOMER
+        $user = Auth::user();
+        if(is_null($user->stripe_customer_id)){
+            // Creo il Customer
+            $stripeCustomer = Stripe::createCustomer([
+                'email' => $user->email,
+                'source' => 'tok_threeDSecure2Required',
+            ]);
+            $user->stripe_customer_id = $stripeCustomer->id;
+            $user->save();
+        }else{
+            $stripeCustomer = Stripe::getCustomer($user->stripe_customer_id);
+        }
+
+        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+        \Stripe\Stripe::setApiVersion("2019-10-08");
+
+        return \Stripe\PaymentMethod::all([
+        'customer' => $user->stripe_customer_id,
+        'type' => 'card',
+        ]);
     }
 
     /**
@@ -38,7 +58,17 @@ class SourceController extends Controller
      */
     public function store(Request $request)
     {
-        $token = $request->get('id');
+        $paymentMethod = json_decode($request->getContent(), true);
+        
+        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+        \Stripe\Stripe::setApiVersion("2019-10-08");
+        $payment_method = \Stripe\PaymentMethod::retrieve($paymentMethod['id']);
+        $return = $payment_method->attach(['customer' => Auth::user()->stripe_customer_id]);
+
+        dd($return);
+
+        
+
         return Stripe::createSource(
             Auth::user()->stripe_customer_id,[
                 'source' => $token
