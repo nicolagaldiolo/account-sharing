@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use App\MyClasses\Support\Facade\Stripe;
 
 class SharingsController extends Controller
 {
@@ -26,9 +27,7 @@ class SharingsController extends Controller
      */
     public function index(Request $request)
     {
-
         $param = $request->input('type', '');
-
         switch ($param){
             case 'pending':
                 $sharings = Auth::user()->sharings()->pending()->get();
@@ -63,8 +62,88 @@ class SharingsController extends Controller
 
     public function prova(Sharing $sharing)
     {
+        $stripeObj = app(Stripe::class);
 
-        return $sharing;
+        // Se ci sono utenti con account Stripe li elimino
+        collect($stripeObj->allAccount(['limit' => 99])->data)->each(function($item) use($stripeObj){
+            $stripeObj->getAccount($item->id)->delete();
+        });
+
+        // Se ci sono Customer li elimino
+        collect($stripeObj->allCustomer(['limit' => 99])->data)->each(function($item) use($stripeObj){
+            $stripeObj->getCustomer($item->id)->delete();
+        });
+
+        $me = User::find(1);
+
+        $stripeAccount = $stripeObj->createAccount([
+            'country' => 'IT',
+            'email' => $me->email,
+            'type' => 'custom',
+            'business_type' => 'individual',
+            // Before the 2019-09-09 API version, the transfers capability was referred to as platform_payments. If you're using an API version older than 2019-09-09, you need to use platform_payments.
+            // For platforms creating connected accounts in Australia, Austria, Belgium, Czech Republic, Denmark, Estonia, Finland, France, Germany, Greece, Ireland, Italy, Latvia, Lithuania, Luxembourg, the Netherlands, New Zealand, Norway, Poland, Portugal, Slovakia, Slovenia, Spain, Sweden, Switzerland, or the United Kingdom, request both the card_payments and transfers capabilities to enable card processing for your connected accounts.
+            "requested_capabilities" => ["card_payments", "transfers"],
+            'individual' => [
+                'email' => $me->email,
+                'first_name' => $me->name,
+                'last_name' => $me->surname,
+                'phone' => '+393917568474',
+                'dob' => [
+                    'day' => $me->birthday->day,
+                    'month' => $me->birthday->month,
+                    'year' => $me->birthday->year
+                ],
+                'address' => [
+                    'line1' => 'Via Giovanni Caboto',
+                    'city' => 'Verona',
+                    'postal_code' => '37068'
+                ]
+            ],
+            'tos_acceptance' => [
+                'date' => time(),
+                'ip' => request()->ip() // Assumes you're not using a proxy
+            ],
+            'business_profile' => [
+                'mcc' => '4900',
+                'url' => 'https://www.google.it'
+            ],
+        ]);
+
+        $me->stripe_account_id = $stripeAccount->id;
+        //$me->stripe_customer_id = $stripeCustomer->id;
+        $me->save();
+
+        $payment_intent = \Stripe\PaymentIntent::create([
+            'payment_method_types' => ['card'],
+            'amount' => 666,
+            'currency' => 'eur',
+            'transfer_data' => [
+                'destination' => $me->stripe_account_id,
+            ],
+        ]);
+
+        return view('prova', compact('payment_intent'));
+
+        /*
+        //dd();
+        $stripe = Stripe::make(config('services.stripe.secret'));
+        //$customers = $stripe->customers()->all();
+        //dd($customers);
+
+        $plan = $stripe->plans()->create([
+            'id'                   => 'monthly',
+            'name'                 => 'Monthly (30$)',
+            'amount'               => 30.00,
+            'currency'             => 'USD',
+            'interval'             => 'month',
+            'statement_descriptor' => 'Monthly Subscription',
+        ]);
+        dd($plan);
+
+        //return $sharing;
+        */
+
     }
 
     /**
@@ -120,11 +199,12 @@ class SharingsController extends Controller
     public function transition(Request $request, Sharing $sharing, $transition = null)
     {
         // Cerco la relazione tra utente e sharing, se non esiste la creo
-        $userSharing = Auth::user()->sharings()->find($sharing->id);
+        $user = Auth::user();
+        $userSharing = $user->sharings()->find($sharing->id);
 
         if(!$userSharing) {
-            Auth::user()->sharings()->attach($sharing->id);
-            $userSharing = Auth::user()->sharings()->find($sharing->id);
+            $user->sharings()->attach($sharing->id);
+            $userSharing = $user->sharings()->find($sharing->id);
         }
 
         $sharingStatus = $userSharing->sharing_status;
@@ -134,25 +214,55 @@ class SharingsController extends Controller
             switch ($transition){
                 case 'pay':
 
-                    $next_renewal = $userSharing->calcNextRenewal();
+                    $currentStripeAccount = $sharing->owner->stripe_account_id;
 
-                    $current_renewal = $sharingStatus->renewals()->create([
-                        'status' => RenewalStatus::Confirmed,
-                        'starts_at' => Carbon::now()->startOfDay(),
-                        'expires_at' => $next_renewal
-                    ]);
+                    if(is_null($user->stripe_customer_id)){
+                        // Creo il Customer
+                        $stripeCustomer = Stripe::createCustomer([
+                            'email' => $user->email,
+                            'source' => 'tok_threeDSecure2Required',
+                        ], ['stripe_account' => $currentStripeAccount]);
+                        $user->stripe_customer_id = $stripeCustomer->id;
+                        $user->save();
+                    }else{
+                        $stripeCustomer = Stripe::getCustomer(
+                            $user->stripe_customer_id,
+                            ["stripe_account" => $currentStripeAccount]
+                        );
+                    }
 
-                    $sharingStatus->renewals()->create([
-                        'status' => RenewalStatus::Pending,
-                        'starts_at' => $current_renewal->expires_at->addDay()->startOfDay(),
-                        'expires_at' => $userSharing->calcNextRenewal($next_renewal)
-                    ]);
+                    $subscription = Stripe::createSubscription([
+                        'customer' => $stripeCustomer->id,
+                        'items' => [
+                            [
+                                'plan' => $sharing->stripe_plan,
+                            ],
+                        ],
+                        'expand' => ['latest_invoice.payment_intent'],
+                    ],['stripe_account' => $currentStripeAccount]);
 
-                    // da capire se la transazione di salvataggio va fatta così oppure sia meglio
-                    // creare un nuovo state machine e condizione il cambiamento di stato solo al pagamento completato,
-                    // ora invece il controllo non c'è.
-                    $stateMachine->apply($transition);
-                    $sharingStatus->save();
+                    if($subscription->status === 'active' && $subscription->latest_invoice->payment_intent->status === 'succeeded') {
+                        $stateMachine->apply($transition);
+                        $sharingStatus->save();
+                    }else if($subscription->status === 'incomplete' && $subscription->latest_invoice->payment_intent->status === 'requires_payment_method'){
+
+                        /*\Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+
+                        $payment_method = \Stripe\PaymentMethod::retrieve('pm_1FYeznClCIKljWvssSbEXRww');
+                        $payment_method->attach(
+                            ['customer' => $stripeCustomer->id],
+                            ['stripe_account' => $currentStripeAccount]);
+
+                        $stateMachine->apply($transition);
+                        $sharingStatus->save();
+                        */
+
+                    }else{
+                        abort(500);
+                        die($subscription);
+                    }
+
+
                     break;
                 default:
                     $stateMachine->apply($transition);

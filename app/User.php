@@ -20,7 +20,7 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name','surname','birthday','email','password',
     ];
 
     /**
@@ -39,6 +39,7 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'birthday' => 'date'
     ];
 
     /**
@@ -111,7 +112,7 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
         return $this->belongsToMany(Sharing::class)
             ->using(SharingUser::class)
             ->as('sharing_status')
-            ->withPivot(['status','id','owner','credential_updated_at'])
+            ->withPivot(['status','id','stripe_subscription_id','owner','credential_updated_at'])
             ->withTimestamps();
     }
 
@@ -119,7 +120,7 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
         return $this->belongsToMany(Sharing::class)
             ->using(SharingUser::class)
             ->as('sharing_status')
-            ->withPivot(['status','id','owner'])
+            ->withPivot(['status','id','stripe_subscription_id','owner'])
             ->withTimestamps()
             ->whereStatus(SharingStatus::Joined)
             ->whereOwner(true);

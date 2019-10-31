@@ -20,6 +20,7 @@ class CreateSharingsTable extends Migration
             $table->tinyInteger('visibility')->unsigned()->default(1);
             $table->integer('capacity')->nullable();
             $table->decimal('price', 10, 2)->nullable();
+            $table->string('stripe_plan')->nullable();
             $table->string('image')->nullable();
             $table->bigInteger('renewal_frequency_id')->unsigned();
             $table->bigInteger('category_id')->unsigned();

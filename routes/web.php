@@ -13,6 +13,10 @@
 
 //Route::get('/prova/{sharing}', 'Sharings\SharingsController@prova');
 
+Route::any('stripe', function () {
+    logger('Eccolo');
+});
+
 Route::get('{path}', function () {
     return view('index');
 })->where('path', '(.*)');

@@ -11,6 +11,16 @@
           </li>
         </ul>
       </card>
+      <card title="Wallets" class="settings-card mt-5">
+        <ul class="nav flex-column nav-pills">
+          <li v-for="tab in tabs2" :key="tab.route" class="nav-item">
+            <router-link :to="{ name: tab.route }" class="nav-link" active-class="active">
+              <fa :icon="tab.icon" fixed-width />
+              {{ tab.name }}
+            </router-link>
+          </li>
+        </ul>
+      </card>
     </div>
 
     <div class="col-md-9">
@@ -39,6 +49,15 @@ export default {
           route: 'settings.password'
         }
       ]
+    },
+    tabs2 () {
+        return [
+            {
+                icon: 'lock',
+                name: 'Carte di pagamento',
+                route: 'settings.wallet'
+            }
+        ]
     }
   }
 }

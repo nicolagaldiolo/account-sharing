@@ -3,7 +3,8 @@ $config = [
     'appName' => config('app.name'),
     'locale' => $locale = app()->getLocale(),
     'locales' => config('app.locales'),
-    'githubAuth' => config('services.github.client_id')
+    'githubAuth' => config('services.github.client_id'),
+    'stripeKey' => config('services.stripe.key')
 ];
 @endphp
 <!DOCTYPE html>
@@ -24,6 +25,7 @@ $config = [
     window.config = @json($config);
   </script>
 
+  <script src="https://js.stripe.com/v3/"></script>
   {{-- Load the application scripts --}}
   <script src="{{ mix('dist/js/app.js') }}"></script>
 </body>

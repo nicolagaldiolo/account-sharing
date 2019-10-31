@@ -23,8 +23,9 @@ class SharingUser extends Pivot
         return $this->belongsTo(Sharing::class);
     }
 
-    public function renewals()
+    /*public function renewals()
     {
         return $this->hasMany(Renewal::class, 'sharing_user_id');
     }
+    */
 }

@@ -41,7 +41,11 @@ Route::group(['middleware' => 'auth:api'], function () {
 
     // Settings
     Route::patch('settings/profile', 'Settings\ProfileController@update');
+    Route::get('settings/customer', 'Stripe\SourceController@index');
+    Route::post('settings/cards', 'Stripe\SourceController@store');
+    Route::patch('settings/customer', 'Stripe\SourceController@update');
     Route::patch('settings/password', 'Settings\PasswordController@update');
+    Route::delete('settings/customer', 'Stripe\SourceController@destroy');
 });
 
 Route::group(['middleware' => 'guest:api'], function () {

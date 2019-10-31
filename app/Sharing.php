@@ -74,7 +74,7 @@ class Sharing extends Model
         return $this->belongsToMany(User::class)
             ->using(SharingUser::class)
             ->as('sharing_status')
-            ->withPivot(['status','id','owner','credential_updated_at'])
+            ->withPivot(['status','id','stripe_subscription_id','owner','credential_updated_at'])
             ->withTimestamps();
     }
 
@@ -86,7 +86,7 @@ class Sharing extends Model
         return $this->belongsToMany(User::class)
             ->using(SharingUser::class)
             ->as('sharing_status')
-            ->withPivot(['status','id','owner','credential_updated_at'])
+            ->withPivot(['status','id','stripe_subscription_id','owner','credential_updated_at'])
             ->whereStatus(SharingStatus::Joined)
             ->withTimestamps();
     }
@@ -95,7 +95,7 @@ class Sharing extends Model
         return $this->belongsToMany(User::class)
             ->using(SharingUser::class)
             ->as('sharing_status')
-            ->withPivot(['status','id','owner','credential_updated_at'])
+            ->withPivot(['status','id','stripe_subscription_id','owner','credential_updated_at'])
             ->whereStatus(SharingStatus::Joined)
             ->whereOwner(null)
             ->withTimestamps();
@@ -138,7 +138,7 @@ class Sharing extends Model
         return SharingVisibility::toSelectArray();
     }
 
-    public function calcNextRenewal($current = null)
+    /*public function calcNextRenewal($current = null)
     {
         $renewalFrequency = $this->renewalFrequency;
         $date = ($current instanceof Carbon) ? $current : Carbon::now();
@@ -158,6 +158,7 @@ class Sharing extends Model
 
         return $expires_on;
     }
+    */
 
     public function scopePending($query)
     {

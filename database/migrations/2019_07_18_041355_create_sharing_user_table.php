@@ -18,6 +18,7 @@ class CreateSharingUserTable extends Migration
             $table->unsignedBigInteger('sharing_id');
             $table->unsignedBigInteger('user_id');
             $table->boolean('owner')->nullable();
+            $table->string('stripe_subscription_id')->nullable();
             $table->tinyInteger('status')->unsigned()->default(\App\Enums\SharingStatus::Pending);
             $table->string('credential_updated_at')->nullable();
             $table->timestamps();

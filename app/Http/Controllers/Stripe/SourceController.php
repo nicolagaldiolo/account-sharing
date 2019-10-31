@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Renewals;
+namespace App\Http\Controllers\Stripe;
 
+use App\MyClasses\Support\Facade\Stripe;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
-class RenewalsController extends Controller
+class SourceController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,7 +16,8 @@ class RenewalsController extends Controller
      */
     public function index()
     {
-        //
+        return Stripe::getCustomer(Auth::user()->stripe_customer_id);
+        //return Stripe::allSource(Auth::user()->stripe_customer_id);
     }
 
     /**
@@ -35,7 +38,12 @@ class RenewalsController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $token = $request->get('id');
+        return Stripe::createSource(
+            Auth::user()->stripe_customer_id,[
+                'source' => $token
+            ]
+        );
     }
 
     /**
@@ -67,9 +75,11 @@ class RenewalsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        $data = json_decode($request->getContent(), true);
+
+        return Stripe::updateCustomer(Auth::user()->stripe_customer_id, $data);
     }
 
     /**
@@ -78,8 +88,9 @@ class RenewalsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        //
+        $data = json_decode($request->getContent(), true);
+        return Stripe::deleteSource(Auth::user()->stripe_customer_id, $data['id']);
     }
 }
