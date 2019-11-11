@@ -3,72 +3,72 @@ import * as types from '../mutation-types'
 
 // state
 export const state = {
-  customer: {}
+  paymentmethods: {}
 }
 
 // getters
 export const getters = {
-  customer: state => state.customer,
-  userCard: state => []
+  paymentmethods: state => state.paymentmethods
 }
 
 // mutations
 export const mutations = {
-  [types.ADD_STRIPE_CARD_SUCCESS] (state, { card }) {
-    state.customer.sources.data.push(card)
+
+  [types.FETCH_STRIPE_PAYMENTMETHODS_SUCCESS] (state, { paymentmethods }) {
+    state.paymentmethods = paymentmethods
   },
 
-  [types.ADD_STRIPE_CARD_FAILURE] (state, { card }) {
-    //
-  },
-
-  [types.UPDATE_STRIPE_CUSTOMER_SUCCESS] (state, { customer }) {
-    state.customer = customer
-  },
-
-  [types.UPDATE_STRIPE_CUSTOMER_FAILURE] (state, { customer }) {
-    state.customer = {}
+  [types.FETCH_STRIPE_PAYMENTMETHODS_FAILURE] (state) {
+    state.paymentmethods = {}
   }
 }
 
 // actions
 export const actions = {
 
-  async fetchCustomer ({ commit }) {
+  async fetchPaymentMethods ({ commit }) {
     try {
-      const { data } = await axios.get('/api/settings/customer')
-      commit(types.UPDATE_STRIPE_CUSTOMER_SUCCESS, { customer: data })
+      const { data } = await axios.get('/api/settings/paymentmethods')
+      commit(types.FETCH_STRIPE_PAYMENTMETHODS_SUCCESS, { paymentmethods: data })
     } catch (e) {
-      commit(types.UPDATE_STRIPE_CUSTOMER_FAILURE)
+      commit(types.FETCH_STRIPE_PAYMENTMETHODS_FAILURE)
     }
   },
 
-  async updateCustomer ({ commit }, sourceId) {
+  async removePaymentMethod ({ commit }, paymentMethodId) {
     try {
-      const { data } = await axios.patch('/api/settings/customer', {
-        default_source: sourceId
+      const { data } = await axios.delete('/api/settings/paymentmethods', {
+        data: {
+          payment_method: paymentMethodId
+        }
       })
-      commit(types.UPDATE_STRIPE_CUSTOMER_SUCCESS, { customer: data })
+      commit(types.FETCH_STRIPE_PAYMENTMETHODS_SUCCESS, { paymentmethods: data })
     } catch (e) {
-      commit(types.UPDATE_STRIPE_CUSTOMER_FAILURE)
+      commit(types.FETCH_STRIPE_PAYMENTMETHODS_FAILURE)
     }
   },
 
-  async removeCard ({ commit }, sourceId) {
+  async addPaymentMethod ({ commit }, paymentMethod) {
+
     try {
-      const { data } = await axios.delete('/api/settings/customer', { data: { id: sourceId } })
-      commit(types.UPDATE_STRIPE_CUSTOMER_SUCCESS, { customer: data })
+      const { data } = await axios.post('/api/settings/paymentmethods', {
+        payment_method: paymentMethod
+      })
+      commit(types.FETCH_STRIPE_PAYMENTMETHODS_SUCCESS, { paymentmethods: data })
     } catch (e) {
-      commit(types.UPDATE_STRIPE_CUSTOMER_FAILURE)
+      commit(types.FETCH_STRIPE_PAYMENTMETHODS_FAILURE)
     }
+
   },
 
-  async addCard ({ commit }, paymentMethod) {
+  async setDefaultPaymentMethods ({ commit }, paymentMethodId) {
     try {
-      const { data } = await axios.post('/api/settings/cards', paymentMethod)
-      commit(types.ADD_STRIPE_CARD_SUCCESS, { card: data })
+      const { data } = await axios.patch('/api/settings/paymentmethods', {
+        payment_method: paymentMethodId
+      })
+      commit(types.FETCH_STRIPE_PAYMENTMETHODS_SUCCESS, { paymentmethods: data })
     } catch (e) {
-      commit(types.ADD_STRIPE_CARD_FAILURE, '')
+      commit(types.FETCH_STRIPE_PAYMENTMETHODS_FAILURE)
     }
   }
 

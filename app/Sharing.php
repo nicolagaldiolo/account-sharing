@@ -25,7 +25,6 @@ class Sharing extends Model
         $user = Auth::user();
         if($user) {
             $permitted = $user->can('manage-sharing', $model);
-            logger($permitted);
             if (!$permitted) $model->setHidden($model->toevaluate);
         }
 
@@ -87,7 +86,7 @@ class Sharing extends Model
             ->using(SharingUser::class)
             ->as('sharing_status')
             ->withPivot(['status','id','stripe_subscription_id','owner','credential_updated_at'])
-            ->whereStatus(SharingStatus::Joined)
+            ->whereIn('status', [SharingStatus::Joined, SharingStatus::Leaving])
             ->withTimestamps();
     }
 
@@ -96,7 +95,7 @@ class Sharing extends Model
             ->using(SharingUser::class)
             ->as('sharing_status')
             ->withPivot(['status','id','stripe_subscription_id','owner','credential_updated_at'])
-            ->whereStatus(SharingStatus::Joined)
+            ->whereIn('status', [SharingStatus::Joined, SharingStatus::Leaving])
             ->whereOwner(null)
             ->withTimestamps();
     }
@@ -177,7 +176,7 @@ class Sharing extends Model
 
     public function scopeJoined($query)
     {
-        return $query->whereStatus(SharingStatus::Joined);
+        return $query->whereIn('status', [SharingStatus::Joined, SharingStatus::Leaving]);
     }
 
     // dato uno stato torno tutte le condivisioni in quello stato

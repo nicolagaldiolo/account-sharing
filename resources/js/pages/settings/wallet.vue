@@ -1,17 +1,23 @@
 <template>
   <div>
-    <card v-if="customer.sources.data.length" title="Credit Card">
-      <div v-for="card in customer.sources.data" :key="card.id">
-        <h5 class="card-title">{{card.brand}}</h5>
-        <strong>{{card.last4}}</strong>
-        <span>{{card.exp_month}}</span>
-        <span>{{card.exp_year}}</span>
-        <span v-if="card.id === customer.default_source" class="badge badge-pill badge-primary">Default</span>
-        <a v-else class="btn btn-link" href="#" @click.prevent="updateCustomer(card.id)">Rendi default</a>
-        <a v-if="customer.sources.data.length > 1" class="btn btn-link" href="#" @click.prevent="removeCard(card.id)">Elimina carta</a>
+    <card title="Credit Card">
+      <div v-if="paymentmethods.methods.data.length">
+
+        <div v-for="paymentmethod in paymentmethods.methods.data" :key="paymentmethod.id">
+          <h5 class="card-title">{{paymentmethod.card.brand}}</h5>
+          <strong>{{paymentmethod.card.last4}}</strong>
+          Scadenza: <span>{{paymentmethod.card.exp_month}}</span>/<span>{{paymentmethod.card.exp_year}}</span>
+          <span v-if="paymentmethod.id === paymentmethods.defaultPaymentMethod" class="badge badge-pill badge-primary">Default</span>
+          <a v-else class="btn btn-link" href="#" @click.prevent="setDefaultPaymentMethods(paymentmethod.id)">Rendi default</a>
+          <a v-if="paymentmethod.id !== paymentmethods.defaultPaymentMethod && paymentmethods.methods.data.length > 1" class="btn btn-link" href="#" @click.prevent="removePaymentMethod(paymentmethod.id)">Elimina carta</a>
+        </div>
+        <button class="btn btn-primary btn-lg btn-block" v-if="checkoutMode && !showCardForm" @click.prevent="subscribeWithDefaultPaymentMethod">Iscriviti</button>
+      </div>
+      <div v-else>
+        <h1>Non hai metodi di pagamento configurati, aggiungine uno</h1>
       </div>
       <template v-slot:footer>
-        <div>
+        <div v-if="showCardForm || paymentmethods.methods.data.length <= 0">
           <div>
             <label for="card-element">
               Credit or debit card
@@ -24,22 +30,26 @@
             <div id="card-errors" role="alert"></div>
           </div>
 
-          <button @click.prevent="addCard">Submit Payment</button>
-          
+          <div v-if="checkoutMode">
+            <button class="btn btn-primary btn-lg btn-block" @click.prevent="subscribeWithNewPaymentMethod">Iscriviti</button>
+          </div>
+          <div v-else>
+            <button @click.prevent="addPaymentMethod">Aggiungi carta</button>
+          </div>
         </div>
-        
+
       </template>
     </card>
-
+    <button class="btn btn btn-outline-secondary btn-lg btn-block" @click.prevent="newCardForm">Nuova carta</button>
   </div>
+
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
+import axios from 'axios'
 
 export default {
-    scrollToTop: false,
-
   data: () => ({
     style: {
       base: {
@@ -57,37 +67,41 @@ export default {
       }
     },
     mytestcard: '',
-    stripe : Stripe(window.config.stripeKey)
+    stripe: window.Stripe(window.config.stripeKey),
+    showCardForm: false
   }),
 
+    props: {
+        checkoutMode: { type: Boolean, default: false }
+    },
+
   computed: mapGetters({
-    customer: 'stripe/customer'
+    paymentmethods: 'stripe/paymentmethods',
+    authUser: 'auth/user'
   }),
 
   created () {
-    this.$store.dispatch('stripe/fetchCustomer')
-
-
+    this.$store.dispatch('stripe/fetchPaymentMethods')
   },
 
   mounted () {
     // Create a Stripe client.
-    
+
 
     // Create an instance of Elements.
     var element = this.stripe.elements();
 
     // Custom styling can be passed to options when creating an Element.
     // (Note that this demo uses a wider set of styles than the guide below.)
-    
+
 
     // Create an instance of the card Element.
     this.mytestcard = element.create('card', {style: this.style});
 
     // Add an instance of the card Element into the `card-element` <div>.
-    
-    setTimeout(()=>this.mytestcard.mount('#card-element') , 2000);
-    
+
+    setTimeout(()=>this.mytestcard.mount('#card-element') , 5000);
+
 
     // Handle real-time validation errors from the card Element.
     this.mytestcard.addEventListener('change', function(event) {
@@ -103,19 +117,96 @@ export default {
   },
 
   methods: {
-    updateCustomer (id) {
-      this.$store.dispatch('stripe/updateCustomer', id)
+
+      newCardForm () {
+          this.showCardForm = !this.showCardForm
+      },
+
+      setDefaultPaymentMethods (id) {
+      this.$store.dispatch('stripe/setDefaultPaymentMethods', id)
     },
 
-    removeCard (cardId) {
-        this.$store.dispatch('stripe/removeCard', cardId)
+      removePaymentMethod (id) {
+        this.$store.dispatch('stripe/removePaymentMethod', id)
     },
-    
-    addCard () {
-      this.stripe.createPaymentMethod('card', this.mytestcard).then(data => {
-        this.$store.dispatch('stripe/addCard', data.paymentMethod)
-        //this.$refs.card.clear()
-      });
+
+      addPaymentMethod () {
+
+        axios.get('/api/settings/setupintent').then(function (result) {
+            if (result.error) {
+                // Display error.message in your UI.
+            } else {
+                const clientSecret = result.data.client_secret;
+
+                this.stripe.confirmCardSetup(clientSecret, {
+                        payment_method: {
+                            card: this.mytestcard,
+                            billing_details: {
+                                email: this.authUser.email
+                            }
+                        }
+                    }
+                ).then(function(result) {
+                    if (result.error) {
+                        // Display error.message in your UI.
+                        console.log(result.error);
+                    } else {
+                        this.$store.dispatch('stripe/addPaymentMethod', result.setupIntent.payment_method)
+                    }
+                }.bind(this));
+
+            }
+        }.bind(this))
+      },
+
+      subscribeWithNewPaymentMethod () {
+          this.stripe.createPaymentMethod('card', this.mytestcard).then(data => {
+              this.subscribe(data.paymentMethod.id)
+          })
+      },
+
+      subscribeWithDefaultPaymentMethod () {
+          this.subscribe(this.paymentmethods.defaultPaymentMethod);
+      },
+
+      subscribe (paymentMethod) {
+
+          axios.post(`/api/sharings/${this.$route.params.sharing_id}/subscribe`, {
+              payment_method: paymentMethod
+          }).then((response) => {
+              //Outcome 1: Payment succeeds
+              if (response.data.status === 'active' && response.data.latest_invoice.payment_intent.status === 'succeeded') {
+                  this.redirectToSharing();
+                  //Outcome 3: Payment fails
+              } else if (response.data.status === 'incomplete' && response.data.latest_invoice.payment_intent.status === 'requires_payment_method') {
+                  console.log("PROBLEMI COL METODO DI PAGAMENTO 22222");
+                  alert(response);
+
+              } else if (response.data.status === 'incomplete' && response.data.latest_invoice.payment_intent.status === 'requires_action') {
+                  console.log("AZIONE RICHIESTA");
+                  const paymentIntentSecret = response.data.latest_invoice.payment_intent.client_secret;
+                  this.stripe.handleCardPayment(paymentIntentSecret).then(function (result) {
+                      if (result.error) {
+                          console.log("PROBLEMI COL METODO DI PAGAMENTO 11111");
+                          alert(response);
+                      } else {
+                          this.redirectToSharing();
+                          // The payment has succeeded. Display a success message.
+                      }
+                  }.bind(this));
+              }
+          })
+      },
+
+    redirectToSharing () {
+        alert("Complimenti, sei iscritto");
+        this.$router.push({
+            name: 'sharing.show',
+            params: {
+                category_id: this.$route.params.category_id,
+                sharing_id: this.$route.params.sharing_id
+            }
+        })
     }
   }
 }

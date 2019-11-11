@@ -7,16 +7,32 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
-class SourceController extends Controller
+class PaymentMethodsController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
+
+    public function setupintent()
+    {
+        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+        \Stripe\Stripe::setApiVersion("2019-10-08");
+
+        return \Stripe\SetupIntent::create([
+            'payment_method_types' => ['card'],
+        ]);
+    }
+
+    public function getCustomer()
+    {
+        return Stripe::getCustomer(Auth::user()->stripe_customer_id);
+    }
+
+
     public function index()
     {
-
         //ASSOLUTAMENTE DA ELIMINARE, VA CENTRALIZZATA ALTROVE LA CREAZIONE DEL CUSTOMER
         $user = Auth::user();
         if(is_null($user->stripe_customer_id)){
@@ -31,17 +47,7 @@ class SourceController extends Controller
             $stripeCustomer = Stripe::getCustomer($user->stripe_customer_id);
         }
 
-        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
-        \Stripe\Stripe::setApiVersion("2019-10-08");
-
-        //dd(Stripe::getCustomer($user->stripe_customer_id));
-
-        return Stripe::getCustomer(Auth::user()->stripe_customer_id);
-
-        //return \Stripe\PaymentMethod::all([
-        //    'customer' => $user->stripe_customer_id,
-        //    'type' => 'card',
-        //]);
+        return $this->getPaymentMethods();
     }
 
     /**
@@ -62,28 +68,32 @@ class SourceController extends Controller
      */
     public function store(Request $request)
     {
-        /*$paymentMethod = json_decode($request->getContent(), true);
+
+        $paymentMethod = $request->payment_method;
 
         \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
         \Stripe\Stripe::setApiVersion("2019-10-08");
-        $payment_method = \Stripe\PaymentMethod::retrieve($paymentMethod['id']);
+
+        $payment_method = \Stripe\PaymentMethod::retrieve($paymentMethod);
         $payment_method->attach(['customer' => Auth::user()->stripe_customer_id]);
 
-        \Stripe\Customer::update(Auth::user()->stripe_customer_id, [
-                'invoice_settings' => [
-                    'default_payment_method' => $payment_method->id,
-                ],
-            ]
-        );
-        */
+        $user = Auth::user();
+        $allPaymentelements = \Stripe\PaymentMethod::all([
+            'customer' => $user->stripe_customer_id,
+            'type' => 'card',
+        ]);
 
+        // Se ho un solo metodo di pagamento lo imposto come default
+        if(count($allPaymentelements->data) == 1) {
+            \Stripe\Customer::update($user->stripe_customer_id, [
+                    'invoice_settings' => [
+                        'default_payment_method' => $paymentMethod,
+                    ],
+                ]
+            );
+        }
 
-        /*return Stripe::createSource(
-            Auth::user()->stripe_customer_id,[
-                'source' => $token
-            ]
-        );
-        */
+        return $this->getPaymentMethods();
     }
 
     /**
@@ -117,9 +127,19 @@ class SourceController extends Controller
      */
     public function update(Request $request)
     {
-        $data = json_decode($request->getContent(), true);
+        $paymentMethod = $request->payment_method;
 
-        return Stripe::updateCustomer(Auth::user()->stripe_customer_id, $data);
+        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+        \Stripe\Stripe::setApiVersion("2019-10-08");
+
+        \Stripe\Customer::update(Auth::user()->stripe_customer_id, [
+                'invoice_settings' => [
+                    'default_payment_method' => $paymentMethod,
+                ],
+            ]
+        );
+
+        return $this->getPaymentMethods();
     }
 
     /**
@@ -130,7 +150,33 @@ class SourceController extends Controller
      */
     public function destroy(Request $request)
     {
-        $data = json_decode($request->getContent(), true);
-        return Stripe::deleteSource(Auth::user()->stripe_customer_id, $data['id']);
+        $paymentMethod = $request->payment_method;
+
+        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+        \Stripe\Stripe::setApiVersion("2019-10-08");
+
+        $payment_method = \Stripe\PaymentMethod::retrieve($paymentMethod);
+        $payment_method->detach();
+
+        return $this->getPaymentMethods();
     }
+
+    protected function getPaymentMethods()
+    {
+        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+        \Stripe\Stripe::setApiVersion("2019-10-08");
+
+        $user = Auth::user();
+
+        $stripeCustomer = Stripe::getCustomer($user->stripe_customer_id);
+
+        return [
+            'methods' => \Stripe\PaymentMethod::all([
+                'customer' => $user->stripe_customer_id,
+                'type' => 'card',
+            ]),
+            'defaultPaymentMethod' => $stripeCustomer->invoice_settings->default_payment_method
+        ];
+    }
+
 }

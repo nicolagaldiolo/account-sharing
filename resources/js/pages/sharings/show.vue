@@ -28,13 +28,18 @@
     <div class="container">
       <div v-if="owner || joined">
         <a v-if="availability" class="btn btn-primary btn-lg btn-block">Invita altra gente</a>
+        <div v-if="sharing.sharing_state_machine.transitions.length">
+          <a v-for="(transition, index) in sharing.sharing_state_machine.transitions" :key="index" href="#" @click.prevent="doTransition(transition.value)" class="btn btn-primary btn-lg btn-block">
+            {{transition.metadata.title}}
+          </a>
+        </div>
       </div>
       <div v-else-if="foreign">
         <a @click.prevent="doTransition()" class="btn btn-primary btn-lg btn-block">Entra nel gruppo</a>
       </div>
       <div v-else>
         <div v-if="sharing.sharing_state_machine.transitions.length">
-          <a v-for="(transition, index) in sharing.sharing_state_machine.transitions" :key="index" @click.prevent="doTransition(transition.value)" class="btn btn-primary btn-lg btn-block">
+          <a v-for="(transition, index) in sharing.sharing_state_machine.transitions" :key="index" href="#" @click.prevent="doTransition(transition.value)" class="btn btn-primary btn-lg btn-block">
             {{transition.metadata.title}}
           </a>
         </div>
@@ -115,103 +120,111 @@
   </div>
 </template>
 <script>
-import { mapGetters } from 'vuex'
-import axios from 'axios'
-import MemberItem from '~/components/MemberItem'
-import Chat from '~/components/Chat'
-import Form from 'vform'
-import VButton from "../../components/Button";
-//import auth from "../../middleware/auth"
+    import { mapGetters } from 'vuex'
+    import axios from 'axios'
+    import MemberItem from '~/components/MemberItem'
+    import Chat from '~/components/Chat'
+    import Form from 'vform'
+    import VButton from "../../components/Button";
+    //import auth from "../../middleware/auth"
 
-export default {
-  middleware: 'auth',
-  components: {
-      VButton,
-    MemberItem,
-    Chat
-  },
+    export default {
+        middleware: 'auth',
+        components: {
+            VButton,
+            MemberItem,
+            Chat
+        },
 
-  data: () => ({
-      form: new Form({
-          username: '',
-          password: ''
-      }),
-      showCredential: false,
-  }),
+        data: () => ({
+            form: new Form({
+                username: '',
+                password: ''
+            }),
+            showCredential: false,
+        }),
 
-  created () {
-    this.$store.dispatch('sharings/fetchSharing', this.$route.params.sharing_id);
-      window.Echo.private(`App.User.${this.authUser.id}`).notification(notifications => {
-          //console.log(notifications);
-          if(notifications.data) {
-              this.$store.dispatch('sharings/updateSharing', { sharing: notifications.data })
-              let message = (notifications.type === 'App\\Notifications\\CredentialConfirmed') ? 'Credenziali confermate' : 'Credenziali aggiornate'
-              alert(message)
-          }
-      })
-  },
+        created () {
+            console.log("entro in created");
+            this.$store.dispatch('sharings/fetchSharing', this.$route.params.sharing_id);
+            window.Echo.private(`App.User.${this.authUser.id}`).notification(notifications => {
+                //console.log(notifications);
+                if(notifications.data) {
+                    this.$store.dispatch('sharings/updateSharing', { sharing: notifications.data })
+                    let message = (notifications.type === 'App\\Notifications\\CredentialConfirmed') ? 'Credenziali confermate' : 'Credenziali aggiornate'
+                    alert(message)
+                }
+            })
+        },
 
-  computed: {
-    ...mapGetters({
-      sharing: 'sharings/sharing',
-      authUser: 'auth/user'
-    }),
-    joinerCredentialConfirmed: function () {
-      return {
-          iMustConfirm: this.sharing.active_users_without_owner.filter(item => this.authUser.id === item.id && !item.sharing_status.credential_updated_at),
-          confirmed: this.sharing.active_users_without_owner.filter(item => item.sharing_status.credential_updated_at),
-          total: this.sharing.active_users_without_owner
-      };
-    },
-    saveCredentialReady: function () {
-      return this.form.username === '' || this.form.password === ''
-    },
-    availability: function () {
-      return this.sharing.availability > 0
-    },
-    owner: function () {
-      return this.authUser.id === this.sharing.owner.id
-    },
-    foreign: function () {
-      return this.sharing.sharing_state_machine === null
-    },
-    joined: function () {
-      return this.sharing.sharing_state_machine !== null && this.sharing.sharing_state_machine.status.value === 3
-    },
-  },
+        computed: {
+            ...mapGetters({
+                sharing: 'sharings/sharing',
+                authUser: 'auth/user'
+            }),
+            joinerCredentialConfirmed: function () {
+                return {
+                    iMustConfirm: this.sharing.active_users_without_owner.filter(item => this.authUser.id === item.id && !item.sharing_status.credential_updated_at),
+                    confirmed: this.sharing.active_users_without_owner.filter(item => item.sharing_status.credential_updated_at),
+                    total: this.sharing.active_users_without_owner
+                };
+            },
+            saveCredentialReady: function () {
+                return this.form.username === '' || this.form.password === ''
+            },
+            availability: function () {
+                return this.sharing.availability > 0
+            },
+            owner: function () {
+                return this.authUser.id === this.sharing.owner.id
+            },
+            foreign: function () {
+                return this.sharing.sharing_state_machine === null
+            },
+            joined: function () {
+                return this.sharing.sharing_state_machine !== null && ([ 3, 4 ].includes(this.sharing.sharing_state_machine.status.value)) // controllo se lo stato della condivisione è 3 o 4
+            },
+        },
 
-  watch: {
-      sharing: function(){
-          this.form.keys().forEach(key => {
-              this.form[key] = this.sharing[key]
-          })
-      }
-  },
+        watch: {
+            sharing: function(){
+                this.form.keys().forEach(key => {
+                    this.form[key] = this.sharing[key]
+                })
+            }
+        },
 
 
-  methods: {
-    credentialToggle () {
-      this.showCredential = !this.showCredential
-    },
-    doTransition (transition) {
-      let api = (transition)
-          ? `/api/sharings/${this.sharing.id}/transitions/${transition}`
-          : `/api/sharings/${this.sharing.id}/transitions`
-        axios.patch(api).then((response) => {
-        this.$store.dispatch('sharings/updateSharing', { sharing: response.data })
-      })
-    },
-    async saveCredentials () {
-        const { data } = await this.form.patch(`/api/sharings/${this.sharing.id}/credential`)
-        if(data) this.$store.dispatch('sharings/updateSharing', { sharing: data })
-    },
-    async confirmCredentials () {
-        axios.post(`/api/sharings/${this.sharing.id}/credential`).then(response => {
-            this.$store.dispatch('sharings/updateSharing', { sharing: response.data })
-        });
+        methods: {
+            credentialToggle () {
+                this.showCredential = !this.showCredential
+            },
+            doTransition (transition) {
+                if(transition === 'pay') {
+                    //https://router.vuejs.org/guide/essentials/navigation.html
+                    const category = this.sharing.category.id
+                    const sharing = this.sharing.id
+                    this.$router.push({ name: 'sharing.checkout', params: { category, sharing } })
+                } else {
+                    let api = (transition)
+                        ? `/api/sharings/${this.sharing.id}/transitions/${transition}`
+                        : `/api/sharings/${this.sharing.id}/transitions`
+                    axios.patch(api).then((response) => {
+                        this.$store.dispatch('sharings/updateSharing', { sharing: response.data })
+                    })
+                }
+            },
+            async saveCredentials () {
+                const { data } = await this.form.patch(`/api/sharings/${this.sharing.id}/credential`)
+                if(data) this.$store.dispatch('sharings/updateSharing', { sharing: data })
+            },
+            async confirmCredentials () {
+                axios.post(`/api/sharings/${this.sharing.id}/credential`).then(response => {
+                    this.$store.dispatch('sharings/updateSharing', { sharing: response.data })
+                });
+            }
+        }
     }
-  }
-}
 </script>
 
 <style scoped>

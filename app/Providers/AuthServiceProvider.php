@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Enums\SharingStatus;
 use App\Sharing;
 use App\User;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
@@ -31,8 +32,20 @@ class AuthServiceProvider extends ServiceProvider
             return $user->id === $sharingUser->sharing->owner->id;
         });
 
-        Gate::define('pay-sharing', function($user, $sharingUser){
-            return $user->id === $sharingUser->user_id;
+        Gate::define('can-subscribe', function($user, $sharingUser){
+            return $user->id === $sharingUser->user_id && $sharingUser->status === SharingStatus::Approved;
+        });
+
+        Gate::define('left-subscription', function ($user, $sharingUser){
+            \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+            \Stripe\Stripe::setApiVersion("2019-10-08");
+
+            if($sharingUser->stripe_subscription_id){
+                $subscription = \Stripe\Subscription::retrieve($sharingUser->stripe_subscription_id);
+                return $subscription->status === 'canceled';
+            }else{
+                return false;
+            }
         });
 
         Gate::define('manage-sharing', function(User $user, Sharing $sharing){

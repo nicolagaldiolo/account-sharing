@@ -8,6 +8,7 @@ use App\Http\Requests\CredentialRequest;
 use App\Http\Requests\SharingRequest;
 use App\Http\Traits\SharingTrait;
 use App\Sharing;
+use App\SharingUser;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -198,6 +199,10 @@ class SharingsController extends Controller
 
     public function transition(Request $request, Sharing $sharing, $transition = null)
     {
+
+        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+        \Stripe\Stripe::setApiVersion("2019-10-08");
+
         // Cerco la relazione tra utente e sharing, se non esiste la creo
         $user = Auth::user();
         $userSharing = $user->sharings()->find($sharing->id);
@@ -211,60 +216,19 @@ class SharingsController extends Controller
         $stateMachine = \StateMachine::get($sharingStatus, 'sharing');
 
         if($transition && $stateMachine->can($transition)) {
+
             switch ($transition){
-                case 'pay':
-
-                    $currentStripeAccount = $sharing->owner->stripe_account_id;
-
-                    if(is_null($user->stripe_customer_id)){
-                        // Creo il Customer
-                        $stripeCustomer = Stripe::createCustomer([
-                            'email' => $user->email,
-                            'source' => 'tok_threeDSecure2Required',
-                        ], ['stripe_account' => $currentStripeAccount]);
-                        $user->stripe_customer_id = $stripeCustomer->id;
-                        $user->save();
-                    }else{
-                        $stripeCustomer = Stripe::getCustomer(
-                            $user->stripe_customer_id,
-                            ["stripe_account" => $currentStripeAccount]
-                        );
-                    }
-
-                    $subscription = Stripe::createSubscription([
-                        'customer' => $stripeCustomer->id,
-                        'items' => [
-                            [
-                                'plan' => $sharing->stripe_plan,
-                            ],
-                        ],
-                        'expand' => ['latest_invoice.payment_intent'],
-                    ],['stripe_account' => $currentStripeAccount]);
-
-                    if($subscription->status === 'active' && $subscription->latest_invoice->payment_intent->status === 'succeeded') {
-                        $stateMachine->apply($transition);
-                        $sharingStatus->save();
-                    }else if($subscription->status === 'incomplete' && $subscription->latest_invoice->payment_intent->status === 'requires_payment_method'){
-
-                        /*\Stripe\Stripe::setApiKey(config('services.stripe.secret'));
-
-                        $payment_method = \Stripe\PaymentMethod::retrieve('pm_1FYeznClCIKljWvssSbEXRww');
-                        $payment_method->attach(
-                            ['customer' => $stripeCustomer->id],
-                            ['stripe_account' => $currentStripeAccount]);
-
-                        $stateMachine->apply($transition);
-                        $sharingStatus->save();
-                        */
-
-                    }else{
-                        abort(500);
-                        die($subscription);
-                    }
-
-
+                case 'leaving' :
+                    \Stripe\Subscription::update($sharingStatus->stripe_subscription_id, [
+                            'cancel_at_period_end' => true,
+                    ]);
                     break;
-                default:
+                case 'back_to_join' :
+                    \Stripe\Subscription::update($sharingStatus->stripe_subscription_id, [
+                        'cancel_at_period_end' => false,
+                    ]);
+                    break;
+                default :
                     $stateMachine->apply($transition);
                     $sharingStatus->save();
                     break;
@@ -272,6 +236,87 @@ class SharingsController extends Controller
         }
         return $this->getSharing($userSharing);
 
+    }
+
+    public function subscribe(Request $request, Sharing $sharing)
+    {
+        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+        \Stripe\Stripe::setApiVersion("2019-10-08");
+
+        $newPaymentMethod = $request->payment_method;
+
+        $user = Auth::user();
+        $userSharing = $user->sharings()->find($sharing->id);
+        $sharingStatus = $userSharing->sharing_status;
+
+        $stateMachine = \StateMachine::get($sharingStatus, 'sharing');
+
+        if($stateMachine->can('pay')) {
+
+            $payment_method = \Stripe\PaymentMethod::retrieve($newPaymentMethod);
+
+            $customerPaymentMethods = \Stripe\PaymentMethod::all([
+                'customer' => $user->stripe_customer_id,
+                'type' => 'card',
+            ]);
+
+            if(!collect($customerPaymentMethods->data)->pluck('id')->contains($payment_method->id)){
+                $payment_method->attach(['customer' => $user->stripe_customer_id]);
+            }
+
+            \Stripe\Customer::update($user->stripe_customer_id, [
+                    'invoice_settings' => [
+                        'default_payment_method' => $payment_method->id,
+                    ],
+                ]
+            );
+
+            // Se esiste già una Subscription incompleta la gestisco
+            // altrimenti ne creo una nuova
+
+            try{
+
+                $subscription = \Stripe\Subscription::retrieve($sharingStatus->stripe_subscription_id);
+
+                if($subscription->status !== 'incomplete') {
+                    throw new \Exception('Subscription not available');
+                }else {
+                    $invoice = \Stripe\Invoice::retrieve(['id' => $subscription->latest_invoice->id]);
+                    try {
+                        $invoice->pay();
+                    } catch (\Exception $e) {
+                    }
+                }
+
+                $subscription = \Stripe\Subscription::retrieve([
+                    'id' => $sharingStatus->stripe_subscription_id,
+                    'expand' => [
+                        'latest_invoice.payment_intent'
+                    ]
+                ]);
+
+            }catch(\Exception $e){
+                $subscription = \Stripe\Subscription::create([
+                    'customer' => $user->stripe_customer_id,
+                    'items' => [
+                        [
+                            'plan' => $sharing->stripe_plan,
+                        ],
+                    ],
+                    'expand' => [
+                        'latest_invoice.payment_intent'
+                    ]
+                ]);
+
+                $sharingStatus->stripe_subscription_id = $subscription->id;
+                $sharingStatus->save();
+            }
+
+            return $subscription;
+
+        }else{
+            abort(500);
+        }
 
     }
 

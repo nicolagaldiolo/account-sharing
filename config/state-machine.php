@@ -33,6 +33,10 @@ return [
                 'metadata' => ['title' => 'Fai parte di questo gruppo'],
             ],
             [
+                'name' => \App\Enums\SharingStatus::Leaving,
+                'metadata' => ['title' => 'Stai lasciando questo gruppo'],
+            ],
+            [
                 'name' => \App\Enums\SharingStatus::Left,
                 'metadata' => ['title' => 'Hai abbandonato questo gruppo'],
             ],
@@ -71,7 +75,24 @@ return [
                 'from' => [\App\Enums\SharingStatus::Approved],
                 'to' => \App\Enums\SharingStatus::Joined,
                 'metadata' => ['title' => 'Paga il servizio'],
-            ]
+            ],
+            'leaving' => [
+                'from' => [\App\Enums\SharingStatus::Joined],
+                'to' => \App\Enums\SharingStatus::Leaving,
+                'metadata' => ['title' => 'Lascia il gruppo'],
+            ],
+            'back_to_join' => [
+                'from' => [\App\Enums\SharingStatus::Leaving],
+                'to' => \App\Enums\SharingStatus::Joined,
+                'metadata' => ['title' => 'Torna nel gruppo'],
+            ],
+
+            // Callable only by program
+            'left' => [
+                'from' => [\App\Enums\SharingStatus::Leaving,\App\Enums\SharingStatus::Joined],
+                'to' => \App\Enums\SharingStatus::Left,
+                'metadata' => ['title' => 'Abbandona il gruppo'],
+            ],
         ],
 
         // list of all callbacks
@@ -94,8 +115,12 @@ return [
                     // call the callback on a specific transition
                     'on' => 'pay',
                     // will check the ability on the gate or the class policy
-                    'can' => 'pay-sharing',
+                    'can' => 'can-subscribe',
                 ],
+                'guard_on_left' => [
+                    'on' => 'left',
+                    'can' => 'left-subscription',
+                ]
 
                 /*'guard_on_submitting' => [
                     // call the callback on a specific transition

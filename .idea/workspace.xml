@@ -2,38 +2,23 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="80fbe383-e517-4357-96d8-8ee0108f1222" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/accountSharing.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/accountSharing.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Auth/RegisterController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Auth/RegisterController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Renewals/RenewalsController.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Settings/ProfileController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Settings/ProfileController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Enums/SharingStatus.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Enums/SharingStatus.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Sharings/SharingsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Sharings/SharingsController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Renewal.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Stripe/SourceController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Stripe/PaymentMethodsController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Kernel.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Kernel.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Middleware/VerifyCsrfToken.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Middleware/VerifyCsrfToken.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Providers/AuthServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Providers/AuthServiceProvider.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Sharing.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Sharing.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/SharingUser.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/SharingUser.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/User.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/User.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/SchemaER.graphml" beforeDir="false" afterPath="$PROJECT_DIR$/database/SchemaER.graphml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/factories/CategoryFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/factories/CategoryFactory.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/factories/RenewalFactory.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/factories/UserFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/factories/UserFactory.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/migrations/2014_10_12_000000_create_users_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2014_10_12_000000_create_users_table.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/migrations/2019_07_17_191346_create_sharings_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2019_07_17_191346_create_sharings_table.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/migrations/2019_07_18_041355_create_sharing_user_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2019_07_18_041355_create_sharing_user_table.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/migrations/2019_08_16_124828_create_renewals_table.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/state-machine.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/state-machine.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/database/seeds/SeedFakeData.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeds/SeedFakeData.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/Card.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Card.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/pages/auth/register.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/auth/register.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/pages/settings/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/settings/index.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/pages/settings/profile.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/settings/profile.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/pages/settings/wallet.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/settings/wallet.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/pages/sharings/show.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/sharings/show.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/router/routes.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/router/routes.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/store/modules/auth.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/store/modules/auth.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/store/modules/stripe.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/store/modules/stripe.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/store/mutation-types.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/store/mutation-types.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/index.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/api.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
     </list>
@@ -83,6 +68,13 @@
         <item name="accountSharing: schema" type="76f4a085:MysqlImplModel$Schema" />
         <item name="renewals: table" type="285a2a93:MysqlImplModel$Table" />
       </path>
+      <path>
+        <item name="Database" type="3277223f:DatabaseStructure$DbRootGroup" />
+        <item name="MySQL for 5.1 - @localhost" type="feb32156:DbDataSourceImpl" />
+        <item name="schemas" type="d4e8921:DatabaseStructure$FamilyGroup" />
+        <item name="accountSharing: schema" type="76f4a085:MysqlImplModel$Schema" />
+        <item name="sharing_user: table" type="285a2a93:MysqlImplModel$Table" />
+      </path>
     </expand>
     <select />
   </component>
@@ -108,7 +100,32 @@
           <mapping local-root="$PROJECT_DIR$" remote-root="/Users/chloe/.composer/vendor/laravel/valet" />
         </path_mappings>
       </server>
-      <server host="" id="6fe1a852-adda-4f88-bc49-319ac8072820" use_path_mappings="true">
+      <server id="6fe1a852-adda-4f88-bc49-319ac8072820" use_path_mappings="true">
+        <path_mappings>
+          <mapping local-root="$PROJECT_DIR$" remote-root="/Users/chloe/.composer/vendor/laravel/valet" />
+        </path_mappings>
+      </server>
+      <server id="ade1b581-fa07-43c6-90bf-bc75ce2a7fe9" use_path_mappings="true">
+        <path_mappings>
+          <mapping local-root="$PROJECT_DIR$" remote-root="/Users/chloe/.composer/vendor/laravel/valet" />
+        </path_mappings>
+      </server>
+      <server id="2160d653-36c4-4663-980e-466e938c7610" use_path_mappings="true">
+        <path_mappings>
+          <mapping local-root="$PROJECT_DIR$" remote-root="/Users/chloe/.composer/vendor/laravel/valet" />
+        </path_mappings>
+      </server>
+      <server id="7b63320e-c475-4846-b9ec-6f9869bcd7e1" use_path_mappings="true">
+        <path_mappings>
+          <mapping local-root="$PROJECT_DIR$" remote-root="/Users/chloe/.composer/vendor/laravel/valet" />
+        </path_mappings>
+      </server>
+      <server id="9feb344f-a54e-479b-bf4e-4fe258e9b591" use_path_mappings="true">
+        <path_mappings>
+          <mapping local-root="$PROJECT_DIR$" remote-root="/Users/chloe/.composer/vendor/laravel/valet" />
+        </path_mappings>
+      </server>
+      <server host="" id="17966d86-0fec-4c5c-945c-44264bfecca1" use_path_mappings="true">
         <path_mappings>
           <mapping local-root="$PROJECT_DIR$" remote-root="/Users/chloe/.composer/vendor/laravel/valet" />
         </path_mappings>
@@ -247,7 +264,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="database.console.LAST_STATE" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/views" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/js/middleware" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -257,23 +274,23 @@
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
-    <property name="settings.editor.selected.configurable" value="reference.settings.php.debug.xdebug.proxy" />
+    <property name="settings.editor.selected.configurable" value="preferences.sourceCode.Other File Types" />
     <property name="ts.external.directory.path" value="$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/resources/views" />
-      <recent name="$PROJECT_DIR$/resources/js/pages/settings" />
-      <recent name="$PROJECT_DIR$/app/MyClasses" />
-      <recent name="$PROJECT_DIR$/resources/views/emails" />
-      <recent name="$PROJECT_DIR$/app/Http/Requests" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/app/MyClasses/Support/Facade" />
       <recent name="$PROJECT_DIR$/app/Http/Controllers/Sharings" />
       <recent name="$PROJECT_DIR$/resources/js/pages/sharings" />
       <recent name="$PROJECT_DIR$/resources/js/pages/categories" />
       <recent name="$PROJECT_DIR$/database" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/resources/js/middleware" />
+      <recent name="$PROJECT_DIR$/resources/js/pages/sharings" />
+      <recent name="$PROJECT_DIR$/resources/views" />
+      <recent name="$PROJECT_DIR$/resources/js/pages/settings" />
+      <recent name="$PROJECT_DIR$/app/MyClasses" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -366,11 +383,20 @@
       <workItem from="1572073698673" duration="1026000" />
       <workItem from="1572332381077" duration="1600000" />
       <workItem from="1572413721886" duration="8954000" />
+      <workItem from="1572706035617" duration="12794000" />
+      <workItem from="1572766929275" duration="8458000" />
+      <workItem from="1573015021365" duration="9940000" />
+      <workItem from="1573061807589" duration="16303000" />
+      <workItem from="1573285591442" duration="28507000" />
+      <workItem from="1573369093034" duration="27178000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName="*.log" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -384,17 +410,5 @@
         </entry>
       </map>
     </option>
-  </component>
-  <component name="XDebuggerManager">
-    <watches-manager>
-      <configuration name="server.php">
-        <watch expression="$param" language="PHP" />
-        <watch expression="$pippo" language="PHP" />
-        <watch expression="$currentStripeAccount" language="PHP" />
-        <watch expression="$stripeCustomer-&gt;id" language="PHP" />
-        <watch expression="$sharing-&gt;stripe_plan" language="PHP" />
-        <watch expression="$currentStripeAccount" language="PHP" />
-      </configuration>
-    </watches-manager>
   </component>
 </project>

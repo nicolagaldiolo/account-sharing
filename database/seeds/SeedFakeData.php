@@ -148,7 +148,7 @@ class SeedFakeData extends Seeder
                         "name" => $category->name
                     ],
                     "currency" => "eur"
-                ], ["stripe_account" => $stripeAccount->id]);
+                ]);
 
                 $sharing->stripe_plan = $stripePlan->id;
                 $sharing->save();

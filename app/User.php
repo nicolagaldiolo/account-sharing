@@ -122,7 +122,7 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
             ->as('sharing_status')
             ->withPivot(['status','id','stripe_subscription_id','owner'])
             ->withTimestamps()
-            ->whereStatus(SharingStatus::Joined)
+            ->whereIn('status', [SharingStatus::Joined, SharingStatus::Leaving])
             ->whereOwner(true);
     }
 

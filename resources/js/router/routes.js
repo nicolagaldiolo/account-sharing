@@ -17,6 +17,7 @@ export default [
   { path: '/categories', name: 'categories', component: page('home.vue') },
   { path: '/category/:category_id', name: 'category.show', component: page('categories/show.vue') },
   { path: '/category/:category_id/sharing/:sharing_id', name: 'sharing.show', component: page('sharings/show.vue') },
+  { path: '/category/:category_id/sharing/:sharing_id/checkout', name: 'sharing.checkout', component: page('sharings/checkout.vue') },
 
   { path: '/sharing/create', name: 'sharing.requests', component: page('sharings/create.vue') },
 
