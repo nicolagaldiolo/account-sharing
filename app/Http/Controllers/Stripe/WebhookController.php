@@ -2,17 +2,24 @@
 
 namespace App\Http\Controllers\Stripe;
 
+use App\Enums\SharingStatus;
+use App\Enums\SubscriptionStatus;
 use App\Http\Middleware\VerifyWebhookSignature;
+use App\Http\Traits\SharingTrait;
 use App\SharingUser;
+use App\Subscription;
 use App\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
 
 class WebhookController extends Controller
 {
+    use SharingTrait;
     /**
      * Create a new WebhookController instance.
      *
@@ -20,7 +27,9 @@ class WebhookController extends Controller
      */
     public function __construct()
     {
-        logger("Eccomi");
+        logger("****************************");
+        logger("INVOCATO WEBHOOK");
+        logger("****************************");
         if (config('stripe.webhook.secret')) {
             $this->middleware(VerifyWebhookSignature::class);
         }
@@ -53,10 +62,16 @@ class WebhookController extends Controller
     }
 
 
+    /**
+     * Conferma iscrizione alla sottoscrizione
+     *
+     */
     protected function handleInvoicePaymentSucceeded(array $payload)
     {
+
         $subscription_id = $payload['data']['object']['subscription'];
-        $userSharing = SharingUser::where('stripe_subscription_id', $subscription_id)->firstOrFail();
+
+        $userSharing = Subscription::where('stripe_id', $subscription_id)->firstOrFail()->sharingUser;
 
         $user = User::findOrFail($userSharing->user_id);
         Auth::login($user);
@@ -69,67 +84,129 @@ class WebhookController extends Controller
             $userSharing->save();
         }
 
+        logger('Payment successffull');
+
         return $this->successMethod();
+    }
+
+    protected function handleInvoicePaymentFailed(array $payload)
+    {
+        logger('Payment failed');
+        //logger($payload);
+    }
+
+    protected function handleInvoicePaymentActionRequired(array $payload)
+    {
+        logger('Payment action required');
+        //logger($payload);
     }
 
 
 
     /**
-     * Handle customer subscription updated.
+     * Cambio di stato della sottoscrizione
      *
-     * @param  array  $payload
-     * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function handleCustomerSubscriptionUpdated(array $payload)
     {
-        logger($payload);
 
         $status = $payload['data']['object']['status'];
 
-        if($status === 'active'){
-            $subscription_id = $payload['data']['object']['id'];
-            $userSharing = SharingUser::where('stripe_subscription_id', $subscription_id)->firstOrFail();
+        $subscription_id = $payload['data']['object']['id'];
+        $userSharing = Subscription::where('stripe_id', $subscription_id)->firstOrFail()->sharingUser;
 
-            $transition = ($payload['data']['object']['cancel_at_period_end']) ? 'leaving' : 'back_to_join';
+        $user = User::findOrFail($userSharing->user_id);
+        Auth::login($user);
 
-            $user = User::findOrFail($userSharing->user_id);
-            Auth::login($user);
+        //$stateMachine = \StateMachine::get($userSharing, 'sharing');
 
-            $stateMachine = \StateMachine::get($userSharing, 'sharing');
-            if($stateMachine->can($transition)) {
-                $stateMachine->apply($transition);
-                $userSharing->save();
-            }
-        }elseif ($status === 'past_due'){
-            logger("Sottoscrizione scaduta");
+        $this->updateSubscription($userSharing->subscription, $payload['data']['object']);
 
-        }
+        //if($stateMachine->getState() === SharingStatus::Joined){
+            // Se la sottoscrizione è attiva
+            //if($status === 'active') {
+
+
+
+            // Altrimenti se è scaduta, nel caso in cui il pagamento sia fallito
+            //}elseif ($status === 'past_due'){
+
+            //    logger("Sottoscrizione scaduta");
+
+            //}
+        //}else{
+        //    abort(403);
+        //}
 
         return $this->successMethod();
     }
 
     /**
-     * Handle a cancelled customer from a Stripe subscription.
+     * Conferma creazione della sottoscrizione
      *
-     * @param  array  $payload
-     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function handleCustomerSubscriptionCreated(array $payload)
+    {
+        //logger($payload);
+        /*
+        $subscription = $payload['data']['object'];
+
+        $userSharing = SharingUser::whereSharingId($subscription['metadata']['sharing_id'])
+            ->whereUserId($subscription['metadata']['user_id'])
+            ->firstOrFail();
+
+        $user = User::findOrFail($userSharing->user_id);
+        Auth::login($user);
+
+        $stateMachine = \StateMachine::get($userSharing, 'sharing');
+
+        //DB::transaction(function() use ($stateMachine, $userSharing, $subscription){
+            if($stateMachine->can('pay')) {
+
+                $userSharing->subscription()->create([
+                    'stripe_id' => $subscription['id'],
+                    'status' => SubscriptionStatus::getValue($subscription['status']),
+                    'current_period_end_at' => $subscription['current_period_end']
+                ]);
+
+            }
+        //});
+
+        */
+
+
+        return $this->successMethod();
+    }
+
+    /**
+     * Conferma cancellazione della sottoscrizione
+     *
      */
 
     protected function handleCustomerSubscriptionDeleted(array $payload)
     {
+
         $subscription_id = $payload['data']['object']['id'];
-        $userSharing = SharingUser::where('stripe_subscription_id', $subscription_id)->firstOrFail();
+        $userSharing = Subscription::where('stripe_id', $subscription_id)->firstOrFail()->sharingUser;
 
         $stateMachine = \StateMachine::get($userSharing, 'sharing');
 
-        $transition = 'left';
+
         $user = User::findOrFail($userSharing->user_id);
         Auth::login($user);
 
-        if($stateMachine->can($transition)) {
-            $stateMachine->apply($transition);
-            $userSharing->save();
-        }
+        DB::transaction(function() use ($stateMachine, $userSharing, $payload) {
+            $transition = 'left';
+
+            if ($stateMachine->can($transition)) {
+                $stateMachine->apply($transition);
+                $userSharing->save();
+            }
+
+            $this->updateSubscription($userSharing->subscription, $payload['data']['object']);
+
+            logger("Avvisare della cancellazione sia admin che user, avvertire admin di cambiare le password");
+        });
 
         return $this->successMethod();
     }

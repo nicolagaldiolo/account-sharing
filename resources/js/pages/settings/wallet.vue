@@ -72,7 +72,8 @@ export default {
   }),
 
     props: {
-        checkoutMode: { type: Boolean, default: false }
+        checkoutMode: { type: Boolean, default: false },
+        action: { type: String, default: 'subscribe' }
     },
 
   computed: mapGetters({
@@ -171,7 +172,11 @@ export default {
 
       subscribe (paymentMethod) {
 
-          axios.post(`/api/sharings/${this.$route.params.sharing_id}/subscribe`, {
+          const api = this.action === 'subscribe'
+              ? `/api/sharings/${this.$route.params.sharing_id}/subscribe`
+              : `/api/sharings/${this.$route.params.sharing_id}/restore`
+
+          axios.post(api, {
               payment_method: paymentMethod
           }).then((response) => {
               //Outcome 1: Payment succeeds
@@ -182,7 +187,8 @@ export default {
                   console.log("PROBLEMI COL METODO DI PAGAMENTO 22222");
                   alert(response);
 
-              } else if (response.data.status === 'incomplete' && response.data.latest_invoice.payment_intent.status === 'requires_action') {
+              // posso entrare qui se sono on session e quindi sto facendo il primo pagamento (incomplete) oppure a seguito di un pagamento fallito in fase di rinnovo (past_due)
+              } else if ((response.data.status === 'incomplete' || response.data.status === 'past_due') && response.data.latest_invoice.payment_intent.status === 'requires_action') {
                   console.log("AZIONE RICHIESTA");
                   const paymentIntentSecret = response.data.latest_invoice.payment_intent.client_secret;
                   this.stripe.handleCardPayment(paymentIntentSecret).then(function (result) {

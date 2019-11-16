@@ -73,7 +73,7 @@ class Sharing extends Model
         return $this->belongsToMany(User::class)
             ->using(SharingUser::class)
             ->as('sharing_status')
-            ->withPivot(['status','id','stripe_subscription_id','owner','credential_updated_at'])
+            ->withPivot(['id','status','owner','credential_updated_at'])
             ->withTimestamps();
     }
 
@@ -85,8 +85,8 @@ class Sharing extends Model
         return $this->belongsToMany(User::class)
             ->using(SharingUser::class)
             ->as('sharing_status')
-            ->withPivot(['status','id','stripe_subscription_id','owner','credential_updated_at'])
-            ->whereIn('status', [SharingStatus::Joined, SharingStatus::Leaving])
+            ->withPivot(['id','status','owner','credential_updated_at'])
+            ->whereStatus(SharingStatus::Joined)
             ->withTimestamps();
     }
 
@@ -94,8 +94,8 @@ class Sharing extends Model
         return $this->belongsToMany(User::class)
             ->using(SharingUser::class)
             ->as('sharing_status')
-            ->withPivot(['status','id','stripe_subscription_id','owner','credential_updated_at'])
-            ->whereIn('status', [SharingStatus::Joined, SharingStatus::Leaving])
+            ->withPivot(['id','status','owner','credential_updated_at'])
+            ->whereStatus(SharingStatus::Joined)
             ->whereOwner(null)
             ->withTimestamps();
     }
@@ -176,7 +176,7 @@ class Sharing extends Model
 
     public function scopeJoined($query)
     {
-        return $query->whereIn('status', [SharingStatus::Joined, SharingStatus::Leaving]);
+        return $query->whereStatus(SharingStatus::Joined);
     }
 
     // dato uno stato torno tutte le condivisioni in quello stato

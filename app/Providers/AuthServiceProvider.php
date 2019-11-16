@@ -3,9 +3,12 @@
 namespace App\Providers;
 
 use App\Enums\SharingStatus;
+use App\Enums\SubscriptionStatus;
 use App\Sharing;
+use App\SharingUser;
 use App\User;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
@@ -36,12 +39,16 @@ class AuthServiceProvider extends ServiceProvider
             return $user->id === $sharingUser->user_id && $sharingUser->status === SharingStatus::Approved;
         });
 
-        Gate::define('left-subscription', function ($user, $sharingUser){
+        Gate::define('can-restore', function($user, $sharingUser){
+            return $user->id === $sharingUser->user_id && $sharingUser->subscription->status === SubscriptionStatus::getValue('past_due');
+        });
+
+        Gate::define('left-subscription', function (User $user, SharingUser $sharingUser){
             \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
             \Stripe\Stripe::setApiVersion("2019-10-08");
 
-            if($sharingUser->stripe_subscription_id){
-                $subscription = \Stripe\Subscription::retrieve($sharingUser->stripe_subscription_id);
+            if($sharingUser->subscription && $sharingUser->subscription->stripe_id){
+                $subscription = \Stripe\Subscription::retrieve($sharingUser->subscription->stripe_id);
                 return $subscription->status === 'canceled';
             }else{
                 return false;

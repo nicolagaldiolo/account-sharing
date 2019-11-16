@@ -1,9 +1,10 @@
 <template>
   <div class="media text-muted pt-3">
+
     <img class="mr-2 rounded-circle" :src="user.photo_url" style="width: 32px; height: 32px;">
     <div class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
 
-      <div v-if="isAdmin">
+      <div v-if=user.sharing_status.owner>
         <strong class="text-gray-dark">{{user.name}}</strong>
         <span class="d-block">Admin</span>
       </div>
@@ -12,19 +13,23 @@
         <div class="d-flex justify-content-between align-items-center w-100">
           <strong class="text-gray-dark">{{user.name}}</strong>
 
-          <a v-if="this.renewalInfo && user.renewalInfo.renewal_status != 2" href="#" @click.prevent="renewalAction('left')" class="btn btn-danger btn-sm">Lascia il gruppo</a>
-          <a v-if="this.renewalInfo && user.renewalInfo.renewal_status == 2" href="#" @click.prevent="renewalAction('restore')" class="btn btn-secondary btn-sm">Torna nel gruppo</a>
+          <a v-if="(owner || authUser.id == user.id) && user.sharing_status.subscription" href="#" @click.prevent="renewalAction"
+             :class="user.sharing_status.subscription.cancel_at_period_end ? 'btn btn-secondary btn-sm' : 'btn btn-danger btn-sm'">
+            {{user.sharing_status.subscription && user.sharing_status.subscription.cancel_at_period_end ? 'torna nel gruppo' : 'lascia il gruppo'}}
+          </a>
 
         </div>
 
-        <span v-if="user.joiner_since" class="d-block">Membro dal {{ user.joiner_since | moment("D MMMM YYYY") }}</span>
+        <span v-if="user.sharing_status.subscription && user.sharing_status.subscription.created_at" class="d-block">Membro dal {{ user.sharing_status.subscription.created_at | moment("D MMMM YYYY") }}</span>
 
-        <div v-if="this.renewalInfo">
-          <div v-if="user.renewalInfo.renewal_status == 2">
-            <small>Verrà rimosso il {{user.renewalInfo.renewal_date | moment("D MMMM YYYY")}} (Giorno limite per rimborso il <strong>{{user.renewalInfo.refund_day_limit | moment("D MMMM YYYY")}}</strong>)</small>
+        <div v-if="(owner || authUser.id == user.id) && user.sharing_status.subscription">
+          <div v-if="user.sharing_status.subscription.cancel_at_period_end">
+            <small>Verrà rimosso il {{user.sharing_status.subscription.current_period_end_at | moment("D MMMM YYYY")}}
+              <!--(Giorno limite per rimborso il <strong>{{user.renewalInfo.refund_day_limit | moment("D MMMM YYYY")}}</strong>)-->
+            </small>
           </div>
           <div v-else>
-            <small>Il prossimo rinnovo sarà il <strong>{{user.renewalInfo.renewal_date | moment("D MMMM YYYY")}}</strong></small>
+            <small>Il prossimo rinnovo sarà il <strong>{{user.sharing_status.subscription.current_period_end_at | moment("D MMMM YYYY")}}</strong></small>
           </div>
         </div>
 
@@ -43,11 +48,11 @@ export default {
       type: Object,
       default: null
     },
-    sharing: {
+    authUser: {
       type: Object,
       default: null
     },
-    isAdmin: {
+    owner: {
       type: Boolean,
       default: false
     }
@@ -61,7 +66,7 @@ export default {
 
   methods: {
     renewalAction (action) {
-      axios.patch(`/api/sharings/${this.sharing.id}/user/${this.user.id}/action/${action}`).then((response) => {
+      axios.patch(`/api/sharings/${this.user.sharing_status.sharing_id}/user/${this.user.sharing_status.user_id}/update`).then((response) => {
         this.$store.dispatch('sharings/updateSharing', { sharing: response.data })
       })
     },

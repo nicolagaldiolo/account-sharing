@@ -3,39 +3,25 @@
 namespace App\Http\Traits;
 
 use App\Enums\SharingStatus;
+use App\Enums\SubscriptionStatus;
 use App\Sharing;
+use App\SharingUser;
+use App\Subscription;
 use Illuminate\Support\Facades\Auth;
+use PhpParser\Node\Expr\Cast\Object_;
 
 trait SharingTrait {
 
     protected function getSharing(Sharing $sharing)
     {
 
-        $sharing->load(['category', 'activeUsers', 'activeUsersWithoutOwner']);
+        //$sharing->load(['category', 'activeUsers', 'activeUsersWithoutOwner']);
+        $sharing->load(['category', 'activeUsersWithoutOwner']);
 
-        //$sharing->sharing_state_machine = $this->getSharingStateMachineAttribute($sharing);
-
-        /*$sharing->active_users = $sharing->activeUsers()->get()->each(function($user) use($sharing){
-
-            if(Auth::id() === $sharing->owner->id || Auth::id() == $user->id ) {
-                $sharing_status = $user->sharings()->where('sharings.id', $sharing->id)->first()->sharing_status;
-
-                $state_history = $sharing_status->stateHistory()->whereTo(3)->latest()->first();
-                if($state_history) $user->joiner_since = $state_history->created_at;
-
-                $renewal = $sharing_status->renewals()->orderBy('expires_at', 'desc')->first();
-                if ($renewal) {
-                    $user->renewalInfo = [
-                        'renewal_status' => $renewal->status,
-                        'renewal_date' => $renewal->expires_at,
-                        'refund_day_limit' => $renewal->expires_at->subDays(config('custom.day_refund_limit'))
-                    ];
-                }
-            }
-
-            return $user;
+        $sharing->active_users = $sharing->activeUsers()->get()->each(function($user) use($sharing){
+            return $user->sharing_status->subscription;
         });
-        */
+
         return $sharing;
     }
 
@@ -55,6 +41,24 @@ trait SharingTrait {
                 $sharingStatus->users = $users->values();
             });
         });
+    }
+
+    protected function updateSubscription(Subscription $subscription, $payload)
+    {
+
+
+        $subscription->update([
+            'status' => SubscriptionStatus::getValue($payload['status']),
+            'cancel_at_period_end' => $payload['cancel_at_period_end'],
+            'ended_at' => $payload['ended_at'],
+            'current_period_end_at' => $payload['current_period_end']
+        ]);
+
+        //if ($subscription->cancel_at_period_end != $payload->cancel_at_period_end){
+        //    $subscription->cancel_at_period_end = $payload->cancel_at_period_end;
+        //    $subscription->save();
+        //}
+        //return $subscription;
     }
 
     /*public function getSharingStateMachineAttribute($item){

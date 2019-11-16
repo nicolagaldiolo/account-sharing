@@ -10,6 +10,5 @@ final class SharingStatus extends Enum
     const Approved  = 1;
     const Refused   = 2;
     const Joined    = 3;
-    const Leaving   = 4;
-    const Left      = 5;
+    const Left      = 4;
 }

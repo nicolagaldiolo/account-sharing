@@ -27,6 +27,12 @@
     </section>
     <div class="container">
       <div v-if="owner || joined">
+
+        <div v-if="userSubscription === 4" class="alert alert-danger" role="alert">
+          Attenzione ci sono problemi con i pagamenti.
+          <router-link :to="{ name: 'sharing.restore' }" class="alert-link">Completa pagamento</router-link>
+        </div>
+
         <a v-if="availability" class="btn btn-primary btn-lg btn-block">Invita altra gente</a>
         <div v-if="sharing.sharing_state_machine.transitions.length">
           <a v-for="(transition, index) in sharing.sharing_state_machine.transitions" :key="index" href="#" @click.prevent="doTransition(transition.value)" class="btn btn-primary btn-lg btn-block">
@@ -56,18 +62,8 @@
             <h4>Membri del gruppo</h4>
 
             <div v-for="(user, index) in sharing.active_users" :key="index" class="media text-muted pt-3">
-              <member-item :user="user" :sharing="sharing" :isAdmin="user.sharing_status.owner === 1"/>
+              <member-item :owner="owner" :user="user" :authUser="authUser"/>
             </div>
-
-            <!--<div class="mt-4">
-              <hr>
-              <a @click.prevent="leaveGroup" href="#" class="btn btn-outline-secondary btn-block">Abbandona gruppo</a>
-              <hr>
-              <small>Il prossimo rinnovo sarà il <strong>{{sharing.renewalInfo.renewalDate | moment("D MMMM YYYY")}}</strong></small>
-              <hr>
-              <small>Se vuoi chiedere un rimborso il giorno limite è il <strong>{{sharing.refundInfo.day_limit | moment("D MMMM YYYY")}}</strong></small>
-            </div>
-            -->
 
             <hr>
             <h4>Credenziali di accesso</h4>
@@ -162,32 +158,36 @@
                 sharing: 'sharings/sharing',
                 authUser: 'auth/user'
             }),
-            joinerCredentialConfirmed: function () {
+            joinerCredentialConfirmed () {
                 return {
                     iMustConfirm: this.sharing.active_users_without_owner.filter(item => this.authUser.id === item.id && !item.sharing_status.credential_updated_at),
                     confirmed: this.sharing.active_users_without_owner.filter(item => item.sharing_status.credential_updated_at),
                     total: this.sharing.active_users_without_owner
                 };
             },
-            saveCredentialReady: function () {
+            saveCredentialReady () {
                 return this.form.username === '' || this.form.password === ''
             },
-            availability: function () {
+            availability () {
                 return this.sharing.availability > 0
             },
-            owner: function () {
+            owner () {
                 return this.authUser.id === this.sharing.owner.id
             },
-            foreign: function () {
+            foreign () {
                 return this.sharing.sharing_state_machine === null
             },
-            joined: function () {
-                return this.sharing.sharing_state_machine !== null && ([ 3, 4 ].includes(this.sharing.sharing_state_machine.status.value)) // controllo se lo stato della condivisione è 3 o 4
+            joined () {
+                return this.sharing.sharing_state_machine !== null && this.sharing.sharing_state_machine.status.value === 3
             },
+            userSubscription () {
+                const user = this.sharing.active_users.filter(user => user.id === this.authUser.id)
+                return (user.length && user[0].sharing_status.subscription) ? user[0].sharing_status.subscription.status : {}
+            }
         },
 
         watch: {
-            sharing: function(){
+            sharing(){
                 this.form.keys().forEach(key => {
                     this.form[key] = this.sharing[key]
                 })

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Sharings;
 
 use App\Enums\RenewalStatus;
 use App\Enums\SharingStatus;
+use App\Enums\SubscriptionStatus;
 use App\Http\Requests\CredentialRequest;
 use App\Http\Requests\SharingRequest;
 use App\Http\Traits\SharingTrait;
@@ -192,9 +193,25 @@ class SharingsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Sharing $sharing)
     {
-        //
+        $this->authorize('manage-sharing', $sharing);
+
+
+        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+        \Stripe\Stripe::setApiVersion("2019-10-08");
+
+        $subscription = Auth::user()->sharings()->findOrFail($sharing->id)->sharing_status->subscription;
+
+
+        $response = \Stripe\Subscription::update($subscription->stripe_id, [
+            'cancel_at_period_end' => !boolval($subscription->cancel_at_period_end),
+        ]);
+
+        $this->updateSubscription($subscription, $response->toArray());
+
+        return $this->getSharing($sharing);
+
     }
 
     public function transition(Request $request, Sharing $sharing, $transition = null)
@@ -218,16 +235,8 @@ class SharingsController extends Controller
         if($transition && $stateMachine->can($transition)) {
 
             switch ($transition){
-                case 'leaving' :
-                    \Stripe\Subscription::update($sharingStatus->stripe_subscription_id, [
-                            'cancel_at_period_end' => true,
-                    ]);
-                    break;
-                case 'back_to_join' :
-                    \Stripe\Subscription::update($sharingStatus->stripe_subscription_id, [
-                        'cancel_at_period_end' => false,
-                    ]);
-                    break;
+                //case '' :
+                //    break;
                 default :
                     $stateMachine->apply($transition);
                     $sharingStatus->save();
@@ -238,18 +247,82 @@ class SharingsController extends Controller
 
     }
 
-    public function subscribe(Request $request, Sharing $sharing)
+
+    public function restore(Request $request, Sharing $sharing)
     {
-        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
-        \Stripe\Stripe::setApiVersion("2019-10-08");
 
         $newPaymentMethod = $request->payment_method;
 
         $user = Auth::user();
-        $userSharing = $user->sharings()->find($sharing->id);
-        $sharingStatus = $userSharing->sharing_status;
+        $userSharing = $user->sharings()->find($sharing->id)->sharing_status;
 
-        $stateMachine = \StateMachine::get($sharingStatus, 'sharing');
+        $this->authorize('can-restore', $userSharing);
+
+        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+        \Stripe\Stripe::setApiVersion("2019-10-08");
+
+        $stateMachine = \StateMachine::get($userSharing, 'sharing');
+
+        //if($stateMachine->can('pay')) {
+
+            $payment_method = \Stripe\PaymentMethod::retrieve($newPaymentMethod);
+
+            $customerPaymentMethods = \Stripe\PaymentMethod::all([
+                'customer' => $user->stripe_customer_id,
+                'type' => 'card',
+            ]);
+
+            if(!collect($customerPaymentMethods->data)->pluck('id')->contains($payment_method->id)){
+                $payment_method->attach(['customer' => $user->stripe_customer_id]);
+            }
+
+            \Stripe\Customer::update($user->stripe_customer_id, [
+                    'invoice_settings' => [
+                        'default_payment_method' => $payment_method->id,
+                    ],
+                ]
+            );
+
+            $subscription = \Stripe\Subscription::retrieve($userSharing->subscription->stripe_id);
+
+            //logger($subscription);
+            //dd();
+
+            if($subscription->status === 'past_due') {
+                $invoice = \Stripe\Invoice::retrieve(['id' => $subscription->latest_invoice]);
+                try {
+                    $invoice->pay();
+                } catch (\Exception $e) {
+                }
+            }
+
+            $subscription = \Stripe\Subscription::retrieve([
+                'id' => $userSharing->subscription->stripe_id,
+                'expand' => [
+                    'latest_invoice.payment_intent'
+                ]
+            ]);
+
+            return $subscription;
+
+        //}else{
+        //    abort(500);
+        //}
+
+    }
+
+    public function subscribe(Request $request, Sharing $sharing)
+    {
+        $newPaymentMethod = $request->payment_method;
+
+        $user = Auth::user();
+        $userSharing = $user->sharings()->find($sharing->id)->sharing_status;
+        $this->authorize('can-subscribe', $userSharing);
+
+        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+        \Stripe\Stripe::setApiVersion("2019-10-08");
+
+        $stateMachine = \StateMachine::get($userSharing, 'sharing');
 
         if($stateMachine->can('pay')) {
 
@@ -276,12 +349,12 @@ class SharingsController extends Controller
 
             try{
 
-                $subscription = \Stripe\Subscription::retrieve($sharingStatus->stripe_subscription_id);
+                $subscription = \Stripe\Subscription::retrieve($userSharing->subscription->stripe_id);
 
                 if($subscription->status !== 'incomplete') {
                     throw new \Exception('Subscription not available');
                 }else {
-                    $invoice = \Stripe\Invoice::retrieve(['id' => $subscription->latest_invoice->id]);
+                    $invoice = \Stripe\Invoice::retrieve(['id' => $subscription->latest_invoice]);
                     try {
                         $invoice->pay();
                     } catch (\Exception $e) {
@@ -289,13 +362,16 @@ class SharingsController extends Controller
                 }
 
                 $subscription = \Stripe\Subscription::retrieve([
-                    'id' => $sharingStatus->stripe_subscription_id,
+                    'id' => $userSharing->subscription->stripe_id,
                     'expand' => [
                         'latest_invoice.payment_intent'
                     ]
                 ]);
 
             }catch(\Exception $e){
+
+                logger($e);
+
                 $subscription = \Stripe\Subscription::create([
                     'customer' => $user->stripe_customer_id,
                     'items' => [
@@ -305,11 +381,19 @@ class SharingsController extends Controller
                     ],
                     'expand' => [
                         'latest_invoice.payment_intent'
+                    ],
+                    'metadata' => [
+                        'user_id' => $user->id,
+                        'sharing_id' => $sharing->id
                     ]
                 ]);
 
-                $sharingStatus->stripe_subscription_id = $subscription->id;
-                $sharingStatus->save();
+                $userSharing->subscription()->create([
+                    'stripe_id' => $subscription->id,
+                    'status' => SubscriptionStatus::getValue($subscription->status),
+                    'current_period_end_at' => $subscription->current_period_end
+                ]);
+
             }
 
             return $subscription;
@@ -330,24 +414,6 @@ class SharingsController extends Controller
             $sharing_status->save();
         }
         return $this->getSharingOwners($sharing->id);
-    }
-
-    public function renewalAction(Request $request, Sharing $sharing, User $user, $action)
-    {
-        switch ($action) {
-            case 'left':
-                $user->sharings()->where('sharings.id', $sharing->id)->first()->sharing_status->renewals()->whereStatus(RenewalStatus::Pending)->orderBy('id', 'desc')->first()->update([
-                    'status' => RenewalStatus::Stopped
-                ]);
-                break;
-            case 'restore':
-                $user->sharings()->where('sharings.id', $sharing->id)->first()->sharing_status->renewals()->whereStatus(RenewalStatus::Stopped)->orderBy('id', 'desc')->first()->update([
-                    'status' => RenewalStatus::Pending
-                ]);
-                break;
-        }
-
-        return $this->getSharing($sharing);
     }
 
     /**
