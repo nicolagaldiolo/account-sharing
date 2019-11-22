@@ -71,7 +71,7 @@ class WebhookController extends Controller
 
         $subscription_id = $payload['data']['object']['subscription'];
 
-        $userSharing = Subscription::where('stripe_id', $subscription_id)->firstOrFail()->sharingUser;
+        $userSharing = Subscription::where('id', $subscription_id)->firstOrFail()->sharingUser;
 
         $user = User::findOrFail($userSharing->user_id);
         Auth::login($user);
@@ -113,7 +113,7 @@ class WebhookController extends Controller
         $status = $payload['data']['object']['status'];
 
         $subscription_id = $payload['data']['object']['id'];
-        $userSharing = Subscription::where('stripe_id', $subscription_id)->firstOrFail()->sharingUser;
+        $userSharing = Subscription::where('id', $subscription_id)->firstOrFail()->sharingUser;
 
         $user = User::findOrFail($userSharing->user_id);
         Auth::login($user);
@@ -164,7 +164,7 @@ class WebhookController extends Controller
             if($stateMachine->can('pay')) {
 
                 $userSharing->subscription()->create([
-                    'stripe_id' => $subscription['id'],
+                    'id' => $subscription['id'],
                     'status' => SubscriptionStatus::getValue($subscription['status']),
                     'current_period_end_at' => $subscription['current_period_end']
                 ]);
@@ -187,7 +187,7 @@ class WebhookController extends Controller
     {
 
         $subscription_id = $payload['data']['object']['id'];
-        $userSharing = Subscription::where('stripe_id', $subscription_id)->firstOrFail()->sharingUser;
+        $userSharing = Subscription::where('id', $subscription_id)->firstOrFail()->sharingUser;
 
         $stateMachine = \StateMachine::get($userSharing, 'sharing');
 
@@ -245,7 +245,7 @@ class WebhookController extends Controller
             });
 
             $user->forceFill([
-                'stripe_id' => null,
+                'id' => null,
                 'trial_ends_at' => null,
                 'card_brand' => null,
                 'card_last_four' => null,
@@ -301,7 +301,7 @@ class WebhookController extends Controller
 
         $model = config('cashier.model');
 
-        return (new $model)->where('stripe_id', $stripeId)->first();
+        return (new $model)->where('id', $stripeId)->first();
     }
     */
 

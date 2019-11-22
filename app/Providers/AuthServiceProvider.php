@@ -40,15 +40,15 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         Gate::define('can-restore', function($user, $sharingUser){
-            return $user->id === $sharingUser->user_id && $sharingUser->subscription->status === SubscriptionStatus::getValue('past_due');
+            return $user->id === $sharingUser->user_id && ($sharingUser->subscription && $sharingUser->subscription->status === SubscriptionStatus::getValue('past_due'));
         });
 
         Gate::define('left-subscription', function (User $user, SharingUser $sharingUser){
             \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
             \Stripe\Stripe::setApiVersion("2019-10-08");
 
-            if($sharingUser->subscription && $sharingUser->subscription->stripe_id){
-                $subscription = \Stripe\Subscription::retrieve($sharingUser->subscription->stripe_id);
+            if($sharingUser->subscription && $sharingUser->subscription->id){
+                $subscription = \Stripe\Subscription::retrieve($sharingUser->subscription->id);
                 return $subscription->status === 'canceled';
             }else{
                 return false;

@@ -10,6 +10,8 @@ use App\User;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use App\Enums\SharingStatus;
+use Illuminate\Support\Facades\Auth;
+
 class SeedFakeData extends Seeder
 {
     /**
@@ -19,6 +21,9 @@ class SeedFakeData extends Seeder
      */
     public function run()
     {
+
+        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+        \Stripe\Stripe::setApiVersion("2019-10-08");
 
         $stripeObj = app(Stripe::class);
 
@@ -32,13 +37,25 @@ class SeedFakeData extends Seeder
             $stripeObj->getCustomer($item->id)->delete();
         });
 
+
+        // Se ci sono Plan li elimino
+        collect(\Stripe\Plan::all(['limit' => 99])->data)->each(function($item){
+            \Stripe\Plan::retrieve($item->id)->delete();
+        });
+
+        // Se ci sono Prodotti li elimino
+        collect(\Stripe\Product::all(['limit' => 99])->data)->each(function($item){
+            \Stripe\Product::retrieve($item->id)->delete();
+        });
+
+
         // Creo gli utenti
         $users = factory(\App\User::class, 1)->create([
             'name' => env('DEMONAME', 'Firstname'),
             'surname' => env('DEMOLASTNAME', 'Lastname'),
             'email' => env('DEMOEMAIL', 'demouser@example.com'),
             'password' => bcrypt(env('DEMOPASS', 'password'))
-        ])->merge(factory(\App\User::class, 9)->create());
+        ])->merge(factory(\App\User::class, 5)->create());
 
         // Creo le frequenze di rinnovo
         $renewalFrequencies = collect([]);
@@ -62,6 +79,7 @@ class SeedFakeData extends Seeder
                 'name' => 'Netflix Premium',
                 'customizable' => false,
             ],
+            /*
             [
                 'name' => 'Amazon Music',
                 'customizable' => false,
@@ -78,60 +96,79 @@ class SeedFakeData extends Seeder
                 'name' => 'Custom',
                 'customizable' => true,
             ]
+            */
         ])->each(function($item) use($categories){
             $categories->push(factory(Category::class)->create($item));
         });
 
 
-        // Creo le condivisioni
+        // Per ogni utente creo, account, customer, e condivisioni
         $users->each(function($me) use($categories, $renewalFrequencies, $users, $stripeObj){
 
-            $stripeAccount = $stripeObj->createAccount([
-                'country' => 'IT',
-                'email' => $me->email,
-                'type' => 'custom',
-                'business_type' => 'individual',
-                // Before the 2019-09-09 API version, the transfers capability was referred to as platform_payments. If you're using an API version older than 2019-09-09, you need to use platform_payments.
-                // For platforms creating connected accounts in Australia, Austria, Belgium, Czech Republic, Denmark, Estonia, Finland, France, Germany, Greece, Ireland, Italy, Latvia, Lithuania, Luxembourg, the Netherlands, New Zealand, Norway, Poland, Portugal, Slovakia, Slovenia, Spain, Sweden, Switzerland, or the United Kingdom, request both the card_payments and transfers capabilities to enable card processing for your connected accounts.
-                "requested_capabilities" => ["card_payments", "transfers"],
-                'individual' => [
+            if(!is_null($me->stripe_account_id)){
+                $account = \Stripe\Account::retrieve($me->stripe_account_id);
+            }else{
+                $account = \Stripe\Account::create([
+                    'country' => 'IT',
                     'email' => $me->email,
-                    'first_name' => $me->name,
-                    'last_name' => $me->surname,
-                    'phone' => '+393917568474',
-                    'dob' => [
-                        'day' => $me->birthday->day,
-                        'month' => $me->birthday->month,
-                        'year' => $me->birthday->year
+                    'type' => 'custom',
+                    'business_type' => 'individual',
+                    // Before the 2019-09-09 API version, the transfers capability was referred to as platform_payments. If you're using an API version older than 2019-09-09, you need to use platform_payments.
+                    // For platforms creating connected accounts in Australia, Austria, Belgium, Czech Republic, Denmark, Estonia, Finland, France, Germany, Greece, Ireland, Italy, Latvia, Lithuania, Luxembourg, the Netherlands, New Zealand, Norway, Poland, Portugal, Slovakia, Slovenia, Spain, Sweden, Switzerland, or the United Kingdom, request both the card_payments and transfers capabilities to enable card processing for your connected accounts.
+                    "requested_capabilities" => ["card_payments", "transfers"],
+                    'individual' => [
+                        'email' => $me->email,
+                        'first_name' => $me->name,
+                        'last_name' => $me->surname,
+                        'phone' => '+393917568474',
+                        'dob' => [
+                            'day' => $me->birthday->day,
+                            'month' => $me->birthday->month,
+                            'year' => $me->birthday->year
+                        ],
+                        'address' => [
+                            'line1' => 'Via Giovanni Caboto',
+                            'city' => 'Verona',
+                            'postal_code' => '37068'
+                        ]
                     ],
-                    'address' => [
-                        'line1' => 'Via Giovanni Caboto',
-                        'city' => 'Verona',
-                        'postal_code' => '37068'
-                    ]
-                ],
-                'tos_acceptance' => [
-                    'date' => time(),
-                    'ip' => request()->ip() // Assumes you're not using a proxy
-                ],
-                'business_profile' => [
-                    'mcc' => '4900',
-                    'url' => 'https://www.google.it'
-                ],
-            ]);
+                    'tos_acceptance' => [
+                        'date' => time(),
+                        'ip' => request()->ip() // Assumes you're not using a proxy
+                    ],
+                    'business_profile' => [
+                        'mcc' => '4900',
+                        'url' => 'https://www.google.it'
+                    ],
+                ]);
+
+                $me->stripe_account_id = $account->id;
+                $me->save();
+            }
+
+            $payment_method = 'pm_card_visa';
 
             // Creo il Customer
-            //$stripeCustomer = $stripeObj->createCustomer([
-            //    'email' => $me->email,
-            //    'source' => 'tok_mastercard',
-            //]);
-
-            $me->stripe_account_id = $stripeAccount->id;
-            //$me->stripe_customer_id = $stripeCustomer->id;
+            $platformStripeCustomer = \Stripe\Customer::create([
+                'email' => $me->email,
+            ]);
+            $me->stripe_customer_id = $platformStripeCustomer->id;
             $me->save();
 
-            //$categories->each(function($category) use($me, $renewalFrequencies, $users, $stripeAccount, $stripeCustomer, $stripeObj){
-            $categories->each(function($category) use($me, $renewalFrequencies, $users, $stripeAccount, $stripeObj){
+
+            // Gli attacco un metodo di pagamento
+            $payment_method_to_attach = \Stripe\PaymentMethod::retrieve($payment_method);
+
+            $payment_method_to_attach->attach(['customer' => $platformStripeCustomer->id]);
+
+            \Stripe\Customer::update($platformStripeCustomer->id, [
+                    'invoice_settings' => [
+                        'default_payment_method' => $payment_method_to_attach,
+                    ],
+                ]
+            );
+
+            $categories->each(function($category) use($me, $renewalFrequencies, $users, $platformStripeCustomer, $payment_method_to_attach, $account){
 
                 $sharing = factory(Sharing::class)->create([
                     'name' => $category->name,
@@ -140,15 +177,15 @@ class SeedFakeData extends Seeder
                     'category_id' => $category->id,
                 ]);
 
-                // Creo il piano
-                $stripePlan = $stripeObj->createPlan([
-                    "amount" => number_format((float)$category->price * 100., 0, '.', ''),
+
+                $stripePlan = \Stripe\Plan::create([
+                    "amount" => number_format((float)$sharing->price * 100., 0, '.', ''),
                     "interval" => "month",
                     "product" => [
-                        "name" => $category->name
+                        "name" => $sharing->name
                     ],
                     "currency" => "eur"
-                ]);
+                ], ['stripe_account' => $account->id]);
 
                 $sharing->stripe_plan = $stripePlan->id;
                 $sharing->save();
@@ -159,12 +196,14 @@ class SeedFakeData extends Seeder
                 })->random(4)->pluck('id')->mapWithKeys(function($item){
                     $sharingStatus = SharingStatus::getValues();
                     $status = rand(min($sharingStatus), max($sharingStatus));
-                    return [$item => [
+                    return [
+                        $item => [
                             'status' => $status,
                             'credential_updated_at' => Carbon::now(),
                         ]
                     ];
                 });
+
 
                 // L'tente corrente lo aggiungo come joiner e owner
                 $sharingUsers->put($me->id, [
@@ -186,40 +225,93 @@ class SeedFakeData extends Seeder
                     ]);
                 });
 
-                /*
-                $sharing->activeUsersWithoutOwner()->get()->each(function($value, $key) use($stripeObj, $sharing, $stripePlan, $stripeCustomer, $stripeAccount){
+                $sharing->activeUsersWithoutOwner()->get()->each(function($item, $key) use($me, $sharing, $stripePlan, $platformStripeCustomer, $payment_method_to_attach, $account){
 
-                    // Per ogni customer da Creare genero un token per clonarlo dal customer definito nel platform account
-                    $stripeCustomerToken = $stripeObj->createToken(
-                        ["customer" => $stripeCustomer->id],
-                        ["stripe_account" => $stripeAccount->id]
-                    );
 
-                    // Clono il customer sull'account
-                    $stripeCustomerCloned = $stripeObj->createCustomer([
-                        //'email' => $me->email,
-                        'source' => $stripeCustomerToken->id,
-                    ], ['stripe_account' => $stripeAccount->id]);
+                    $currentOwnerSharing = $me->sharingOwners->pluck('id');
 
-                    // Creo la subscription
-                    $subscription = $stripeObj->createSubscription([
-                        "customer" => $stripeCustomerCloned->id,
-                        "items" => [
-                            [
-                                "plan" => $stripePlan->id,
+                    $userSharing = $item->activeSharing()->whereIn('sharings.id', $currentOwnerSharing->toArray())->first();
+
+                    $subscription = ($userSharing) ? $userSharing->sharing_status->subscription : null;
+
+                    if($subscription){
+                        $stripeSubscription = \Stripe\Subscription::retrieve(
+                            $subscription->id,
+                            ['stripe_account' => $account->id]
+                        );
+
+                        $customer = \Stripe\Customer::retrieve($stripeSubscription->customer, [
+                            'stripe_account' => $account->id
+                        ]);
+                    }else{
+
+                        $new_payment_method = \Stripe\PaymentMethod::create([
+                            'customer' => $platformStripeCustomer->id,
+                            'payment_method' => $payment_method_to_attach->id,
+                        ], ['stripe_account' => $account->id]);
+
+                        $customer = \Stripe\Customer::create([
+                            'payment_method' => $new_payment_method,
+                            'email' => $item->email,
+                        ], ['stripe_account' => $account->id]);
+
+                        \Stripe\Customer::update($customer->id, [
+                            'invoice_settings' => [
+                                'default_payment_method' => $new_payment_method->id,
                             ],
-                        ],
-                        "application_fee_percent" => 10,
-                    ],["stripe_account" => $stripeAccount->id]);
+                        ], ['stripe_account' => $account->id]);
 
-                    $value->sharings()->updateExistingPivot($sharing->id, [
-                        'stripe_subscription_id' => $subscription->id
-                    ]);
+                    }
+
+                    if($customer){
+
+                        // Creo la subscription
+                        $subscription = \Stripe\Subscription::create([
+                            "customer" => $customer->id,
+                            "items" => [
+                                [
+                                    "plan" => $stripePlan->id,
+                                ],
+                            ],
+                            "application_fee_percent" => 10,
+                        ], ['stripe_account' => $account->id]);
+
+                        $item->sharings()->find($sharing->id)->sharing_status->subscription()->create([
+                            'id' => $subscription['id'],
+                            'status' => \App\Enums\SubscriptionStatus::getValue($subscription['status']),
+                            'current_period_end_at' => $subscription['current_period_end']
+                        ]);
+
+                    }
+
+/*
+                    $me->sharingOwners()->where('user_id', $item->id);
+
+                    $new_payment_method = \Stripe\PaymentMethod::create([
+                        'customer' => $platformStripeCustomer->id,
+                        'payment_method' => $payment_method_to_attach->id,
+                    ], ['stripe_account' => $account->id]);
+
+
+                    $customer_xxx = \Stripe\Customer::create([
+                        'payment_method' => $new_payment_method,
+                    ], ['stripe_account' => $account->id]);
+
+
+                    \Stripe\Customer::update($customer_xxx->id, [
+                        'invoice_settings' => [
+                            'default_payment_method' => $new_payment_method->id,
+                        ],
+                    ], ['stripe_account' => $account->id]);
+*/
+
+
+
                 });
-                */
 
             });
         });
+
 
     }
 }

@@ -2,6 +2,11 @@
 
 namespace App\Providers;
 
+use App\Http\Requests\SharingRequest;
+use App\Observers\SharingObserver;
+use App\Observers\UserObserver;
+use App\Sharing;
+use App\User;
 use Carbon\Carbon;
 use Laravel\Dusk\DuskServiceProvider;
 use Illuminate\Support\Facades\Schema;
@@ -19,6 +24,10 @@ class AppServiceProvider extends ServiceProvider
         if ($this->app->runningUnitTests()) {
             Schema::defaultStringLength(191);
         }
+
+        User::observe(UserObserver::class);
+        Sharing::observe(SharingObserver::class);
+
     }
 
     /**

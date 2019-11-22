@@ -33,20 +33,6 @@ class PaymentMethodsController extends Controller
 
     public function index()
     {
-        //ASSOLUTAMENTE DA ELIMINARE, VA CENTRALIZZATA ALTROVE LA CREAZIONE DEL CUSTOMER
-        $user = Auth::user();
-        if(is_null($user->stripe_customer_id)){
-            // Creo il Customer
-            $stripeCustomer = Stripe::createCustomer([
-                'email' => $user->email,
-                'source' => 'tok_visa',
-            ]);
-            $user->stripe_customer_id = $stripeCustomer->id;
-            $user->save();
-        }else{
-            $stripeCustomer = Stripe::getCustomer($user->stripe_customer_id);
-        }
-
         return $this->getPaymentMethods();
     }
 

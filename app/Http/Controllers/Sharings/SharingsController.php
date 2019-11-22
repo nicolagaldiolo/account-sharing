@@ -204,7 +204,7 @@ class SharingsController extends Controller
         $subscription = Auth::user()->sharings()->findOrFail($sharing->id)->sharing_status->subscription;
 
 
-        $response = \Stripe\Subscription::update($subscription->stripe_id, [
+        $response = \Stripe\Subscription::update($subscription->id, [
             'cancel_at_period_end' => !boolval($subscription->cancel_at_period_end),
         ]);
 
@@ -283,7 +283,7 @@ class SharingsController extends Controller
                 ]
             );
 
-            $subscription = \Stripe\Subscription::retrieve($userSharing->subscription->stripe_id);
+            $subscription = \Stripe\Subscription::retrieve($userSharing->subscription->id);
 
             //logger($subscription);
             //dd();
@@ -297,7 +297,7 @@ class SharingsController extends Controller
             }
 
             $subscription = \Stripe\Subscription::retrieve([
-                'id' => $userSharing->subscription->stripe_id,
+                'id' => $userSharing->subscription->id,
                 'expand' => [
                     'latest_invoice.payment_intent'
                 ]
@@ -349,7 +349,7 @@ class SharingsController extends Controller
 
             try{
 
-                $subscription = \Stripe\Subscription::retrieve($userSharing->subscription->stripe_id);
+                $subscription = \Stripe\Subscription::retrieve($userSharing->subscription->id);
 
                 if($subscription->status !== 'incomplete') {
                     throw new \Exception('Subscription not available');
@@ -362,7 +362,7 @@ class SharingsController extends Controller
                 }
 
                 $subscription = \Stripe\Subscription::retrieve([
-                    'id' => $userSharing->subscription->stripe_id,
+                    'id' => $userSharing->subscription->id,
                     'expand' => [
                         'latest_invoice.payment_intent'
                     ]
@@ -389,7 +389,7 @@ class SharingsController extends Controller
                 ]);
 
                 $userSharing->subscription()->create([
-                    'stripe_id' => $subscription->id,
+                    'id' => $subscription->id,
                     'status' => SubscriptionStatus::getValue($subscription->status),
                     'current_period_end_at' => $subscription->current_period_end
                 ]);

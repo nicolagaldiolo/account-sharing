@@ -6,8 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Subscription extends Model
 {
+
+    public $incrementing = false;
+
     protected $fillable = [
-        'stripe_id',
+        'id',
         'status',
         'cancel_at_period_end',
         'ended_at',
