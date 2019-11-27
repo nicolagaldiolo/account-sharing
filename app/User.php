@@ -115,7 +115,6 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
             ->withPivot(['id','status','owner','credential_updated_at'])
             ->withTimestamps();
     }
-
     public function activeSharing(){
         return $this->belongsToMany(Sharing::class)
             ->using(SharingUser::class)
@@ -125,7 +124,6 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
             ->whereStatus(SharingStatus::Joined)
             ->whereNull('owner');
     }
-
     public function sharingOwners(){
         return $this->belongsToMany(Sharing::class)
             ->using(SharingUser::class)
@@ -136,9 +134,15 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
             ->whereOwner(true);
     }
 
-    //public function customers()
+
+    public function customers()
+    {
+        return $this->hasMany(ConnectCustomer::class, 'user_pl_customer_id', 'id');
+    }
+
+    //public function customersAsOwner()
     //{
-    //    return $this->hasMany(ConnectCustomer::class, 'user_pl_customer_id', 'pl_customer_id');
+    //    return $this->hasMany(ConnectCustomer::class, 'user_pl_account_id', 'id');
     //}
 
     public function chats(){

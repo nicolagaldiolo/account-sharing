@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Stripe;
 
+use App\ConnectCustomer;
 use App\Enums\SharingStatus;
 use App\Enums\SubscriptionStatus;
 use App\Http\Middleware\VerifyWebhookSignature;
@@ -47,6 +48,7 @@ class WebhookController extends Controller
         $method = 'handle'.Str::studly(str_replace('.', '_', $payload['type']));
 
         logger($method);
+        logger($payload);
 
         //WebhookReceived::dispatch($payload);
 
@@ -68,7 +70,7 @@ class WebhookController extends Controller
      */
     protected function handleInvoicePaymentSucceeded(array $payload)
     {
-
+        /*
         $subscription_id = $payload['data']['object']['subscription'];
 
         $userSharing = Subscription::where('id', $subscription_id)->firstOrFail()->sharingUser;
@@ -83,6 +85,7 @@ class WebhookController extends Controller
             $stateMachine->apply($transition);
             $userSharing->save();
         }
+        */
 
         logger('Payment successffull');
 
@@ -109,7 +112,7 @@ class WebhookController extends Controller
      */
     protected function handleCustomerSubscriptionUpdated(array $payload)
     {
-
+        /*
         $status = $payload['data']['object']['status'];
 
         $subscription_id = $payload['data']['object']['id'];
@@ -137,6 +140,7 @@ class WebhookController extends Controller
         //}else{
         //    abort(403);
         //}
+        */
 
         return $this->successMethod();
     }
@@ -148,32 +152,30 @@ class WebhookController extends Controller
     protected function handleCustomerSubscriptionCreated(array $payload)
     {
         //logger($payload);
-        /*
+
         $subscription = $payload['data']['object'];
 
-        $userSharing = SharingUser::whereSharingId($subscription['metadata']['sharing_id'])
-            ->whereUserId($subscription['metadata']['user_id'])
-            ->firstOrFail();
-
-        $user = User::findOrFail($userSharing->user_id);
+        $user = ConnectCustomer::where('customer_id', $subscription['customer'])->firstOrFail()->user;
         Auth::login($user);
 
-        $stateMachine = \StateMachine::get($userSharing, 'sharing');
+        $sharingStatus = $user->sharings()->where('stripe_plan', $subscription['plan']['id'])->first()->sharing_status;
+        $stateMachine = \StateMachine::get($sharingStatus, 'sharing');
 
-        //DB::transaction(function() use ($stateMachine, $userSharing, $subscription){
-            if($stateMachine->can('pay')) {
+        DB::transaction(function() use ($stateMachine, $sharingStatus, $subscription) {
 
-                $userSharing->subscription()->create([
+            $transition = 'pay';
+
+            if ($stateMachine->can($transition)) {
+                $sharingStatus->subscription()->create([
                     'id' => $subscription['id'],
                     'status' => SubscriptionStatus::getValue($subscription['status']),
                     'current_period_end_at' => $subscription['current_period_end']
                 ]);
 
+                $stateMachine->apply($transition);
+                $sharingStatus->save();
             }
-        //});
-
-        */
-
+        });
 
         return $this->successMethod();
     }
@@ -210,100 +212,6 @@ class WebhookController extends Controller
 
         return $this->successMethod();
     }
-
-    /**
-     * Handle customer updated.
-     *
-     * @param  array  $payload
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-
-    /*
-    protected function handleCustomerUpdated(array $payload)
-    {
-        if ($user = $this->getUserByStripeId($payload['data']['object']['id'])) {
-            $user->updateDefaultPaymentMethodFromStripe();
-        }
-
-        return $this->successMethod();
-    }
-    */
-
-    /**
-     * Handle deleted customer.
-     *
-     * @param  array  $payload
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-
-    /*
-    protected function handleCustomerDeleted(array $payload)
-    {
-        if ($user = $this->getUserByStripeId($payload['data']['object']['id'])) {
-            $user->subscriptions->each(function (Subscription $subscription) {
-                $subscription->skipTrial()->markAsCancelled();
-            });
-
-            $user->forceFill([
-                'id' => null,
-                'trial_ends_at' => null,
-                'card_brand' => null,
-                'card_last_four' => null,
-            ])->save();
-        }
-
-        return $this->successMethod();
-    }
-    */
-
-    /**
-     * Handle payment action required for invoice.
-     *
-     * @param  array  $payload
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-
-    /*
-    protected function handleInvoicePaymentActionRequired(array $payload)
-    {
-        if (is_null($notification = config('cashier.payment_notification'))) {
-            return $this->successMethod();
-        }
-
-        if ($user = $this->getUserByStripeId($payload['data']['object']['customer'])) {
-            if (in_array(Notifiable::class, class_uses_recursive($user))) {
-                $payment = new Payment(StripePaymentIntent::retrieve(
-                    $payload['data']['object']['payment_intent'],
-                    $user->stripeOptions()
-                ));
-
-                $user->notify(new $notification($payment));
-            }
-        }
-
-        return $this->successMethod();
-    }
-    */
-
-    /**
-     * Get the billable entity instance by Stripe ID.
-     *
-     * @param  string|null  $stripeId
-     * @return \Laravel\Cashier\Billable|null
-     */
-
-    /*
-    protected function getUserByStripeId($stripeId)
-    {
-        if ($stripeId === null) {
-            return;
-        }
-
-        $model = config('cashier.model');
-
-        return (new $model)->where('id', $stripeId)->first();
-    }
-    */
 
     /**
      * Handle successful calls on the controller.

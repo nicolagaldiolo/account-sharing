@@ -16,13 +16,6 @@ class SharingUser extends Pivot
         'canceled_at' => 'datetime',
     ];
 
-    //protected $with = ["subscription"];
-
-    //protected function getGraph()
-    //{
-    //    return 'sharing';
-    //}
-
     public function sharing(){
         return $this->belongsTo(Sharing::class);
     }

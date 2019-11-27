@@ -81,6 +81,15 @@ class Sharing extends Model
         return $this->hasMany(Chat::class);
     }
 
+    public function approvedUsers(){
+        return $this->belongsToMany(User::class)
+            ->using(SharingUser::class)
+            ->as('sharing_status')
+            ->withPivot(['id','status','owner','credential_updated_at'])
+            ->whereStatus(SharingStatus::Approved)
+            ->withTimestamps();
+    }
+
     public function activeUsers(){
         return $this->belongsToMany(User::class)
             ->using(SharingUser::class)

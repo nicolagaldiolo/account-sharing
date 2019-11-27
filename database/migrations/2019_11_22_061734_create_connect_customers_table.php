@@ -15,11 +15,13 @@ class CreateConnectCustomersTable extends Migration
     {
         Schema::create('connect_customers', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('user_pl_account_id');
-            $table->string('user_pl_customer_id');
+            $table->string('customer_id');
+            $table->bigInteger('user_pl_account_id')->unsigned();
+            $table->bigInteger('user_pl_customer_id')->unsigned();
             $table->timestamps();
 
-            $table->foreign('user_pl_customer_id')->on('users')->references('pl_customer_id');
+            $table->foreign('user_pl_account_id')->on('users')->references('id');
+            $table->foreign('user_pl_customer_id')->on('users')->references('id');
             $table->unique(['user_pl_account_id', 'user_pl_customer_id']);
         });
     }
