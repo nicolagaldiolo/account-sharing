@@ -10,13 +10,19 @@
 </head>
 <body>
 
+@foreach ($test as $user)
+  {{$user->owner->name}}
+@endforeach
+
+
+{{--
   <input id="cardholder-name" type="text" value="Andrea Vallusso">
   <!-- placeholder for Elements -->
   <div id="card-element"></div>
   <button id="card-button" data-secret="{{ $payment_intent->client_secret }}">
     Submit Payment
   </button>
-
+--}}
   <script src="https://js.stripe.com/v3/"></script>
 
   <script>

@@ -28,7 +28,17 @@ class VerifyWebhookSignature
                 config('cashier.webhook.tolerance')
             );
         } catch (SignatureVerificationException $exception) {
-            throw new AccessDeniedHttpException($exception->getMessage(), $exception);
+            // Add Secret Connect Verify
+            try {
+                WebhookSignature::verifyHeader(
+                    $request->getContent(),
+                    $request->header('Stripe-Signature'),
+                    config('stripe.webhook.secret_connect'),
+                    config('cashier.webhook.tolerance')
+                );
+            } catch (SignatureVerificationException $exception) {
+                throw new AccessDeniedHttpException($exception->getMessage(), $exception);
+            }
         }
 
         return $next($request);

@@ -49,6 +49,7 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
      */
     protected $appends = [
         'photo_url',
+        'username',
     ];
 
     /**
@@ -108,6 +109,11 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
         return [];
     }
 
+    public function getUsernameAttribute()
+    {
+        return $this->name . (!empty($this->surname) ? ' ' . $this->surname : '');
+    }
+
     public function sharings(){
         return $this->belongsToMany(Sharing::class)
             ->using(SharingUser::class)
@@ -147,5 +153,10 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
 
     public function chats(){
         return $this->hasMany(Chat::class);
+    }
+
+    public function payouts()
+    {
+        return $this->hasMany(Payout::class, 'account_id', 'pl_account_id');
     }
 }

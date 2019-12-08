@@ -7,6 +7,9 @@ use App\Enums\SharingStatus;
 use App\Enums\SubscriptionStatus;
 use App\Http\Middleware\VerifyWebhookSignature;
 use App\Http\Traits\SharingTrait;
+use App\Invoice;
+use App\Refund;
+use App\Sharing;
 use App\SharingUser;
 use App\Subscription;
 use App\User;
@@ -34,6 +37,9 @@ class WebhookController extends Controller
         if (config('stripe.webhook.secret')) {
             $this->middleware(VerifyWebhookSignature::class);
         }
+
+        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+        \Stripe\Stripe::setApiVersion("2019-10-08");
     }
 
     /**
@@ -70,9 +76,37 @@ class WebhookController extends Controller
      */
     protected function handleInvoicePaymentSucceeded(array $payload)
     {
-        /*
-        $subscription_id = $payload['data']['object']['subscription'];
 
+        $object = $payload['data']['object'];
+
+        DB::transaction(function() use($object){
+
+            $account_id = Subscription::findOrFail($object['subscription'])->sharingUser->sharing->owner->pl_account_id;
+
+            Invoice::create([
+                'stripe_id' => $object['id'],
+                'customer_id' => $object['customer'],
+                'account_id' => $account_id,
+                'subscription_id' => $object['subscription'],
+                'payment_intent' => $object['payment_intent'],
+                'total' => $object['total'],
+                'currency' => $object['currency'],
+                'last4' => '4567'
+            ])->transactions()->create();
+
+        });
+
+        // creo dei refound facker
+        Refund::create([
+            'stripe_id' => 'xxxxxxxx',
+            'payment_intent' => $object['payment_intent'],
+            'amount' => $object['total'],
+            'currency' => $object['currency'],
+            'last4' => '4567'
+        ])->transactions()->create();
+
+
+        /*
         $userSharing = Subscription::where('id', $subscription_id)->firstOrFail()->sharingUser;
 
         $user = User::findOrFail($userSharing->user_id);
@@ -87,6 +121,21 @@ class WebhookController extends Controller
         }
         */
 
+        /*
+        $plan = $payload['data']['object']['lines']['data'][0]['plan']['id'];
+
+        $account_id = Sharing::where('stripe_plan', $plan)->firstOrFail()->owner->pl_account_id;
+        $amount = 1000;//$object['total'];
+        $currency = $object['currency'];
+        $charge = $object['charge'];
+
+        $transfer = \Stripe\Transfer::create([
+            "amount" => $amount,
+            "currency" => $currency,
+            "source_transaction" => $charge,
+            "destination" => $account_id,
+        ]);
+        */
         logger('Payment successffull');
 
         return $this->successMethod();
@@ -152,30 +201,6 @@ class WebhookController extends Controller
     protected function handleCustomerSubscriptionCreated(array $payload)
     {
         //logger($payload);
-
-        $subscription = $payload['data']['object'];
-
-        $user = ConnectCustomer::where('customer_id', $subscription['customer'])->firstOrFail()->user;
-        Auth::login($user);
-
-        $sharingStatus = $user->sharings()->where('stripe_plan', $subscription['plan']['id'])->first()->sharing_status;
-        $stateMachine = \StateMachine::get($sharingStatus, 'sharing');
-
-        DB::transaction(function() use ($stateMachine, $sharingStatus, $subscription) {
-
-            $transition = 'pay';
-
-            if ($stateMachine->can($transition)) {
-                $sharingStatus->subscription()->create([
-                    'id' => $subscription['id'],
-                    'status' => SubscriptionStatus::getValue($subscription['status']),
-                    'current_period_end_at' => $subscription['current_period_end']
-                ]);
-
-                $stateMachine->apply($transition);
-                $sharingStatus->save();
-            }
-        });
 
         return $this->successMethod();
     }

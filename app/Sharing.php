@@ -109,6 +109,19 @@ class Sharing extends Model
             ->withTimestamps();
     }
 
+    /*
+    public function owner()
+    {
+        return $this->belongsToMany(User::class)
+            ->using(SharingUser::class)
+            ->as('sharing_status')
+            ->withPivot(['id','status','owner','credential_updated_at'])
+            ->whereStatus(SharingStatus::Joined)
+            ->whereOwner(1)
+            ->withTimestamps();
+    }
+    */
+
     public function getOwnerAttribute()
     {
         return $this->activeUsers()->whereOwner(true)->first();

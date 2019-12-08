@@ -7,9 +7,12 @@ use App\Enums\SharingStatus;
 use App\Enums\SubscriptionStatus;
 use App\Http\Requests\CredentialRequest;
 use App\Http\Requests\SharingRequest;
+use App\Http\Resources\Transaction as TransactionResource;
 use App\Http\Traits\SharingTrait;
+use App\Invoice;
 use App\Sharing;
 use App\SharingUser;
+use App\Transaction;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -17,6 +20,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use App\MyClasses\Support\Facade\Stripe;
+use PhpParser\Builder;
 
 class SharingsController extends Controller
 {
@@ -62,8 +66,10 @@ class SharingsController extends Controller
         //
     }
 
-    public function prova(Sharing $sharing)
+    public function prova()
     {
+
+        /*
         $stripeObj = app(Stripe::class);
 
         // Se ci sono utenti con account Stripe li elimino
@@ -145,6 +151,7 @@ class SharingsController extends Controller
 
         //return $sharing;
         */
+
 
     }
 
@@ -372,27 +379,7 @@ class SharingsController extends Controller
 
                 logger($e);
 
-                $subscription = \Stripe\Subscription::create([
-                    'customer' => $user->stripe_customer_id,
-                    'items' => [
-                        [
-                            'plan' => $sharing->stripe_plan,
-                        ],
-                    ],
-                    'expand' => [
-                        'latest_invoice.payment_intent'
-                    ],
-                    'metadata' => [
-                        'user_id' => $user->id,
-                        'sharing_id' => $sharing->id
-                    ]
-                ]);
-
-                $userSharing->subscription()->create([
-                    'id' => $subscription->id,
-                    'status' => SubscriptionStatus::getValue($subscription->status),
-                    'current_period_end_at' => $subscription->current_period_end
-                ]);
+                $subscription = $this->createSubscription($user, $sharing);
 
             }
 

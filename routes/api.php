@@ -42,6 +42,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('sharings/{sharing}/chat/', 'Sharings\ChatsController@store')->name('sharings.chat.store');
 
     // Settings
+    Route::get('settings/transactions', 'Settings\TransactionsController@index');
     Route::patch('settings/profile', 'Settings\ProfileController@update');
     Route::get('settings/paymentmethods', 'Stripe\PaymentMethodsController@index');
     Route::get('settings/getCustomer', 'Stripe\PaymentMethodsController@getCustomer');

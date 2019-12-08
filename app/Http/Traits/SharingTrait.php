@@ -7,8 +7,9 @@ use App\Enums\SubscriptionStatus;
 use App\Sharing;
 use App\SharingUser;
 use App\Subscription;
+use App\User;
 use Illuminate\Support\Facades\Auth;
-use PhpParser\Node\Expr\Cast\Object_;
+use Illuminate\Support\Facades\DB;
 
 trait SharingTrait {
 
@@ -41,6 +42,74 @@ trait SharingTrait {
                 $sharingStatus->users = $users->values();
             });
         });
+    }
+
+    protected function createSubscription($user, Sharing $sharing)
+    {
+
+        $subscription = null;
+
+        // Nel caso sto lanciando questo script in maniera programmatica (seed)
+        if(Auth::id() != $user->id){
+            Auth::login($user);
+        }
+
+        $userSharing = $user->sharings()->find($sharing->id);
+        $sharingStatus = $userSharing->sharing_status;
+
+        $stateMachine = \StateMachine::get($sharingStatus, 'sharing');
+
+
+        DB::transaction(function() use ($stateMachine, $sharingStatus, $user, $sharing) {
+
+            $transition = 'pay';
+
+            if ($stateMachine->can($transition)) {
+
+                \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+                \Stripe\Stripe::setApiVersion("2019-10-08");
+
+
+                /*
+                    $customer = $item->customers()->where('user_pl_account_id', $me->id)->firstOrFail();
+
+                    // Creo la subscription
+                    $subscription = \Stripe\Subscription::create([
+                        "customer" => $customer->customer_id,
+                        "items" => [
+                            [
+                                "plan" => $sharing->stripe_plan,
+                            ],
+                        ],
+                        "application_fee_percent" => 10,
+                    ], ['stripe_account' => $me->pl_account_id]);
+                    */
+
+                $subscription = \Stripe\Subscription::create([
+                    'customer' => $user->pl_customer_id,
+                    'items' => [
+                        [
+                            'plan' => $sharing->stripe_plan,
+                        ],
+                    ],
+                    'expand' => [
+                        'latest_invoice.payment_intent'
+                    ]
+                ]);
+
+                $sharingStatus->subscription()->create([
+                    'id' => $subscription->id,
+                    'status' => SubscriptionStatus::getValue($subscription->status),
+                    'current_period_end_at' => $subscription->current_period_end
+                ]);
+
+                $stateMachine->apply($transition);
+                $sharingStatus->save();
+            }
+        });
+
+        return $subscription;
+
     }
 
     protected function updateSubscription(Subscription $subscription, $payload)

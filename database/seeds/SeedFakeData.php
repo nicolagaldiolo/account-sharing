@@ -2,6 +2,7 @@
 
 use App\Category;
 use App\Chat;
+use App\Enums\SubscriptionStatus;
 use App\MyClasses\Stripe;
 use App\RenewalFrequency;
 use App\Sharing;
@@ -14,6 +15,9 @@ use Illuminate\Support\Facades\Auth;
 
 class SeedFakeData extends Seeder
 {
+
+    use \App\Http\Traits\SharingTrait;
+
     /**
      * Run the database seeds.
      *
@@ -120,7 +124,8 @@ class SeedFakeData extends Seeder
         });
 
         // Per ogni utente creo, account, customer, e condivisioni
-        $users->take(2)->each(function($me) use($categories, $renewalFrequencies, $users, $stripeObj){
+        //$users->take(2)->each(function($me) use($categories, $renewalFrequencies, $users, $stripeObj){
+        $users->each(function($me) use($categories, $renewalFrequencies, $users, $stripeObj){
 
             $account = \Stripe\Account::create([
                 'country' => 'IT',
@@ -159,7 +164,8 @@ class SeedFakeData extends Seeder
             $me->pl_account_id = $account->id;
             $me->save();
 
-            $categories->take(1)->each(function($category) use($me, $renewalFrequencies, $users, $account){
+            //$categories->take(1)->each(function($category) use($me, $renewalFrequencies, $users, $account){
+            $categories->each(function($category) use($me, $renewalFrequencies, $users, $account){
 
                 $sharing = factory(Sharing::class)->create([
                     'name' => $category->name,
@@ -175,7 +181,8 @@ class SeedFakeData extends Seeder
                         "name" => $sharing->name
                     ],
                     "currency" => "eur"
-                ], ['stripe_account' => $account->id]);
+                //], ['stripe_account' => $account->id]);
+                ]);
 
                 $sharing->stripe_plan = $stripePlan->id;
                 $sharing->save();
@@ -183,7 +190,10 @@ class SeedFakeData extends Seeder
                 // Per ogni condivisione assegno degli utenti random e mi assicuro di togliere l'utente corrente
                 $usersToAttach = $users->reject(function($value) use($me){
                     return $value->id === $me->id;
-                })->random(1)->each(function($item) use($me){
+                //})->random(1)->each(function($item) use($me){
+                })->random(4)->each(function($item) use($me){
+                    // Funzionalità di clone customers sull'account collegato
+                    /*
                     $stripeCustomer = $item->customers()->where('user_pl_account_id', $me->id)->first();
                     if(is_null($stripeCustomer)){
 
@@ -212,7 +222,7 @@ class SeedFakeData extends Seeder
                             'user_pl_account_id' => $me->id,
                         ]);
                     }
-
+                    */
                 })->pluck('id')->mapWithKeys(function($item){
                     $sharingStatus = SharingStatus::getValues();
                     return [
@@ -245,20 +255,15 @@ class SeedFakeData extends Seeder
                 });
 
                 $sharing->approvedUsers()->get()->each(function($item) use($me, $sharing) {
-
-                    $customer = $item->customers()->where('user_pl_account_id', $me->id)->firstOrFail();
-
-                    // Creo la subscription
-                    $subscription = \Stripe\Subscription::create([
-                        "customer" => $customer->customer_id,
-                        "items" => [
-                            [
-                                "plan" => $sharing->stripe_plan,
-                            ],
-                        ],
-                        "application_fee_percent" => 10,
-                    ], ['stripe_account' => $me->pl_account_id]);
+                    $this->createSubscription($item, $sharing);
                 });
+
+                $me->payouts()->create([
+                    'stripe_id' => 'xxxxxxxx',
+                    'amount' => number_format((float)$sharing->price * 100., 0, '.', ''),
+                    'currency' => 'eur',
+                    'ccnumber' => '8745'
+                ])->transactions()->create();
 
             });
         });

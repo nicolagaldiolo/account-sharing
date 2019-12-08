@@ -11,11 +11,11 @@
     "lint": "eslint --fix --ext .js,.vue resources/js"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^1.2.19",
+    "@fortawesome/fontawesome-svg-core": "^1.2.25",
     "@fortawesome/free-brands-svg-icons": "^5.9.0",
     "@fortawesome/free-regular-svg-icons": "^5.9.0",
-    "@fortawesome/free-solid-svg-icons": "^5.9.0",
-    "@fortawesome/vue-fontawesome": "^0.1.6",
+    "@fortawesome/free-solid-svg-icons": "^5.11.2",
+    "@fortawesome/vue-fontawesome": "^0.1.8",
     "axios": "^0.18.1",
     "bootstrap": "^4.3.1",
     "jquery": "^3.4.1",
@@ -31,6 +31,7 @@
     "vue-infinite-loading": "^2.4.4",
     "vue-meta": "^1.6.0",
     "vue-moment": "^4.0.0",
+    "vue-money-format": "^1.1.1",
     "vue-owl-carousel": "^2.0.3",
     "vue-router": "^3.0.7",
     "vue-stripe-elements-plus": "^0.3.2",

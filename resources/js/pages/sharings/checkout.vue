@@ -3,7 +3,7 @@
     <div class="container">
       <div class="row">
         <div class="col-md-8">
-          <wallet checkout-mode="true"></wallet>
+          <paymentmethods checkout-mode="true"></paymentmethods>
         </div>
         <div class="col-md-4">
           <card title="Credit Card">
@@ -23,7 +23,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import axios from 'axios'
-import wallet from '../settings/wallet';
+import paymentmethods from '../settings/paymentmethods';
 
 export default {
   middleware: [
@@ -31,7 +31,7 @@ export default {
     'userCanPay'
   ],
   components: {
-    wallet
+    paymentmethods
   },
 
   data: () => ({
