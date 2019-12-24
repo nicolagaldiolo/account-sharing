@@ -292,19 +292,19 @@
     <property name="ts.external.directory.path" value="$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/app/MyClasses/Support/Facade" />
-      <recent name="$PROJECT_DIR$/app/Http/Controllers/Sharings" />
-      <recent name="$PROJECT_DIR$/resources/js/pages/sharings" />
-      <recent name="$PROJECT_DIR$/resources/js/pages/categories" />
-      <recent name="$PROJECT_DIR$/database" />
-    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/resources/js/components" />
       <recent name="$PROJECT_DIR$/resources/js/pages/settings" />
       <recent name="$PROJECT_DIR$/resources/js/middleware" />
       <recent name="$PROJECT_DIR$/resources/js/pages/sharings" />
       <recent name="$PROJECT_DIR$/app/Console/Commands" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/app/MyClasses/Support/Facade" />
+      <recent name="$PROJECT_DIR$/app/Http/Controllers/Sharings" />
+      <recent name="$PROJECT_DIR$/resources/js/pages/sharings" />
+      <recent name="$PROJECT_DIR$/resources/js/pages/categories" />
+      <recent name="$PROJECT_DIR$/database" />
     </key>
   </component>
   <component name="RunManager">
