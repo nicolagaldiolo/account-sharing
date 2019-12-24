@@ -1,4 +1,6 @@
 {
+  "additional_info": "Additional info",
+  "create_sharing" : "Crea Condivisione EN",
   "ok": "Ok",
   "cancel": "Cancel",
   "error_alert_title": "Oops...",
@@ -28,7 +30,6 @@
   "your_info": "Your Info",
   "info_updated": "Your info has been updated!",
   "update": "Update",
-  "create_sharing": "Create Sharing",
   "your_password": "Your Password",
   "password_updated": "Your password has been updated!",
   "new_password": "New Password",

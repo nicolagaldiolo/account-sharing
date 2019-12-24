@@ -1,5 +1,6 @@
 {
   "ok": "De Acuerdo",
+  "create_sharing" : "Crea Condivisione ES",
   "cancel": "Cancelar",
   "error_alert_title": "Ha ocurrido un problema",
   "error_alert_text": "¡Algo salió mal! Inténtalo de nuevo.",

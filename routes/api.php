@@ -44,6 +44,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     // Settings
         // Profile
         Route::patch('settings/profile', 'Settings\ProfileController@update');
+        Route::patch('settings/profile_new', 'Settings\ProfileController@update_new');
         Route::patch('settings/password', 'Settings\PasswordController@update');
 
         // Transactions

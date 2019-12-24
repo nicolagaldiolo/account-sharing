@@ -46,6 +46,11 @@ export default {
           route: 'settings.profile'
         },
         {
+          icon: 'user',
+          name: this.$t('additional_info'),
+          route: 'settings.additional_info'
+        },
+        {
           icon: 'lock',
           name: this.$t('password'),
           route: 'settings.password'
