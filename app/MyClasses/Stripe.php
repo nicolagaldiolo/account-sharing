@@ -2,50 +2,143 @@
 
 namespace App\MyClasses;
 
+use App\User;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+
 class Stripe
 {
+
+    protected $user = '';
+
     public function __construct()
     {
         \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
         \Stripe\Stripe::setApiVersion("2019-10-08");
+
+        $this->setUser();
+    }
+
+    protected function setUser($user = null)
+    {
+        $this->user = ($user) ? $user : Auth::user();
     }
 
     /*
      * ACCOUNT
      */
 
-    public function allAccount($params = null)
+    public function deleteAllAccount()
     {
-        return \Stripe\Account::all($params);
-    }
-
-    public function getAccount($id = null)
-    {
-        return \Stripe\Account::retrieve($id);
+        $accounts = collect(\Stripe\Account::all(['limit' => 99])->data);
+        if($accounts->isNotEmpty()){
+            $accounts->each(function($item){
+                $item->delete();
+            });
+            $this->deleteAllAccount();
+        }
     }
 
     public function createAccount($params = null)
     {
-        return \Stripe\Account::create($params);
+
+        $now = time();
+
+        $account = \Stripe\Account::create([
+            'country' => $this->user->country,
+            'email' => $this->user->email,
+            'type' => 'custom',
+            'requested_capabilities' => [
+                'card_payments',
+                'transfers'
+            ],
+            'business_type' => 'individual',
+            'tos_acceptance' => [
+                'date' => $now,
+                'ip' => request()->ip()
+            ],
+            'business_profile' => [
+                'mcc' => '5734',
+                'product_description' => ''
+            ]
+        ]);
+
+        $this->user->update([
+            'pl_account_id' => $account->id,
+            'tos_acceptance_at' => Carbon::createFromTimestamp($now)
+        ]);
+
+        return $account;
+    }
+
+    public function getAccount($user = null)
+    {
+        // Use logged user if not provided
+        if(!is_null($user)){
+            $this->setUser($user);
+        }
+
+        // If the account exists, return it otherwise create it
+        if(!empty($this->user->pl_account_id)){
+            try {
+                $account = \Stripe\Account::retrieve($this->user->pl_account_id);
+            } catch (\Stripe\Exception\InvalidRequestException $e) {
+                $account = $this->createAccount();
+            }
+        }else{
+            $account = $this->createAccount();
+        }
+
+        return $account;
     }
 
     /*
      * CUSTOMER
      */
 
-    public function createCustomer($params = null, $options = null)
+    public function createCustomer()
     {
-        return \Stripe\Customer::create($params, $options);
+        $customer = \Stripe\Customer::create([
+            'email' => $this->user->email
+        ]);
+
+        $this->user->update([
+            'pl_customer_id' => $customer->id
+        ]);
+
+        return $customer;
     }
 
-    public function allCustomer($params = null)
+    public function deleteAllCustomer()
     {
-        return \Stripe\Customer::all($params);
+        $customers = collect(\Stripe\Customer::all(['limit' => 99])->data);
+        if($customers->isNotEmpty()){
+            $customers->each(function($item){
+                $item->delete();
+            });
+            $this->deleteAllCustomer();
+        }
     }
 
-    public function getCustomer($id = null, $options = null)
+    public function getCustomer($user = null)
     {
-        return \Stripe\Customer::retrieve($id, $options);
+        // Use logged user if not provided
+        if(!is_null($user)){
+            $this->setUser($user);
+        }
+
+        // If the customer exists, return it otherwise create it
+        if(!empty($this->user->pl_customer_id)){
+            try {
+                $customer = \Stripe\Customer::retrieve($this->user->pl_customer_id);
+            } catch (\Stripe\Exception\InvalidRequestException $e) {
+                $customer = $this->createCustomer();
+            }
+        }else{
+            $customer = $this->createCustomer();
+        }
+
+        return $customer;
     }
 
     public function updateCustomer($id = null, $options = null)
@@ -53,38 +146,40 @@ class Stripe
         return \Stripe\Customer::update($id, $options);
     }
 
-
-    /*
-     * SOURCE
-     */
-    public function allSource($id = null, $options = null)
-    {
-        return \Stripe\Customer::allSources($id, $options);
-    }
-
-    public function createSource($source = null, $metadata = null)
-    {
-        return \Stripe\Customer::createSource($source, $metadata);
-    }
-
-    public function deleteSource($id = null, $source = null)
-    {
-        $customer = $this->getCustomer($id);
-        if(count($customer->sources->data) <= 1){
-            abort(403, 'Operation not permitted');
-        }else{
-            \Stripe\Customer::deleteSource($id, $source);
-            return $this->getCustomer($id);
-        }
-    }
-
     /*
      * PLAN
      */
-    public function createPlan($params = null, $options = null)
+    public function createPlan($sharing = null, $user = null)
     {
-        return \Stripe\Plan::create($params, $options);
+
+        // Get account
+        $account = $this->getAccount($user);
+
+        if(!is_null($sharing) && $account){
+            $plan = \Stripe\Plan::create([
+                'amount' => number_format((float)$sharing->price * 100., 0, '.', ''),
+                'interval' => 'month',
+                'product' => [
+                    'name' => $sharing->name
+                ],
+                'metadata' => [
+                    'account_id' => $account->id
+                ],
+                'currency' => 'eur' // incastrato, da rendere dinamico
+            ]);
+
+            $sharing->stripe_plan = $plan->id;
+            $sharing->save();
+        }
+
+        return $plan;
     }
+
+
+
+
+
+
 
     /*
      * TOKEN

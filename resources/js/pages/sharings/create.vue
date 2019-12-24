@@ -86,6 +86,30 @@
               </div>
             </div>
 
+            <!-- Visibility -->
+            <div class="form-group row">
+              <label class="col-md-3 col-form-label text-md-right">Visibilità</label>
+              <div class="col-md-7">
+                <select v-model="form.visibility" :class="{ 'is-invalid': form.errors.has('visibility') }" class="form-control" name="visibility">
+                  <option value="">Scegli la visibilità</option>
+                  <option v-for="(visibility, index) in sharings_visibility" :key="index" :value="index">{{visibility}}</option>
+                </select>
+                <has-error :form="form" field="visibility" />
+              </div>
+            </div>
+
+            <div class="form-group row">
+              <label class="col-md-3 col-form-label text-md-right">Termini di servizio</label>
+              <div class="col-md-7">
+                <div class="form-check">
+                  <input type="checkbox" v-model="form.service_igree" :class="{ 'is-invalid': form.errors.has('service_igree') }" class="form-control form-check-input" name="service_igree" id="service_igree" value="1">
+                  <label class="form-check-label" for="service_igree">Accetto i termini di servizi</label>
+                  <has-error :form="form" field="service_igree" />
+                </div>
+
+              </div>
+            </div>
+
             <!-- Category -->
             <div class="form-group row">
               <div class="col-md-7 offset-md-3">
@@ -126,7 +150,8 @@
         capacity: '',
         visibility: '',
         renewal_frequency_id: '',
-        category_id: ''
+        category_id: '',
+        service_igree: 0
       })
     }),
 

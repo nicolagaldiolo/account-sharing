@@ -2,10 +2,13 @@
 
 namespace App;
 
+use App\Http\Traits\UtilityTrait;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class Invoice extends Model
 {
+    use UtilityTrait;
 
     protected $fillable = [
         'stripe_id',
@@ -14,13 +17,15 @@ class Invoice extends Model
         'subscription_id',
         'payment_intent',
         'total',
+        'total_less_fee',
         'currency',
         'last4'
     ];
 
     protected $with = [
-        'subscription.sharingUser.sharing',
-        'user'
+        //'subscription.sharingUser.sharing',
+        //'user',
+        //'owner'
     ];
 
     public function getServiceAttribute()
@@ -36,6 +41,12 @@ class Invoice extends Model
     public function getTotalAttribute()
     {
         return $this->attributes['total'];
+    }
+
+    public function setTotalAttribute($value)
+    {
+        $this->attributes['total'] = $value;
+        $this->attributes['total_less_fee'] = $this->calcNetPrice($value);
     }
 
     public function transactions()
@@ -55,11 +66,30 @@ class Invoice extends Model
 
     public function subscription()
     {
-        return $this->belongsTo(Subscription::class);
+        return $this->belongsTo( Subscription::class);
     }
 
     public function refunds()
     {
         return $this->hasMany(Refund::class, 'payment_intent', 'payment_intent');
+    }
+
+    public function transfer()
+    {
+        return $this->hasOne(Transfer::class);
+    }
+
+    /*
+     * Una fattura è trasferibile quando:
+     * 1 sono passati 25 giorni dalla data di emissione
+     * 2 non è già stata trasferita
+     * 3 non ha un rimborso approvato
+     */
+
+    public function scopeTransferable($query)
+    {
+        return $query->doesntHave('transfer')->whereDoesntHave('refunds', function ($query) {
+            $query->approved();
+        })->where('created_at', '<=', Carbon::now()->subDays(config('custom.day_refund_limit'))->endOfDay());
     }
 }

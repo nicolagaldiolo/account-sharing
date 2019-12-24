@@ -66,10 +66,6 @@ trait SharingTrait {
 
             if ($stateMachine->can($transition)) {
 
-                \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
-                \Stripe\Stripe::setApiVersion("2019-10-08");
-
-
                 /*
                     $customer = $item->customers()->where('user_pl_account_id', $me->id)->firstOrFail();
 

@@ -24,7 +24,7 @@ class VerifyWebhookSignature
             WebhookSignature::verifyHeader(
                 $request->getContent(),
                 $request->header('Stripe-Signature'),
-                config('stripe.webhook.secret'),
+                config('custom.stripe.webhook.secret'),
                 config('cashier.webhook.tolerance')
             );
         } catch (SignatureVerificationException $exception) {
@@ -33,7 +33,7 @@ class VerifyWebhookSignature
                 WebhookSignature::verifyHeader(
                     $request->getContent(),
                     $request->header('Stripe-Signature'),
-                    config('stripe.webhook.secret_connect'),
+                    config('custom.stripe.webhook.secret_connect'),
                     config('cashier.webhook.tolerance')
                 );
             } catch (SignatureVerificationException $exception) {

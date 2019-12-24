@@ -36,7 +36,7 @@ axios.interceptors.response.use(response => response, error => {
     })
   }
 
-  if (status === 403) {
+  if (status === 403 || status === 422) {
     Swal.fire({
       type: 'error',
       title: i18n.t('error_alert_title'),

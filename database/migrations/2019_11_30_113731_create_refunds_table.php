@@ -15,11 +15,10 @@ class CreateRefundsTable extends Migration
     {
         Schema::create('refunds', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('stripe_id');
-            $table->string('payment_intent')->index();
-            $table->bigInteger('amount');
-            $table->char('currency', 3);
-            $table->char('last4', 4);
+            $table->string('stripe_id')->nullable();
+            $table->string('payment_intent')->unique()->index();
+            $table->tinyInteger('internal_status')->unsigned()->default(\App\Enums\RefundApplicationStatus::Pending);
+            $table->tinyInteger('status')->unsigned()->nullable();
             $table->timestamps();
 
             $table->foreign('payment_intent')->on('invoices')->references('payment_intent');

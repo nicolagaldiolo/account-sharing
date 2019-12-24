@@ -12,12 +12,13 @@
             <p class="m-0" v-if="item.last4">{{transactionFormatted.paymentLabel}}: <strong>{{item.last4}}</strong></p>
             <p class="m-0">{{transactionFormatted.paymentDirectionLabel}}: <strong>{{item.user}}</strong></p>
           </div>
-          <div class="text-right">
+          <div class="d-flex flex-column align-items-end">
+            <small>{{ item.created_at | moment("D/M/YYYY") }}</small>
             <div class="d-flex money_data" :class="transactionFormatted.colorClass">
               {{item.direction === 'INCOMING' ? "+" : "-"}}
-              <money-format :value="item.total.value" locale="IT" :currency-code='item.total.currency' :subunit-value=false :hide-subunits=false></money-format>
+              <money-format :value="(item.total.value / 100)" locale="IT" :currency-code='item.total.currency' :subunit-value=false :hide-subunits=false></money-format>
             </div>
-            <small>{{ item.created_at | moment("D/M/YYYY") }}</small>
+            <a v-if="item.refundable" href="#" class="btn btn-primary" @click.prevent="refundRequest">Richiedi rimborso <br><small>Entro il {{ item.refundable.within | moment("D/M/YYYY") }}</small></a>
           </div>
         </div>
       </div>
@@ -27,6 +28,9 @@
 
 <script>
     import MoneyFormat from 'vue-money-format'
+    import VButton from "./Button";
+    import axios from 'axios'
+
     export default {
         name: 'Transaction',
         props: {
@@ -36,6 +40,7 @@
             }
         },
         components: {
+            VButton,
             'money-format': MoneyFormat
         },
 
@@ -70,15 +75,39 @@
                 }
 
                 return {
-                    colorClass : (this.item.direction === 'INCOMING') ? 'green' : 'red',
-                    title : title2,
-                    icon : icon,
-                    paymentLabel : paymentLabel,
-                    paymentDirectionLabel : paymentDirectionLabel
+                    colorClass: (this.item.direction === 'INCOMING') ? 'green' : 'red',
+                    title: title2,
+                    icon: icon,
+                    paymentLabel: paymentLabel,
+                    paymentDirectionLabel: paymentDirectionLabel
                 }
 
             }
 
+        },
+
+        methods: {
+            refundRequest () {
+              axios.post('/api/settings/refunds', {
+                  payment_intent: this.item.refundable.payment_intent
+              }).then(({ data }) => {
+                  console.log(data);
+                  /*
+                  if (data.data.length) {
+                      this.lists.push(...data.data)
+                      $state.loaded()
+                  }
+
+                  if (this.search_fields.page < data.meta.last_page) {
+                      this.search_fields.page += 1
+                  } else {
+                      $state.complete()
+                  }
+
+                   */
+
+              })
+            }
         }
     }
 </script>

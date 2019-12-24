@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Stripe;
 
 use App\ConnectCustomer;
+use App\Enums\RefundApplicationStatus;
+use App\Enums\RefundStripeStatus;
 use App\Enums\SharingStatus;
 use App\Enums\SubscriptionStatus;
 use App\Http\Middleware\VerifyWebhookSignature;
@@ -12,6 +14,8 @@ use App\Refund;
 use App\Sharing;
 use App\SharingUser;
 use App\Subscription;
+use App\Transaction;
+use App\Transfer;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -34,12 +38,9 @@ class WebhookController extends Controller
         logger("****************************");
         logger("INVOCATO WEBHOOK");
         logger("****************************");
-        if (config('stripe.webhook.secret')) {
+        if (config('custom.stripe.webhook.secret')) {
             $this->middleware(VerifyWebhookSignature::class);
         }
-
-        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
-        \Stripe\Stripe::setApiVersion("2019-10-08");
     }
 
     /**
@@ -83,7 +84,7 @@ class WebhookController extends Controller
 
             $account_id = Subscription::findOrFail($object['subscription'])->sharingUser->sharing->owner->pl_account_id;
 
-            Invoice::create([
+            $invoice = Invoice::create([
                 'stripe_id' => $object['id'],
                 'customer_id' => $object['customer'],
                 'account_id' => $account_id,
@@ -92,18 +93,14 @@ class WebhookController extends Controller
                 'total' => $object['total'],
                 'currency' => $object['currency'],
                 'last4' => '4567'
-            ])->transactions()->create();
+            ]);
+
+            $invoice->transactions()->create();
+
+            // creo dei refunds fake
+            //$invoice->refunds()->create()->transactions()->create();
 
         });
-
-        // creo dei refound facker
-        Refund::create([
-            'stripe_id' => 'xxxxxxxx',
-            'payment_intent' => $object['payment_intent'],
-            'amount' => $object['total'],
-            'currency' => $object['currency'],
-            'last4' => '4567'
-        ])->transactions()->create();
 
 
         /*
@@ -234,6 +231,41 @@ class WebhookController extends Controller
 
             logger("Avvisare della cancellazione sia admin che user, avvertire admin di cambiare le password");
         });
+
+        return $this->successMethod();
+    }
+
+    protected function handleChargeRefunded(array $payload)
+    {
+        $object = $payload['data']['object']['refunds']['data'][0];
+
+        Invoice::where('payment_intent', $object['payment_intent'])->firstOrFail()->refunds()->firstOrFail()->update([
+            'stripe_id' => $object['id'],
+            'status' => RefundStripeStatus::getValue($object['status'])
+        ]);
+
+        return $this->successMethod();
+    }
+
+    protected function handleChargeRefundUpdated(array $payload)
+    {
+        logger("Dovrebbe essere invocato solo quando il rimborso fallisce da parte di stripe");
+
+        return $this->successMethod();
+    }
+
+    protected function handleTransferCreated(array $payload)
+    {
+        $object = $payload['data']['object'];
+
+        Invoice::where('payment_intent', $object['transfer_group'])->firstOrFail()->transfer()->create([
+            'stripe_id' => $object['id'],
+            'account_id' => $object['destination'],
+            'amount' => $object['amount'],
+            'currency' => $object['currency'],
+        ]);
+
+        // inviare mail all'utente che il denaro è stato trasferito
 
         return $this->successMethod();
     }

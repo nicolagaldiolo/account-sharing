@@ -31,7 +31,19 @@ class Sharing extends Model
         return $model;
     }
 
-    protected $guarded = [];
+    protected $fillable = [
+        'name',
+        'description',
+        'visibility',
+        'capacity',
+        'price',
+        'stripe_plan',
+        'image',
+        'renewal_frequency_id',
+        'category_id',
+        'username',
+        'password'
+    ];
     protected $appends = [
         'availability',
         'visility_list',
@@ -107,6 +119,11 @@ class Sharing extends Model
             ->whereStatus(SharingStatus::Joined)
             ->whereOwner(null)
             ->withTimestamps();
+    }
+
+    public function subscription()
+    {
+        return $this->hasOneThrough('App\Subscription', 'App\SharingUser', 'sharing_id', 'sharing_user_id', 'id', 'id');
     }
 
     /*

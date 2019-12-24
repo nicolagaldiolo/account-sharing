@@ -42,15 +42,27 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('sharings/{sharing}/chat/', 'Sharings\ChatsController@store')->name('sharings.chat.store');
 
     // Settings
-    Route::get('settings/transactions', 'Settings\TransactionsController@index');
-    Route::patch('settings/profile', 'Settings\ProfileController@update');
-    Route::get('settings/paymentmethods', 'Stripe\PaymentMethodsController@index');
-    Route::get('settings/getCustomer', 'Stripe\PaymentMethodsController@getCustomer');
-    Route::get('settings/setupintent', 'Stripe\PaymentMethodsController@setupintent');
-    Route::post('settings/paymentmethods', 'Stripe\PaymentMethodsController@store');
-    Route::patch('settings/paymentmethods', 'Stripe\PaymentMethodsController@update');
-    Route::patch('settings/password', 'Settings\PasswordController@update');
-    Route::delete('settings/paymentmethods', 'Stripe\PaymentMethodsController@destroy');
+        // Profile
+        Route::patch('settings/profile', 'Settings\ProfileController@update');
+        Route::patch('settings/password', 'Settings\PasswordController@update');
+
+        // Transactions
+        Route::get('settings/transactions', 'Settings\TransactionsController@index');
+
+        // Balance
+        Route::get('settings/balance', 'Settings\BalanceController@index');
+
+        // Payment Methods
+        Route::get('settings/paymentmethods', 'Stripe\PaymentMethodsController@index');
+        Route::get('settings/getCustomer', 'Stripe\PaymentMethodsController@getCustomer');
+        Route::get('settings/setupintent', 'Stripe\PaymentMethodsController@setupintent');
+        Route::post('settings/paymentmethods', 'Stripe\PaymentMethodsController@store');
+        Route::patch('settings/paymentmethods', 'Stripe\PaymentMethodsController@update');
+        Route::delete('settings/paymentmethods', 'Stripe\PaymentMethodsController@destroy');
+        Route::post('settings/paymentmethods', 'Stripe\PaymentMethodsController@store');
+
+        // Refunds
+        Route::post('settings/refunds', 'Settings\RefundsController@store');
 });
 
 Route::group(['middleware' => 'guest:api'], function () {

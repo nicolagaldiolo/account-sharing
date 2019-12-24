@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Stripe;
 
+use App\Http\Traits\StripeTrait;
 use App\MyClasses\Support\Facade\Stripe;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -9,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 
 class PaymentMethodsController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      *
@@ -17,17 +19,9 @@ class PaymentMethodsController extends Controller
 
     public function setupintent()
     {
-        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
-        \Stripe\Stripe::setApiVersion("2019-10-08");
-
         return \Stripe\SetupIntent::create([
             'payment_method_types' => ['card'],
         ]);
-    }
-
-    public function getCustomer()
-    {
-        return Stripe::getCustomer(Auth::user()->stripe_customer_id);
     }
 
 
@@ -56,22 +50,19 @@ class PaymentMethodsController extends Controller
     {
 
         $paymentMethod = $request->payment_method;
-
-        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
-        \Stripe\Stripe::setApiVersion("2019-10-08");
+        $customer_id = Auth::user()->pl_customer_id;
 
         $payment_method = \Stripe\PaymentMethod::retrieve($paymentMethod);
-        $payment_method->attach(['customer' => Auth::user()->stripe_customer_id]);
+        $payment_method->attach(['customer' => $customer_id]);
 
-        $user = Auth::user();
         $allPaymentelements = \Stripe\PaymentMethod::all([
-            'customer' => $user->stripe_customer_id,
+            'customer' => $customer_id,
             'type' => 'card',
         ]);
 
-        // Se ho un solo metodo di pagamento lo imposto come default
+        // If i've only one set it to default
         if(count($allPaymentelements->data) == 1) {
-            \Stripe\Customer::update($user->stripe_customer_id, [
+            \Stripe\Customer::update($customer_id, [
                     'invoice_settings' => [
                         'default_payment_method' => $paymentMethod,
                     ],
@@ -115,9 +106,6 @@ class PaymentMethodsController extends Controller
     {
         $paymentMethod = $request->payment_method;
 
-        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
-        \Stripe\Stripe::setApiVersion("2019-10-08");
-
         \Stripe\Customer::update(Auth::user()->stripe_customer_id, [
                 'invoice_settings' => [
                     'default_payment_method' => $paymentMethod,
@@ -138,9 +126,6 @@ class PaymentMethodsController extends Controller
     {
         $paymentMethod = $request->payment_method;
 
-        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
-        \Stripe\Stripe::setApiVersion("2019-10-08");
-
         $payment_method = \Stripe\PaymentMethod::retrieve($paymentMethod);
         $payment_method->detach();
 
@@ -149,16 +134,11 @@ class PaymentMethodsController extends Controller
 
     protected function getPaymentMethods()
     {
-        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
-        \Stripe\Stripe::setApiVersion("2019-10-08");
-
-        $user = Auth::user();
-
-        $stripeCustomer = Stripe::getCustomer($user->stripe_customer_id);
+        $stripeCustomer = Stripe::getCustomer();
 
         return [
             'methods' => \Stripe\PaymentMethod::all([
-                'customer' => $user->stripe_customer_id,
+                'customer' => $stripeCustomer->id,
                 'type' => 'card',
             ]),
             'defaultPaymentMethod' => $stripeCustomer->invoice_settings->default_payment_method

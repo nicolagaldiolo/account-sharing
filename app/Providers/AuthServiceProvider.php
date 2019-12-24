@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Enums\SharingStatus;
 use App\Enums\SubscriptionStatus;
+use App\Invoice;
 use App\Sharing;
 use App\SharingUser;
 use App\User;
@@ -44,8 +45,6 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         Gate::define('left-subscription', function (User $user, SharingUser $sharingUser){
-            \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
-            \Stripe\Stripe::setApiVersion("2019-10-08");
 
             if($sharingUser->subscription && $sharingUser->subscription->id){
                 $subscription = \Stripe\Subscription::retrieve($sharingUser->subscription->id);
@@ -53,6 +52,10 @@ class AuthServiceProvider extends ServiceProvider
             }else{
                 return false;
             }
+        });
+
+        Gate::define('create-sharing', function(User $user){
+            return !empty($user->birthday) && !empty($user->country);
         });
 
         Gate::define('manage-sharing', function(User $user, Sharing $sharing){

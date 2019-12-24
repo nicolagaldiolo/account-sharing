@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Sharings;
 
+use App\Enums\RefundApplicationStatus;
 use App\Enums\RenewalStatus;
 use App\Enums\SharingStatus;
 use App\Enums\SubscriptionStatus;
@@ -10,6 +11,8 @@ use App\Http\Requests\SharingRequest;
 use App\Http\Resources\Transaction as TransactionResource;
 use App\Http\Traits\SharingTrait;
 use App\Invoice;
+use App\Payout;
+use App\Refund;
 use App\Sharing;
 use App\SharingUser;
 use App\Transaction;
@@ -18,6 +21,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use App\MyClasses\Support\Facade\Stripe;
 use PhpParser\Builder;
@@ -69,90 +73,57 @@ class SharingsController extends Controller
     public function prova()
     {
 
-        /*
-        $stripeObj = app(Stripe::class);
 
-        // Se ci sono utenti con account Stripe li elimino
-        collect($stripeObj->allAccount(['limit' => 99])->data)->each(function($item) use($stripeObj){
-            $stripeObj->getAccount($item->id)->delete();
-        });
 
-        // Se ci sono Customer li elimino
-        collect($stripeObj->allCustomer(['limit' => 99])->data)->each(function($item) use($stripeObj){
-            $stripeObj->getCustomer($item->id)->delete();
-        });
+        Auth::login(User::find(6));
 
-        $me = User::find(1);
+        $user = Auth::user();
 
-        $stripeAccount = $stripeObj->createAccount([
-            'country' => 'IT',
-            'email' => $me->email,
-            'type' => 'custom',
-            'business_type' => 'individual',
-            // Before the 2019-09-09 API version, the transfers capability was referred to as platform_payments. If you're using an API version older than 2019-09-09, you need to use platform_payments.
-            // For platforms creating connected accounts in Australia, Austria, Belgium, Czech Republic, Denmark, Estonia, Finland, France, Germany, Greece, Ireland, Italy, Latvia, Lithuania, Luxembourg, the Netherlands, New Zealand, Norway, Poland, Portugal, Slovakia, Slovenia, Spain, Sweden, Switzerland, or the United Kingdom, request both the card_payments and transfers capabilities to enable card processing for your connected accounts.
-            "requested_capabilities" => ["card_payments", "transfers"],
-            'individual' => [
-                'email' => $me->email,
-                'first_name' => $me->name,
-                'last_name' => $me->surname,
-                'phone' => '+393917568474',
-                'dob' => [
-                    'day' => $me->birthday->day,
-                    'month' => $me->birthday->month,
-                    'year' => $me->birthday->year
+        //Stripe::getAccount($user);
+
+        //$user->pl_account_id = null;
+        //$user->save();
+
+        if (empty($user->pl_account_id)) {
+            /*$account = \Stripe\Account::create([
+                'country' => 'GB',
+                'email' => $user->email,
+                'type' => 'custom',
+                "requested_capabilities" => ["card_payments","transfers"],
+                'business_type' => 'individual',
+
+                'individual' => [
+                    'email' => $user->email,
+                    'first_name' => $user->name,
+                    'last_name' => $user->surname,
+                    'phone' => '+393917568474',
+                    'dob' => [
+                        'day' => $user->birthday->day,
+                        'month' => $user->birthday->month,
+                        'year' => $user->birthday->year
+                    ],
+                    'address' => [
+                        'line1' => 'Via Giovanni Caboto',
+                        'city' => 'london',
+                        'postal_code' => 'WC2H 0HU'
+                    ]
                 ],
-                'address' => [
-                    'line1' => 'Via Giovanni Caboto',
-                    'city' => 'Verona',
-                    'postal_code' => '37068'
+                'tos_acceptance' => [
+                    'date' => time(),
+                    'ip' => request()->ip()
+                ],
+                'business_profile' => [
+                    'mcc' => '5734',
+                    'product_description' => ''
                 ]
-            ],
-            'tos_acceptance' => [
-                'date' => time(),
-                'ip' => request()->ip() // Assumes you're not using a proxy
-            ],
-            'business_profile' => [
-                'mcc' => '4900',
-                'url' => 'https://www.google.it'
-            ],
-        ]);
+            ]);
 
-        $me->stripe_account_id = $stripeAccount->id;
-        //$me->stripe_customer_id = $stripeCustomer->id;
-        $me->save();
+            logger($account);
 
-        $payment_intent = \Stripe\PaymentIntent::create([
-            'payment_method_types' => ['card'],
-            'amount' => 666,
-            'currency' => 'eur',
-            'transfer_data' => [
-                'destination' => $me->stripe_account_id,
-            ],
-        ]);
-
-        return view('prova', compact('payment_intent'));
-
-        /*
-        //dd();
-        $stripe = Stripe::make(config('services.stripe.secret'));
-        //$customers = $stripe->customers()->all();
-        //dd($customers);
-
-        $plan = $stripe->plans()->create([
-            'id'                   => 'monthly',
-            'name'                 => 'Monthly (30$)',
-            'amount'               => 30.00,
-            'currency'             => 'USD',
-            'interval'             => 'month',
-            'statement_descriptor' => 'Monthly Subscription',
-        ]);
-        dd($plan);
-
-        //return $sharing;
-        */
-
-
+            $user->pl_account_id = $account->id;
+            $user->save();
+            */
+        }
     }
 
     /**
@@ -163,7 +134,16 @@ class SharingsController extends Controller
      */
     public function store(SharingRequest $request)
     {
+
+        $this->authorize('create-sharing');
+
+        // Create the sharing
         $sharing = Sharing::create($request->validated());
+
+        // Create stripe plan
+        Stripe::createPlan($sharing);
+
+        // Attach the sharing to user
         return Auth::user()->sharings()->save($sharing, [
             'status' => SharingStatus::Joined,
             'owner' => true
@@ -204,10 +184,6 @@ class SharingsController extends Controller
     {
         $this->authorize('manage-sharing', $sharing);
 
-
-        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
-        \Stripe\Stripe::setApiVersion("2019-10-08");
-
         $subscription = Auth::user()->sharings()->findOrFail($sharing->id)->sharing_status->subscription;
 
 
@@ -223,9 +199,6 @@ class SharingsController extends Controller
 
     public function transition(Request $request, Sharing $sharing, $transition = null)
     {
-
-        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
-        \Stripe\Stripe::setApiVersion("2019-10-08");
 
         // Cerco la relazione tra utente e sharing, se non esiste la creo
         $user = Auth::user();
@@ -264,9 +237,6 @@ class SharingsController extends Controller
         $userSharing = $user->sharings()->find($sharing->id)->sharing_status;
 
         $this->authorize('can-restore', $userSharing);
-
-        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
-        \Stripe\Stripe::setApiVersion("2019-10-08");
 
         $stateMachine = \StateMachine::get($userSharing, 'sharing');
 
@@ -325,9 +295,6 @@ class SharingsController extends Controller
         $user = Auth::user();
         $userSharing = $user->sharings()->find($sharing->id)->sharing_status;
         $this->authorize('can-subscribe', $userSharing);
-
-        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
-        \Stripe\Stripe::setApiVersion("2019-10-08");
 
         $stateMachine = \StateMachine::get($userSharing, 'sharing');
 

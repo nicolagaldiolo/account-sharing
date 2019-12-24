@@ -1,6 +1,31 @@
 <template>
   <div>
-    <h1>Filtra la ricerca</h1>
+
+    <div class="balance">
+      <h2>Balance</h2>
+      <ul class="list-group mb-3">
+        <li class="list-group-item d-flex justify-content-between lh-condensed">
+          <div>
+            <h4 class="my-0">Saldo contabile</h4>
+            <small class="text-muted" v-if="balance.dayofdelay">Disponibili dopo <strong>{{balance.dayofdelay}}gg</strong> dalla ricezione del pagamento</small>
+          </div>
+          <span v-for="(pending, index) in balance.pending" :key="index" class="text-muted">
+            <money-format :value="(pending.total / 100)" locale="IT" :currency-code='pending.currency' :subunit-value=false :hide-subunits=false></money-format>
+          </span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between lh-condensed">
+          <div>
+            <h4 class="my-0">Saldo disponibile</h4>
+          </div>
+          <span v-for="(available, index) in balance.available" :key="index" class="text-muted">
+            <money-format :value="(available.total / 100)" locale="IT" :currency-code='available.currency' :subunit-value=false :hide-subunits=false></money-format>
+          </span>
+        </li>
+      </ul>
+      <a href="#" class="btn btn-primary btn-lg btn-block">Preleva</a>
+    </div>
+
+    <h2>Filtra la ricerca</h2>
 
     <div class="form-row">
       <div class="form-group col-md-4">
@@ -52,6 +77,7 @@
     import InfiniteLoading from 'vue-infinite-loading'
     import axios from 'axios'
     import Transaction from '~/components/Transaction'
+    import MoneyFormat from "vue-money-format";
 
 export default {
   data: () => ({
@@ -63,12 +89,18 @@ export default {
           to: '',
           subtype: '',
           page: 1
-      }
+      },
+      balance: {}
   }),
 
   components: {
       Transaction,
-      InfiniteLoading
+      InfiniteLoading,
+      'money-format': MoneyFormat
+  },
+
+  created () {
+    this.getBalance()
   },
 
     watch: {
@@ -79,6 +111,17 @@ export default {
     },
 
   methods: {
+
+      getBalance () {
+        axios.get('/api/settings/balance').then(function (result) {
+          if (result.error) {
+            // Display error.message in your UI.
+          } else {
+            this.balance = result.data
+          }
+        }.bind(this))
+      },
+
       updateResults (event) {
           this.search_fields.page = 1
           this.lists = []

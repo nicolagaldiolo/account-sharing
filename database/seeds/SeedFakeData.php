@@ -26,20 +26,13 @@ class SeedFakeData extends Seeder
     public function run()
     {
 
-        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
-        \Stripe\Stripe::setApiVersion("2019-10-08");
-
         $stripeObj = app(Stripe::class);
 
-        // Se ci sono utenti con account Stripe li elimino
-        collect($stripeObj->allAccount(['limit' => 99])->data)->each(function($item) use($stripeObj){
-            $stripeObj->getAccount($item->id)->delete();
-        });
+        // If accounts exist, delete them
+        $stripeObj->deleteAllAccount();
 
         // Se ci sono Customer li elimino
-        collect($stripeObj->allCustomer(['limit' => 99])->data)->each(function($item) use($stripeObj){
-            $stripeObj->getCustomer($item->id)->delete();
-        });
+        $stripeObj->deleteAllCustomer();
 
 
         // Se ci sono Plan li elimino
@@ -59,16 +52,12 @@ class SeedFakeData extends Seeder
             'surname' => env('DEMOLASTNAME', 'Lastname'),
             'email' => env('DEMOEMAIL', 'demouser@example.com'),
             'password' => bcrypt(env('DEMOPASS', 'password'))
-        ])->merge(factory(\App\User::class, 9)->create());
+        ])->merge(factory(\App\User::class, 4)->create());
 
         // Per ogni utente creo un customer, gli attacco un metodo di pagamento e lo rendo di default per il customer
         $users->each(function($user){
 
-            $platformStripeCustomer = \Stripe\Customer::create([
-                'email' => $user->email,
-            ]);
-            $user->pl_customer_id = $platformStripeCustomer->id;
-            $user->save();
+            $platformStripeCustomer = \App\MyClasses\Support\Facade\Stripe::getCustomer($user);
 
             $payment_method_to_attach = \Stripe\PaymentMethod::retrieve('pm_card_visa');
             $payment_method_to_attach->attach(['customer' => $platformStripeCustomer->id]);
@@ -103,7 +92,7 @@ class SeedFakeData extends Seeder
                 'name' => 'Netflix Premium',
                 'customizable' => false,
             ],
-            [
+            /*[
                 'name' => 'Amazon Music',
                 'customizable' => false,
             ],
@@ -119,6 +108,7 @@ class SeedFakeData extends Seeder
                 'name' => 'Custom',
                 'customizable' => true,
             ]
+            */
         ])->each(function($item) use($categories){
             $categories->push(factory(Category::class)->create($item));
         });
@@ -132,9 +122,7 @@ class SeedFakeData extends Seeder
                 'email' => $me->email,
                 'type' => 'custom',
                 'business_type' => 'individual',
-                // Before the 2019-09-09 API version, the transfers capability was referred to as platform_payments. If you're using an API version older than 2019-09-09, you need to use platform_payments.
-                // For platforms creating connected accounts in Australia, Austria, Belgium, Czech Republic, Denmark, Estonia, Finland, France, Germany, Greece, Ireland, Italy, Latvia, Lithuania, Luxembourg, the Netherlands, New Zealand, Norway, Poland, Portugal, Slovakia, Slovenia, Spain, Sweden, Switzerland, or the United Kingdom, request both the card_payments and transfers capabilities to enable card processing for your connected accounts.
-                "requested_capabilities" => ["card_payments", "transfers"],
+                "requested_capabilities" => ["transfers"],
                 'individual' => [
                     'email' => $me->email,
                     'first_name' => $me->name,
@@ -165,7 +153,7 @@ class SeedFakeData extends Seeder
             $me->save();
 
             //$categories->take(1)->each(function($category) use($me, $renewalFrequencies, $users, $account){
-            $categories->each(function($category) use($me, $renewalFrequencies, $users, $account){
+            $categories->each(function($category) use($me, $renewalFrequencies, $users, $account, $stripeObj){
 
                 $sharing = factory(Sharing::class)->create([
                     'name' => $category->name,
@@ -174,24 +162,13 @@ class SeedFakeData extends Seeder
                     'category_id' => $category->id,
                 ]);
 
-                $stripePlan = \Stripe\Plan::create([
-                    "amount" => number_format((float)$sharing->price * 100., 0, '.', ''),
-                    "interval" => "month",
-                    "product" => [
-                        "name" => $sharing->name
-                    ],
-                    "currency" => "eur"
-                //], ['stripe_account' => $account->id]);
-                ]);
-
-                $sharing->stripe_plan = $stripePlan->id;
-                $sharing->save();
+                $stripeObj->createPlan($sharing, $me);
 
                 // Per ogni condivisione assegno degli utenti random e mi assicuro di togliere l'utente corrente
                 $usersToAttach = $users->reject(function($value) use($me){
                     return $value->id === $me->id;
                 //})->random(1)->each(function($item) use($me){
-                })->random(4)->each(function($item) use($me){
+                })->random(3)->each(function($item) use($me){
                     // Funzionalità di clone customers sull'account collegato
                     /*
                     $stripeCustomer = $item->customers()->where('user_pl_account_id', $me->id)->first();

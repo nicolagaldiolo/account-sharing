@@ -38,7 +38,6 @@ class SharingRequest extends FormRequest
             abort(403, 'Operazione non ammessa');
         }
 
-
         return [
             'name'                  => 'required|max:255',
             'description'           => 'sometimes|max:750',
@@ -49,6 +48,7 @@ class SharingRequest extends FormRequest
             'renewal_frequency_id'  => 'required|exists:renewal_frequencies,id',
             'username'              => 'sometimes',
             'password'              => 'sometimes',
+            'service_igree'         => 'required|in:1',
         ];
     }
 }

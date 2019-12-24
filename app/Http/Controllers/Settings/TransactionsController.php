@@ -42,11 +42,9 @@ class TransactionsController extends Controller
             $transactions_subtype = $transactions_subtype->only($params['subtype']);
         }
 
-        logger($transactions_subtype->contains('owner'));
-
-
-
         $transactions = Transaction::whereHasMorph('transactiontable', $transactions_type->all(), function (Builder $query, $type) use($user, $transactions_subtype){
+
+        //$transactions = Transaction::whereHasMorph('transactiontable', $transactions_type->all(), function (Builder $query, $type) use($user){
 
             $query->whereId('');
 

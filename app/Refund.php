@@ -2,20 +2,20 @@
 
 namespace App;
 
+use App\Enums\RefundApplicationStatus;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class Refund extends Model
 {
     protected $fillable = [
         'stripe_id',
-        'payment_intent',
-        'amount',
-        'currency',
-        'last4'
+        'internal_status',
+        'status'
     ];
 
     protected $with = [
-        'invoice'
+        //'invoice'
     ];
 
     public function getServiceAttribute()
@@ -25,12 +25,17 @@ class Refund extends Model
 
     public function getTotalAttribute()
     {
-        return $this->attributes['amount'];
+        return $this->invoice->total;
+    }
+
+    public function getCurrencyAttribute()
+    {
+        return $this->invoice->currency;
     }
 
     public function getLast4Attribute()
     {
-        return $this->attributes['last4'];
+        return $this->invoice->last4;
     }
 
     public function transactions()
@@ -51,5 +56,10 @@ class Refund extends Model
     public function invoice()
     {
         return $this->belongsTo(Invoice::class, 'payment_intent', 'payment_intent');
+    }
+
+    public function scopeApproved($query)
+    {
+        return $query->where('internal_status', RefundApplicationStatus::Approved);
     }
 }
