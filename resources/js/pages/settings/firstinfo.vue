@@ -10,9 +10,7 @@
           <div class="col-md-7">
             <select v-model="form.country" :class="{ 'is-invalid': form.errors.has('country') }" class="form-control" name="country">
               <option value="">Scegli la nazione</option>
-              <option value="IT">Italia</option>
-              <option value="ES">Spagna</option>
-              <option value="GB">United Kingdom</option>
+              <option v-for="(country, key) in countries" :key="key" :value="key">{{country.label}}</option>
             </select>
             <has-error :form="form" field="country" />
           </div>
@@ -59,7 +57,8 @@ export default {
 
   computed: {
     ...mapGetters({
-      user: 'auth/user'
+      user: 'auth/user',
+      countries: 'lang/countries'
     }),
     ageFrom: function () {
       return this.$moment().subtract(window.config.limitUserAge, 'years').format('YYYY-MM-DD')

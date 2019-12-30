@@ -50,6 +50,7 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::patch('settings/profile', 'Settings\ProfileController@update');
         Route::patch('settings/profile-needed-info', 'Settings\ProfileController@neededInfo');
         Route::post('settings/verify-account', 'Settings\ProfileController@verifyAccount');
+        Route::post('settings/bank-account', 'Settings\ProfileController@bankAccount');
         Route::patch('settings/password', 'Settings\PasswordController@update');
 
         // Transactions

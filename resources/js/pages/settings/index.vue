@@ -61,6 +61,11 @@ export default {
           route: 'settings.verifyaccount'
         },
         {
+          icon: 'user',
+          name: this.$t('bank_account'),
+          route: 'settings.bankaccount'
+        },
+        {
           icon: 'lock',
           name: this.$t('password'),
           route: 'settings.password'

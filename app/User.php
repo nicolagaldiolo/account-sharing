@@ -32,6 +32,7 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
         'cap',
         'city',
         'country',
+        'currency',
         'tos_acceptance_at'
     ];
 
@@ -87,6 +88,14 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
         $this->setJsonData('address', 'city', $value);
     }
 
+    public function setCountryAttribute($value)
+    {
+        $this->attributes['country'] = $value;
+        $this->attributes['currency'] = collect(config('custom.countries'))->get('gb')['currency'] ??
+            config('custom.stripe.default_currency');
+    }
+
+
     /**
      * Get the oauth providers.
      *
@@ -141,7 +150,7 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
 
     public function getRegistrationCompletedAttribute()
     {
-        return !empty($this->birthday) && !empty($this->country);
+        return !empty($this->birthday) && !empty($this->country) && !empty($this->currency);
     }
 
     public function getAdditionalDataNeededAttribute()

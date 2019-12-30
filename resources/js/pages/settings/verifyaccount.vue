@@ -3,40 +3,24 @@
 
     <card :title="$t('your_info')">
 
-      <input type="file" name="file" @change="selectFile">
-
-      <form @submit.prevent="update" @keydown="form.onKeydown($event)">
+      <form @submit.prevent="selectFile" @keydown="form.onKeydown($event)">
         <alert-success :form="form" :message="$t('info_updated')" />
 
         <div class="form-group row">
-          <label class="col-md-3 col-form-label text-md-right">{{ $t('phone') }}</label>
+          <label class="col-md-3 col-form-label text-md-right">{{ $t('document_front') }}</label>
           <div class="col-md-7">
-            <input v-model="form.phone" :class="{ 'is-invalid': form.errors.has('phone') }" class="form-control" type="text" name="phone">
-            <has-error :form="form" field="phone" />
+            <!--<input v-model="form.phone" :class="{ 'is-invalid': form.errors.has('phone') }" class="form-control" type="text" name="phone">
+            <has-error :form="form" field="phone" />-->
+            <input type="file" name="file" ref="file">
           </div>
         </div>
 
         <div class="form-group row">
-          <label class="col-md-3 col-form-label text-md-right">{{ $t('street') }}</label>
+          <label class="col-md-3 col-form-label text-md-right">{{ $t('document_back') }}</label>
           <div class="col-md-7">
-            <input v-model="form.street" :class="{ 'is-invalid': form.errors.has('street') }" class="form-control" type="text" name="street">
-            <has-error :form="form" field="street" />
-          </div>
-        </div>
-
-        <div class="form-group row">
-          <label class="col-md-3 col-form-label text-md-right">{{ $t('city') }}</label>
-          <div class="col-md-7">
-            <input v-model="form.city" :class="{ 'is-invalid': form.errors.has('city') }" class="form-control" type="text" name="city">
-            <has-error :form="form" field="city" />
-          </div>
-        </div>
-
-        <div class="form-group row">
-          <label class="col-md-3 col-form-label text-md-right">{{ $t('cap') }}</label>
-          <div class="col-md-7">
-            <input v-model="form.cap" :class="{ 'is-invalid': form.errors.has('cap') }" class="form-control" type="text" name="cap">
-            <has-error :form="form" field="cap" />
+            <!--<input v-model="form.phone" :class="{ 'is-invalid': form.errors.has('phone') }" class="form-control" type="text" name="phone">
+            <has-error :form="form" field="phone" />-->
+            <input type="file" name="file" ref="file2">
           </div>
         </div>
 
@@ -68,7 +52,8 @@ export default {
   data: () => ({
     form: new Form({
       foo: 'bar',
-      file: null
+      file: null,
+      file2: null
     })
   }),
 
@@ -92,11 +77,10 @@ export default {
     },
 
     selectFile (e) {
-      const file = e.target.files[0]
-
       // Do some client side validation...
 
-      this.form.file = file
+      this.form.file = this.$refs.file.files[0];
+      this.form.file2 = this.$refs.file2.files[0];
 
       this.form.submit('post', '/api/settings/verify-account', {
         // Transform form data to FormData

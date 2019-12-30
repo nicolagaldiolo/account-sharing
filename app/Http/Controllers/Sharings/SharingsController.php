@@ -79,7 +79,7 @@ class SharingsController extends Controller
         \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
         \Stripe\Stripe::setApiVersion("2019-10-08");
 
-        return \Stripe\Account::allCapabilities(
+        return \Stripe\Account::retrieve(
             'acct_1FottpCGUE69w9KZ'
         );
 

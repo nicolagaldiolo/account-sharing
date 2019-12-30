@@ -168,10 +168,12 @@ class Stripe
     public function createPlan($sharing = null, $user = null)
     {
 
-        // Get account
-        $account = $this->getAccount($user);
+        // Use logged user if not provided
+        if(!is_null($user)){
+            $this->setUser($user);
+        }
 
-        if(!is_null($sharing) && $account){
+        if(!is_null($sharing)){
             $plan = \Stripe\Plan::create([
                 'amount' => number_format((float)$sharing->price * 100., 0, '.', ''),
                 'interval' => 'month',
@@ -179,9 +181,9 @@ class Stripe
                     'name' => $sharing->name
                 ],
                 'metadata' => [
-                    'account_id' => $account->id
+                    'account_id' => $this->user->pl_account_id
                 ],
-                'currency' => 'eur' // incastrato, da rendere dinamico
+                'currency' => $this->user->currency
             ]);
 
             $sharing->stripe_plan = $plan->id;
@@ -189,6 +191,29 @@ class Stripe
         }
 
         return $plan;
+    }
+
+    /*
+     * EXTERNAL ACCOUNT
+     */
+    public function createExternalAccount($token, $user = null)
+    {
+
+        // Use logged user if not provided
+        if(!is_null($user)){
+            $this->setUser($user);
+        }
+
+        $account = $this->getAccount();
+
+        $external_account = \Stripe\Account::createExternalAccount(
+            $account->id,
+            [
+                'external_account' => $token,
+            ]
+        );
+
+        return $external_account;
     }
 
 

@@ -21,6 +21,22 @@ return [
             'secret_connect' => env('STRIPE_CONNECT_WEBHOOK_SECRET'),
             'tolerance' => env('STRIPE_WEBHOOK_TOLERANCE', 300),
         ],
+        'default_currency' => env('STRIPE_DEFAULT_CURRENCY', 'eur')
+    ],
+
+    'countries' => [
+        'it' => [
+            'label' => 'Italia',
+            'currency' => 'eur',
+        ],
+        'es' => [
+            'label' => 'Spain',
+            'currency' => 'eur',
+        ],
+        'gb' => [
+            'label' => 'United Kingdom',
+            'currency' => 'gbp',
+        ]
     ]
 
 ];

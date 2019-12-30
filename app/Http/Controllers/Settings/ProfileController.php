@@ -67,12 +67,12 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
-        dd($request);
+        //dd($request);
 
         $path = '';
         //if($request->hasFile('file') && $request->file('file')->isValid()){
-            $path_front = $request->file('file_front')->store('uploaded_documents');
-            $path_back = $request->file('file_back')->store('uploaded_documents');
+            $path_front = $request->file('file')->store('uploaded_documents');
+            $path_back = $request->file('file2')->store('uploaded_documents');
 
 
 
@@ -117,6 +117,16 @@ class ProfileController extends Controller
         //}
 
 
+
+    }
+
+    public function bankAccount(Request $request)
+    {
+
+        $user = $request->user();
+        $bankAccount = $request->bank_account;
+
+        return createExternalAccount($bankAccount);
 
     }
 }

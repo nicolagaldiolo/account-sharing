@@ -3,6 +3,7 @@ $config = [
     'appName' => config('app.name'),
     'locale' => $locale = app()->getLocale(),
     'locales' => config('app.locales'),
+    'countries' => config('custom.countries'),
     'githubAuth' => config('services.github.client_id'),
     'stripeKey' => config('services.stripe.key'),
     'limitUserAge' => config('custom.limit_user_age'),

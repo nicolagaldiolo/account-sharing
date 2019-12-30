@@ -50,6 +50,7 @@ export default [
       { path: 'firstinfo', name: 'settings.firstinfo', component: page('settings/firstinfo.vue') },
       { path: 'neededinfo', name: 'settings.neededinfo', component: page('settings/neededinfo.vue') },
       { path: 'verifyaccount', name: 'settings.verifyaccount', component: page('settings/verifyaccount.vue') },
+      { path: 'bankaccount', name: 'settings.bankaccount', component: page('settings/bankaccount.vue') },
       { path: 'password', name: 'settings.password', component: page('settings/password.vue') },
       { path: 'wallet', name: 'settings.wallet', component: page('settings/wallet.vue') },
       { path: 'paymentmethods', name: 'settings.paymentmethods', component: page('settings/paymentmethods.vue') }

@@ -23,6 +23,7 @@ class User extends JsonResource
             'pl_account_id' => $this->pl_account_id,
             'pl_customer_id' => $this->pl_customer_id,
             'country' => $this->country,
+            'currency' => $this->currency,
             'phone' => $this->phone,
             'street' => $this->street,
             'city' => $this->city,

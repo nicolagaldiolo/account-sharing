@@ -35,3 +35,4 @@ export const SYNC_SHARINGS = 'SYNC_SHARINGS'
 export const UPDATE_SHARING = 'UPDATE_SHARING'
 // lang.js
 export const SET_LOCALE = 'SET_LOCALE'
+export const SET_COUNTRY = 'SET_COUNTRY'
