@@ -47,8 +47,18 @@ export default {
         },
         {
           icon: 'user',
-          name: this.$t('additional_info'),
-          route: 'settings.additional_info'
+          name: this.$t('first_info'),
+          route: 'settings.firstinfo'
+        },
+        {
+          icon: 'user',
+          name: this.$t('needed_info'),
+          route: 'settings.neededinfo'
+        },
+        {
+          icon: 'user',
+          name: this.$t('verify_account'),
+          route: 'settings.verifyaccount'
         },
         {
           icon: 'lock',

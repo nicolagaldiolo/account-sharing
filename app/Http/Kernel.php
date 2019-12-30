@@ -61,7 +61,8 @@ class Kernel extends HttpKernel
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
-        'VerifyWebhookSignature' => \App\Http\Middleware\VerifyWebhookSignature::class
+        'VerifyWebhookSignature' => \App\Http\Middleware\VerifyWebhookSignature::class,
+        'RegistrationCompleted' => \App\Http\Middleware\RegistrationCompleted::class
     ];
 
     /**

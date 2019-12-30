@@ -22,7 +22,9 @@
       </div>
 
       <div v-if="Object.keys(category).length">
-        <card :title="`Nuovo ${category.name}`">
+
+        <neededinfo v-if="user.additional_data_needed"></neededinfo>
+        <card v-else :title="`Nuovo ${category.name}`">
           <form @submit.prevent="create" @keydown="form.onKeydown($event)">
             <!--<alert-success :form="form" :message="$t('info_updated')" />-->
 
@@ -137,8 +139,12 @@
 <script>
   import Form from 'vform'
   import { mapGetters } from 'vuex'
+  import Neededinfo from "../settings/neededinfo";
 
   export default {
+    components: {
+      Neededinfo
+    },
     middleware: 'auth',
 
     data: () => ({
@@ -174,10 +180,10 @@
 
     created() {
       this.$store.dispatch('categories/fetchCategories', ['renewal_frequencies', 'sharings_visibility']);
-      console.log(this.embeds);
     },
 
     computed: mapGetters({
+      user: 'auth/user',
       categories: 'categories/categories',
       renewal_frequencies: 'categories/renewal_frequencies',
       sharings_visibility: 'categories/sharings_visibility'

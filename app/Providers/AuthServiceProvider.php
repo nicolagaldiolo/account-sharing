@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Category;
 use App\Enums\SharingStatus;
 use App\Enums\SubscriptionStatus;
 use App\Invoice;
@@ -54,8 +55,9 @@ class AuthServiceProvider extends ServiceProvider
             }
         });
 
-        Gate::define('create-sharing', function(User $user){
-            return !empty($user->birthday) && !empty($user->country);
+        Gate::define('create-sharing', function(User $user, Category $category){
+            return !$user->additional_data_needed &&
+                (!$user->sharingOwners()->get()->pluck('category_id')->contains($category->id) || $category->customizable);
         });
 
         Gate::define('manage-sharing', function(User $user, Sharing $sharing){

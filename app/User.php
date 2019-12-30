@@ -27,17 +27,12 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
         'password',
         'pl_account_id',
         'pl_customer_id',
+        'phone',
+        'street',
+        'cap',
+        'city',
         'country',
-        'tos_acceptance_at',
-    ];
-
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-     */
-    protected $hidden = [
-        'password', 'remember_token',
+        'tos_acceptance_at'
     ];
 
     /**
@@ -48,17 +43,8 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     protected $casts = [
         'email_verified_at' => 'datetime',
         'birthday' => 'date',
-        'tos_acceptance_at' => 'datetime'
-    ];
-
-    /**
-     * The accessors to append to the model's array form.
-     *
-     * @var array
-     */
-    protected $appends = [
-        'photo_url',
-        'username',
+        'tos_acceptance_at' => 'datetime',
+        'address' => 'array',
     ];
 
     /**
@@ -69,6 +55,36 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     public function getPhotoUrlAttribute()
     {
         return 'https://www.gravatar.com/avatar/'.md5(strtolower($this->email)).'.jpg?s=200&d=mm';
+    }
+
+    public function getStreetAttribute()
+    {
+        return data_get($this->address, 'street');
+    }
+
+    public function setStreetAttribute($value)
+    {
+        $this->setJsonData('address', 'street', $value);
+    }
+
+    public function getCapAttribute()
+    {
+        return data_get($this->address, 'cap');
+    }
+
+    public function setCapAttribute($value)
+    {
+        $this->setJsonData('address', 'cap', $value);
+    }
+
+    public function getCityAttribute()
+    {
+        return data_get($this->address, 'city');
+    }
+
+    public function setCityAttribute($value)
+    {
+        $this->setJsonData('address', 'city', $value);
     }
 
     /**
@@ -121,6 +137,23 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     public function getUsernameAttribute()
     {
         return $this->name . (!empty($this->surname) ? ' ' . $this->surname : '');
+    }
+
+    public function getRegistrationCompletedAttribute()
+    {
+        return !empty($this->birthday) && !empty($this->country);
+    }
+
+    public function getAdditionalDataNeededAttribute()
+    {
+        return empty($this->phone) || empty($this->street) || empty($this->cap) || empty($this->city);
+    }
+
+    protected function setJsonData($item, $key, $value)
+    {
+        $options = json_decode($this->attributes[$item]);
+        $data = data_set($options, $key, $value);
+        $this->attributes[$item] = json_encode($data);
     }
 
     public function sharings(){

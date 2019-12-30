@@ -17,34 +17,39 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('logout', 'Auth\LoginController@logout');
 
     Route::get('/user', function (Request $request) {
-        return $request->user();
+        return new \App\Http\Resources\User($request->user());
     });
 
-    // Categories
-    Route::resource('categories', 'Categories\CategoriesController');
+    Route::patch('settings/complete-registration', 'Settings\ProfileController@completeRegistration');
 
-    // Sharings
-    Route::resource('sharings', 'Sharings\SharingsController');
-    //Route::patch('sharings/{sharing}/transitions/{transition}', 'Sharings\SharingsController@transition')->name('sharings.transition');
-    //Route::get('sharing-requests', 'Sharings\SharingsController@requestToManage')->name('sharing.requests');
+    Route::group(['middleware' => 'RegistrationCompleted'], function () {
 
-    Route::post('sharings/{sharing}/join', 'Sharings\SharingsController@join')->name('sharings.join');
-    Route::patch('sharings/{sharing}/user/{user}/update', 'Sharings\SharingsController@update')->name('sharings.renewal.update');
-    Route::patch('sharings/{sharing}/transitions/{transition?}', 'Sharings\SharingsController@transition')->name('sharings.transition');
-    Route::patch('sharings/{sharing}/user/{user}/transition-user/{transition}', 'Sharings\SharingsController@transitionUser')->name('sharings.user.transition');
-    Route::patch('sharings/{sharing}/credential/', 'Sharings\CredentialController@update')->name('sharings.credential.update');
-    Route::post('sharings/{sharing}/credential/', 'Sharings\CredentialController@confirm')->name('sharings.credential.confirm');
-    Route::post('sharings/{sharing}/subscribe/', 'Sharings\SharingsController@subscribe')->name('sharings.credential.subscribe');
-    Route::post('sharings/{sharing}/restore/', 'Sharings\SharingsController@restore')->name('sharings.credential.restore');
+        // Categories
+        Route::resource('categories', 'Categories\CategoriesController');
 
-    // Chat
-    Route::get('sharings/{sharing}/chats', 'Sharings\ChatsController@getSharingChat')->name('sharings.chats');
-    Route::post('sharings/{sharing}/chat/', 'Sharings\ChatsController@store')->name('sharings.chat.store');
+        // Sharings
+        Route::resource('sharings', 'Sharings\SharingsController');
+        //Route::patch('sharings/{sharing}/transitions/{transition}', 'Sharings\SharingsController@transition')->name('sharings.transition');
+        //Route::get('sharing-requests', 'Sharings\SharingsController@requestToManage')->name('sharing.requests');
 
-    // Settings
+        Route::post('sharings/{sharing}/join', 'Sharings\SharingsController@join')->name('sharings.join');
+        Route::patch('sharings/{sharing}/user/{user}/update', 'Sharings\SharingsController@update')->name('sharings.renewal.update');
+        Route::patch('sharings/{sharing}/transitions/{transition?}', 'Sharings\SharingsController@transition')->name('sharings.transition');
+        Route::patch('sharings/{sharing}/user/{user}/transition-user/{transition}', 'Sharings\SharingsController@transitionUser')->name('sharings.user.transition');
+        Route::patch('sharings/{sharing}/credential/', 'Sharings\CredentialController@update')->name('sharings.credential.update');
+        Route::post('sharings/{sharing}/credential/', 'Sharings\CredentialController@confirm')->name('sharings.credential.confirm');
+        Route::post('sharings/{sharing}/subscribe/', 'Sharings\SharingsController@subscribe')->name('sharings.credential.subscribe');
+        Route::post('sharings/{sharing}/restore/', 'Sharings\SharingsController@restore')->name('sharings.credential.restore');
+
+        // Chat
+        Route::get('sharings/{sharing}/chats', 'Sharings\ChatsController@getSharingChat')->name('sharings.chats');
+        Route::post('sharings/{sharing}/chat/', 'Sharings\ChatsController@store')->name('sharings.chat.store');
+
+        // Settings
         // Profile
         Route::patch('settings/profile', 'Settings\ProfileController@update');
-        Route::patch('settings/profile_new', 'Settings\ProfileController@update_new');
+        Route::patch('settings/profile-needed-info', 'Settings\ProfileController@neededInfo');
+        Route::post('settings/verify-account', 'Settings\ProfileController@verifyAccount');
         Route::patch('settings/password', 'Settings\PasswordController@update');
 
         // Transactions
@@ -64,6 +69,7 @@ Route::group(['middleware' => 'auth:api'], function () {
 
         // Refunds
         Route::post('settings/refunds', 'Settings\RefundsController@store');
+    });
 });
 
 Route::group(['middleware' => 'guest:api'], function () {

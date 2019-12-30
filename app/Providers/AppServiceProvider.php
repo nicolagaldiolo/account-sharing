@@ -8,6 +8,7 @@ use App\Observers\UserObserver;
 use App\Sharing;
 use App\User;
 use Carbon\Carbon;
+use Illuminate\Http\Resources\Json\Resource;
 use Laravel\Dusk\DuskServiceProvider;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
@@ -27,7 +28,7 @@ class AppServiceProvider extends ServiceProvider
 
         User::observe(UserObserver::class);
         Sharing::observe(SharingObserver::class);
-
+        Resource::withoutWrapping();
     }
 
     /**

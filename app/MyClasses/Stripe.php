@@ -53,6 +53,22 @@ class Stripe
                 'transfers'
             ],
             'business_type' => 'individual',
+            'individual' => [
+                'phone' => $this->user->phone,
+                'first_name' => $this->user->name,
+                'last_name' => $this->user->surname,
+                'email' => $this->user->email,
+                'dob' => [
+                    'day' => $this->user->birthday->day,
+                    'month' => $this->user->birthday->month,
+                    'year' => $this->user->birthday->year
+                ],
+                'address' => [
+                    'line1' => $this->user->street,
+                    'city' => $this->user->city,
+                    'postal_code' => $this->user->cap
+                ]
+            ],
             'tos_acceptance' => [
                 'date' => $now,
                 'ip' => request()->ip()

@@ -55,7 +55,10 @@
     components: {
       SharingCard
     },
-    middleware: 'auth',
+    middleware: [
+      'auth',
+      'registrationCompleted'
+    ],
     //components: {
     //  carousel
     //},

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Sharings;
 
+use App\Category;
 use App\Enums\RefundApplicationStatus;
 use App\Enums\RenewalStatus;
 use App\Enums\SharingStatus;
@@ -73,13 +74,14 @@ class SharingsController extends Controller
     public function prova()
     {
 
+        //return Stripe::getAccount($user);
 
+        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+        \Stripe\Stripe::setApiVersion("2019-10-08");
 
-        Auth::login(User::find(6));
-
-        $user = Auth::user();
-
-        //Stripe::getAccount($user);
+        return \Stripe\Account::allCapabilities(
+            'acct_1FottpCGUE69w9KZ'
+        );
 
         //$user->pl_account_id = null;
         //$user->save();
@@ -134,8 +136,8 @@ class SharingsController extends Controller
      */
     public function store(SharingRequest $request)
     {
-
-        $this->authorize('create-sharing');
+        $category = Category::findOrFail($request->get('category_id'));
+        $this->authorize('create-sharing', $category);
 
         // Create the sharing
         $sharing = Sharing::create($request->validated());
