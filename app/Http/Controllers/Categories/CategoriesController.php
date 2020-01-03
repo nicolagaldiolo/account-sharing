@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Categories;
 use App\Category;
 use App\Enums\RenewalFrequencies;
 use App\Enums\SharingVisibility;
+use App\Http\Resources\CategoryCollection;
 use App\RenewalFrequency;
 use App\Sharing;
 use Illuminate\Http\Request;
@@ -20,33 +21,7 @@ class CategoriesController extends Controller
      */
     public function index(Request $request)
     {
-        $embed = ($request->has('embed') ? explode(',', $request->input('embed')) : []);
-
-        $appends = [];
-
-        if(in_array('renewal_frequencies', $embed)){
-            $appends['renewal_frequencies'] = RenewalFrequency::all();
-        };
-
-        if(in_array('sharings', $embed)){
-            $appends['sharings'] = Sharing::all();
-        };
-
-        if(in_array('sharings_visibility', $embed)){
-            $appends['sharings_visibility'] = SharingVisibility::toSelectArray();
-        };
-
-        // Se ho già creato una condivisione con quella categoria o la categoria non è customizable non posso creare altre condivisioni dello stesso tipo
-        //$mycategories = Auth::user()->sharingOwners()->get()->pluck('category_id');
-        $categories = Category::all(); /*->each(function($category) use($mycategories){
-            $category->available = !$mycategories->contains($category->id) || $category->customizable;
-        });*/
-
-        $data = [
-            'categories' => $categories,
-        ];
-
-        return array_merge($data, $appends);
+        return new CategoryCollection(Category::with('categoryForbidden')->get());
     }
 
     /**

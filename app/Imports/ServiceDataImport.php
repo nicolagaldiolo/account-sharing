@@ -23,7 +23,7 @@ class ServiceDataImport implements ToCollection, WithHeadingRow
                     'description' => $row->get('desc'),
                     'capacity' => $row->get('account'),
                     'price' => $row->get($key),
-                    'customizable' => $row->get('custom'),
+                    'custom' => $row->get('custom'),
                     'country' => $key
                 ]);
             });

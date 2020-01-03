@@ -41,7 +41,7 @@ export const actions = {
     try {
       let params = (embed.length > 0) ? `?embed=${embed.join(',')}` : '';
       const { data } = await axios.get('/api/categories' + params);
-      commit(types.FETCH_CATEGORIES_SUCCESS, { data: data })
+      commit(types.FETCH_CATEGORIES_SUCCESS, { data: data.data })
     } catch (e) {
       commit(types.FETCH_CATEGORIES_FAILURE)
     }

@@ -84,8 +84,7 @@ class CredentialController extends Controller
     public function update(CredentialRequest $request, Sharing $sharing)
     {
 
-        $sharingUser = $sharing->users()->findOrFail(Auth::id())->sharing_status;
-        $this->authorize('manage-own-sharing', $sharingUser);
+        $this->authorize('manage-own-sharing', $sharing);
 
         $sharing->update($request->validated());
 

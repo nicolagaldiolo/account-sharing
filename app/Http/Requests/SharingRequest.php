@@ -29,7 +29,6 @@ class SharingRequest extends FormRequest
     {
 
         $category = Category::findOrFail($this->input('category_id'));
-
         $max_price = ($category->price > 0) ? '|max:' . $category->price : '';
         $max_capacity = ($category->capacity > 0) ? '|max:' . $category->capacity : '';
 
@@ -38,7 +37,7 @@ class SharingRequest extends FormRequest
             'description'           => 'sometimes|max:750',
             'visibility'            => ['required', new EnumValue(SharingVisibility::class, false)],
             'capacity'              => 'required|numeric' . $max_capacity,
-            'price'                 => 'required|numeric' . $max_price,
+            'price'                 => 'required|numeric|min:1' . $max_price,
             'category_id'           => 'required|exists:categories,id',
             'renewal_frequency_id'  => 'required|exists:renewal_frequencies,id',
             'username'              => 'sometimes',

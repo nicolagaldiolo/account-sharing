@@ -13,12 +13,9 @@
       <div v-if="!Object.keys(category).length" class="list-group text-center">
 
         <div v-for="category in categories" :key="category.id">
-          <a v-if="category.available" href="#" @click.prevent="setCategory($event, category)" class="list-group-item list-group-item-action">{{ category.name }}</a>
+          <a v-if="!category.forbidden" href="#" @click.prevent="setCategory($event, category)" class="list-group-item list-group-item-action">{{ category.name }}</a>
           <a v-else href="#" class="list-group-item list-group-item-action disabled">{{ category.name }}</a>
         </div>
-
-
-
       </div>
 
       <div v-if="Object.keys(category).length">
@@ -62,7 +59,7 @@
             <div class="form-group row">
               <label class="col-md-3 col-form-label text-md-right">Prezzo del servizio</label>
               <div class="col-md-7">
-                <input v-model="form.price" :class="{ 'is-invalid': form.errors.has('price') }" class="form-control" type="text" name="price">
+                <currency-input :disabled="!category.custom" v-model="form.price" :currency="user.currency" :locale="user.country" distraction-free="false" :class="{ 'is-invalid': form.errors.has('price') }" class="form-control" type="text"/>
                 <has-error :form="form" field="price" />
               </div>
             </div>
@@ -71,7 +68,10 @@
             <div class="form-group row">
               <label class="col-md-3 col-form-label text-md-right">Posti disponibili</label>
               <div class="col-md-7">
-                <input v-model="form.capacity" :class="{ 'is-invalid': form.errors.has('capacity') }" class="form-control" type="text" name="capacity">
+                <select v-model="form.capacity" :class="{ 'is-invalid': form.errors.has('capacity') }" class="form-control" name="capacity">
+                  <option value="">Seleziona i posti liberi</option>
+                  <option v-for="index in category.capacity" :key="index" :value="index">{{ index }}</option>
+                </select>
                 <has-error :form="form" field="capacity" />
               </div>
             </div>
@@ -127,11 +127,13 @@
 <script>
   import Form from 'vform'
   import { mapGetters } from 'vuex'
-  import Neededinfo from "../settings/neededinfo";
+  import Neededinfo from '../settings/neededinfo'
+  import MoneyFormat from 'vue-money-format'
 
   export default {
     components: {
-      Neededinfo
+      Neededinfo,
+      MoneyFormat
     },
     middleware: 'auth',
 

@@ -79,7 +79,18 @@ class SharingsController extends Controller
 
         Auth::login(User::find(3));
 
-        return Sharing::all()->pluck('category_id');
+        $test = Category::first();
+
+        return $test->categoryAvailable;
+
+
+
+        $test->each(function($item){
+            return $item->categoryAvailable;
+        });
+
+        return "aaa";
+        //return Sharing::all()->pluck('category_id');
 
 
 
@@ -150,18 +161,20 @@ class SharingsController extends Controller
         $category = Category::findOrFail($request->get('category_id'));
         $this->authorize('create-sharing', $category);
 
+        $user = Auth::user();
+
         // Create the sharing
-        $sharing = Sharing::create($request->validated());
+        $sharing = $user->sharingOwners()->create($request->validated());
+
+        // Attach the sharing to user
+        $user->sharings()->save($sharing, [
+            'status' => SharingStatus::Joined,
+        ]);
 
         // Create stripe plan
         Stripe::createPlan($sharing);
 
-        // Attach the sharing to user
-        return Auth::user()->sharings()->save($sharing, [
-            'status' => SharingStatus::Joined,
-            'owner' => true
-        ]);
-
+        return new SharingResource($sharing);
     }
 
     /**

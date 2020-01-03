@@ -16,7 +16,7 @@ class Category extends Model
         'capacity',
         'price',
         'image',
-        'customizable',
+        'custom',
         'country'
     ];
 
@@ -34,9 +34,13 @@ class Category extends Model
         });
     }
 
-
     public function sharings()
     {
         return $this->hasMany(Sharing::class);
+    }
+
+    public function categoryForbidden()
+    {
+        return $this->hasOne(Sharing::class)->where('owner_id', Auth::user()->id);
     }
 }

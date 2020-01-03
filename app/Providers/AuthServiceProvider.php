@@ -33,8 +33,8 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        Gate::define('manage-own-sharing', function($user, $sharingUser){
-            return $user->id === $sharingUser->sharing->owner->id;
+        Gate::define('manage-own-sharing', function(User $user, Sharing $sharing){
+            return $user->id === $sharing->owner_id;
         });
 
         Gate::define('can-subscribe', function($user, $sharingUser){
@@ -56,8 +56,7 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         Gate::define('create-sharing', function(User $user, Category $category){
-            return !$user->additional_data_needed &&
-                (!$user->sharingOwners()->get()->pluck('category_id')->contains($category->id) || $category->customizable);
+            return !$user->additional_data_needed && (is_null($category->categoryForbidden) || $category->custom);
         });
 
         //Gate::define('manage-sharing', function(User $user, Sharing $sharing){

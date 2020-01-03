@@ -2,6 +2,7 @@
 
 namespace App\MyClasses;
 
+use App\Sharing;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -177,30 +178,26 @@ class Stripe
         }
     }
 
-    public function createPlan($sharing = null, $user = null)
+    public function createPlan(Sharing $sharing)
     {
 
-        // Use logged user if not provided
-        if(!is_null($user)){
-            $this->setUser($user);
-        }
+        $user = User::findOrFail($sharing->owner_id);
+        $this->setUser($user);
 
-        if(!is_null($sharing)){
-            $plan = \Stripe\Plan::create([
-                'amount' => number_format((float)$sharing->price * 100., 0, '.', ''),
-                'interval' => 'month',
-                'product' => [
-                    'name' => $sharing->name
-                ],
-                'metadata' => [
-                    'user_id' => $this->user->pl_account_id
-                ],
-                'currency' => $this->user->currency
-            ]);
+        $plan = \Stripe\Plan::create([
+            'amount' => number_format((float)$sharing->price * 100., 0, '.', ''),
+            'interval' => 'month',
+            'product' => [
+                'name' => $sharing->name
+            ],
+            'metadata' => [
+                'user_id' => $this->user->pl_account_id
+            ],
+            'currency' => $this->user->currency
+        ]);
 
-            $sharing->stripe_plan = $plan->id;
-            $sharing->save();
-        }
+        $sharing->stripe_plan = $plan->id;
+        $sharing->save();
 
         return $plan;
     }

@@ -19,7 +19,7 @@ class Sharing extends Model
 
     // https://stackoverflow.com/questions/36750540/accessing-a-database-value-in-a-models-constructor-in-laravel-5-2
     // Alla crezione del modello condiziono dimamicamente i campi che voglio nascondere previa condizione
-    /*public function newFromBuilder($attributes = [], $connection = null)
+    public function newFromBuilder($attributes = [], $connection = null)
     {
         $model = parent::newFromBuilder($attributes, $connection);
         $user = Auth::user();
@@ -30,7 +30,6 @@ class Sharing extends Model
 
         return $model;
     }
-    */
 
     protected $fillable = [
         'name',
@@ -69,7 +68,7 @@ class Sharing extends Model
         //'availability',
         //'visility_list',
         //'owner',
-        //'sharing_state_machine'
+        'sharing_state_machine'
     ];
 
     protected $toevaluate = [
@@ -78,7 +77,7 @@ class Sharing extends Model
     ];
 
     public function getUsernameAttribute(){
-        return Crypt::decryptString($this->attributes['username']);
+        return ''; //(!empty($this->username)) ? Crypt::decryptString($this->username) : $this->username;
     }
 
     public function setUsernameAttribute($value){
@@ -86,7 +85,7 @@ class Sharing extends Model
     }
 
     public function getPasswordAttribute(){
-        return Crypt::decryptString($this->attributes['password']);
+        return ''; //(!empty($this->password)) ? Crypt::decryptString($this->password) : $this->password;
     }
 
     public function setPasswordAttribute($value){
@@ -106,7 +105,7 @@ class Sharing extends Model
         return $this->belongsToMany(User::class)
             ->using(SharingUser::class)
             ->as('sharing_status')
-            ->withPivot(['id','status','owner','credential_updated_at'])
+            ->withPivot(['id','status','credential_updated_at'])
             ->withTimestamps();
     }
 
@@ -118,7 +117,7 @@ class Sharing extends Model
         return $this->belongsToMany(User::class)
             ->using(SharingUser::class)
             ->as('sharing_status')
-            ->withPivot(['id','status','owner','credential_updated_at'])
+            ->withPivot(['id','status','credential_updated_at'])
             ->whereStatus(SharingStatus::Approved)
             ->withTimestamps();
     }
@@ -127,7 +126,7 @@ class Sharing extends Model
         return $this->belongsToMany(User::class)
             ->using(SharingUser::class)
             ->as('sharing_status')
-            ->withPivot(['id','status','owner','credential_updated_at'])
+            ->withPivot(['id','status','credential_updated_at'])
             ->whereStatus(SharingStatus::Joined)
             ->withTimestamps();
     }
@@ -136,7 +135,7 @@ class Sharing extends Model
         return $this->belongsToMany(User::class)
             ->using(SharingUser::class)
             ->as('sharing_status')
-            ->withPivot(['id','status','owner','credential_updated_at'])
+            ->withPivot(['id','status','credential_updated_at'])
             ->whereStatus(SharingStatus::Joined)
             ->where('user_id', '<>', $this->owner_id)
             ->withTimestamps();
@@ -194,28 +193,6 @@ class Sharing extends Model
     {
         return SharingVisibility::toSelectArray();
     }
-
-    /*public function calcNextRenewal($current = null)
-    {
-        $renewalFrequency = $this->renewalFrequency;
-        $date = ($current instanceof Carbon) ? $current : Carbon::now();
-        $expires_on = null;
-
-        switch ($renewalFrequency->type){
-            case RenewalFrequencies::Weeks:
-                $expires_on = $date->addWeekNoOverflow($renewalFrequency->value)->endOfDay();
-                break;
-            case RenewalFrequencies::Months:
-                $expires_on = $date->addMonthNoOverflow($renewalFrequency->value)->endOfDay();
-                break;
-            case RenewalFrequencies::Years:
-                $expires_on = $date->addYearNoOverflow($renewalFrequency->value)->endOfDay();
-                break;
-        }
-
-        return $expires_on;
-    }
-    */
 
     public function scopePending($query)
     {

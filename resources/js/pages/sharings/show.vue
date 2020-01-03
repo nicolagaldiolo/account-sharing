@@ -6,8 +6,8 @@
           <div class="col-sm-6">
             <div class="card">
               <div class="card-body">
-                <img :src="sharing.owner.photo_url">
-                <h5 class="card-title">{{sharing.owner.name}}</h5>
+                <!--<img :src="sharing.owner.photo_url">-->
+                <!--<h5 class="card-title">{{sharing.owner.name}}</h5>-->
                 <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
                 <a href="#" class="btn btn-primary">Go somewhere</a>
               </div>
@@ -33,12 +33,12 @@
           <router-link :to="{ name: 'sharing.restore' }" class="alert-link">Completa pagamento</router-link>
         </div>
 
-        <a v-if="availability" class="btn btn-primary btn-lg btn-block">Invita altra gente</a>
+        <!--<a v-if="availability" class="btn btn-primary btn-lg btn-block">Invita altra gente</a>
         <div v-if="sharing.sharing_state_machine.transitions.length">
           <a v-for="(transition, index) in sharing.sharing_state_machine.transitions" :key="index" href="#" @click.prevent="doTransition(transition.value)" class="btn btn-primary btn-lg btn-block">
             {{transition.metadata.title}}
           </a>
-        </div>
+        </div>-->
       </div>
       <div v-else-if="foreign">
         <a @click.prevent="doTransition()" class="btn btn-primary btn-lg btn-block">Entra nel gruppo</a>
@@ -113,6 +113,7 @@
         </div>
       </div>
     </div>
+
   </div>
 </template>
 <script>
@@ -141,8 +142,8 @@
         }),
 
         created () {
-            console.log("entro in created");
             this.$store.dispatch('sharings/fetchSharing', this.$route.params.sharing_id);
+            /*
             window.Echo.private(`App.User.${this.authUser.id}`).notification(notifications => {
                 //console.log(notifications);
                 if(notifications.data) {
@@ -151,6 +152,7 @@
                     alert(message)
                 }
             })
+            */
         },
 
         computed: {
@@ -172,7 +174,7 @@
                 return this.sharing.availability > 0
             },
             owner () {
-                return this.authUser.id === this.sharing.owner.id
+                return this.authUser.id === this.sharing.owner_id
             },
             foreign () {
                 return this.sharing.sharing_state_machine === null
@@ -181,8 +183,8 @@
                 return this.sharing.sharing_state_machine !== null && this.sharing.sharing_state_machine.status.value === 3
             },
             userSubscription () {
-                const user = this.sharing.active_users.filter(user => user.id === this.authUser.id)
-                return (user.length && user[0].sharing_status.subscription) ? user[0].sharing_status.subscription.status : {}
+                //const user = this.sharing.active_users.filter(user => user.id === this.authUser.id)
+                return ''//(user.length && user[0].sharing_status.subscription) ? user[0].sharing_status.subscription.status : {}
             }
         },
 
