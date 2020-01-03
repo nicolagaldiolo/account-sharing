@@ -16,6 +16,11 @@ use Faker\Generator as Faker;
 */
 
 $factory->define(User::class, function (Faker $faker) {
+
+    $countries = collect(config('custom.countries'));
+    $country_key = $countries->keys()->random();
+    $country = $countries->get($country_key);
+
     return [
         'name' => $faker->firstName,
         'surname' => $faker->lastName,
@@ -23,6 +28,11 @@ $factory->define(User::class, function (Faker $faker) {
         'email' => $faker->unique()->safeEmail,
         'email_verified_at' => now(),
         'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+        'phone' => $country['fake_data']['number'],
+        'address' => $country['fake_data']['address'],
+        'country' => $country_key,
+        'currency' => $country['currency'],
+        'tos_acceptance_at' => Carbon\Carbon::now(),
         'remember_token' => Str::random(10),
     ];
 });

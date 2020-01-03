@@ -19,13 +19,13 @@
 </template>
 
 <script>
-export default {
-  name: 'SharingCard',
-  props: {
-    sharing: {
-      type: Object,
-      default: null
+  export default {
+    name: 'SharingCard',
+    props: {
+      sharing: {
+        type: Object,
+        default: null
+      }
     }
   }
-}
 </script>

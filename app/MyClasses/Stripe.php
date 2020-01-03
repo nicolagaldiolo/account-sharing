@@ -28,14 +28,14 @@ class Stripe
      * ACCOUNT
      */
 
-    public function deleteAllAccount()
+    public function deleteAllAccounts()
     {
         $accounts = collect(\Stripe\Account::all(['limit' => 99])->data);
         if($accounts->isNotEmpty()){
             $accounts->each(function($item){
                 $item->delete();
             });
-            $this->deleteAllAccount();
+            $this->deleteAllAccounts();
         }
     }
 
@@ -125,14 +125,14 @@ class Stripe
         return $customer;
     }
 
-    public function deleteAllCustomer()
+    public function deleteAllCustomers()
     {
         $customers = collect(\Stripe\Customer::all(['limit' => 99])->data);
         if($customers->isNotEmpty()){
             $customers->each(function($item){
                 $item->delete();
             });
-            $this->deleteAllCustomer();
+            $this->deleteAllCustomers();
         }
     }
 
@@ -165,6 +165,18 @@ class Stripe
     /*
      * PLAN
      */
+
+    public function deleteAllPlans()
+    {
+        $plans = collect(\Stripe\Plan::all(['limit' => 99])->data);
+        if($plans->isNotEmpty()){
+            $plans->each(function($item){
+                $item->delete();
+            });
+            $this->deleteAllPlans();
+        }
+    }
+
     public function createPlan($sharing = null, $user = null)
     {
 
@@ -181,7 +193,7 @@ class Stripe
                     'name' => $sharing->name
                 ],
                 'metadata' => [
-                    'account_id' => $this->user->pl_account_id
+                    'user_id' => $this->user->pl_account_id
                 ],
                 'currency' => $this->user->currency
             ]);
@@ -191,6 +203,21 @@ class Stripe
         }
 
         return $plan;
+    }
+
+    /*
+     * PRODUCT
+     */
+
+    public function deleteAllProducts()
+    {
+        $products = collect(\Stripe\Product::all(['limit' => 99])->data);
+        if($products->isNotEmpty()){
+            $products->each(function($item){
+                $item->delete();
+            });
+            $this->deleteAllProducts();
+        }
     }
 
     /*
@@ -216,25 +243,23 @@ class Stripe
         return $external_account;
     }
 
-
-
-
-
-
-
-    /*
-     * TOKEN
-     */
-    public function createToken($params = null, $options = null)
-    {
-        return \Stripe\Token::create($params, $options);
-    }
-
     /*
      * SUBSCRIPTION
      */
-    public function createSubscription($params = null, $options = null)
+    public function createSubscription($sharing, $user = null)
     {
-        return \Stripe\Subscription::create($params, $options);
+        $customer = $this->getCustomer($user);
+
+        return \Stripe\Subscription::create([
+            'customer' => $customer->id,
+            'items' => [
+                [
+                    'plan' => $sharing->stripe_plan,
+                ],
+            ],
+            'expand' => [
+                'latest_invoice.payment_intent'
+            ]
+        ]);
     }
 }

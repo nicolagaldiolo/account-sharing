@@ -26,9 +26,9 @@ export default [
     component: page('sharings/index.vue'),
     children: [
       { path: '', name: 'sharings', redirect: { name: 'sharings.pending' } },
-      { path: 'pending', name: 'sharings.pending', component: page('sharings/lists.vue'), props: { type: 'pending' } },
-      { path: 'approved', name: 'sharings.approved', component: page('sharings/lists.vue'), props: { type: 'approved' } },
-      { path: 'joined', name: 'sharings.joined', component: page('sharings/lists.vue'), props: { type: 'joined' } },
+      { path: 'pending', name: 'sharings.pending', component: page('sharings/lists.vue'), props: { type: 'pending', title: 'In attesa' } },
+      { path: 'approved', name: 'sharings.approved', component: page('sharings/lists.vue'), props: { type: 'approved', title: 'Approvate' } },
+      { path: 'joined', name: 'sharings.joined', component: page('sharings/lists.vue'), props: { type: 'joined', title: 'A cui partecipo' } },
       { path: 'owner', name: 'sharings.owner', component: page('sharings/owner.vue'), props: { type: 'owner' } }
     ]
   },

@@ -10,7 +10,9 @@ use App\Enums\SubscriptionStatus;
 use App\Http\Requests\CredentialRequest;
 use App\Http\Requests\SharingRequest;
 use App\Http\Resources\Transaction as TransactionResource;
+use App\Http\Resources\Sharing as SharingResource;
 use App\Http\Traits\SharingTrait;
+use App\Imports\ServiceDataImport;
 use App\Invoice;
 use App\Payout;
 use App\Refund;
@@ -25,6 +27,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use App\MyClasses\Support\Facade\Stripe;
+use Maatwebsite\Excel\Facades\Excel;
 use PhpParser\Builder;
 
 class SharingsController extends Controller
@@ -41,20 +44,20 @@ class SharingsController extends Controller
         $param = $request->input('type', '');
         switch ($param){
             case 'pending':
-                $sharings = Auth::user()->sharings()->pending()->get();
+                $sharings = SharingResource::collection(Auth::user()->sharings()->pending()->paginate(12));
                 break;
             case 'approved':
-                $sharings = Auth::user()->sharings()->approved()->get();
+                $sharings = SharingResource::collection(Auth::user()->sharings()->approved()->paginate(12));
                 break;
             case 'owner':
                 // manipolo i dati tornati raggruppando gli utenti per stato della relazione con sharing(es: pendind: utenti..., joined: utenti...)
                 $sharings = $this->getSharingOwners();
                 break;
             case 'joined':
-                $sharings = Auth::user()->sharings()->joined()->get();
+                $sharings = SharingResource::collection(Auth::user()->sharings()->joined()->paginate(12));
                 break;
             default:
-                $sharings = Sharing::public()->get();
+                $sharings = SharingResource::collection(Sharing::public()->paginate(12));
                 break;
         }
 
@@ -73,6 +76,14 @@ class SharingsController extends Controller
 
     public function prova()
     {
+
+        Auth::login(User::find(3));
+
+        return Sharing::all()->pluck('category_id');
+
+
+
+
 
         //return Stripe::getAccount($user);
 

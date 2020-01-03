@@ -51,7 +51,7 @@
 
         computed: {
             transactionFormatted: function () {
-                var title2,icon, paymentLabel,paymentDirectionLabel
+                var title2,icon,paymentLabel,paymentDirectionLabel
 
                 switch (this.item.type) {
                     case 'INVOICE':

@@ -28,14 +28,38 @@ return [
         'it' => [
             'label' => 'Italia',
             'currency' => 'eur',
+            'fake_data' => [
+                'address' => [
+                    'street' => 'Via Marsala, 29H',
+                    'city' => 'Roma',
+                    'cap' => '00185'
+                ],
+                'number' => '+3903549003847'
+            ]
         ],
         'es' => [
             'label' => 'Spain',
             'currency' => 'eur',
+            'fake_data' => [
+                'address' => [
+                    'street' => 'Ronda de Segovia, 11',
+                    'city' => 'Madrid',
+                    'cap' => '28005'
+                ],
+                'number' => '+34636859773'
+            ]
         ],
         'gb' => [
             'label' => 'United Kingdom',
             'currency' => 'gbp',
+            'fake_data' => [
+                'address' => [
+                    'street' => '66 Trafalgar Square, St. James\'s',
+                    'city' => 'London',
+                    'cap' => 'WC2N 5DS'
+                ],
+                'number' => '+4407036400109'
+            ]
         ]
     ]
 

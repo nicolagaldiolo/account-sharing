@@ -60,9 +60,9 @@ class AuthServiceProvider extends ServiceProvider
                 (!$user->sharingOwners()->get()->pluck('category_id')->contains($category->id) || $category->customizable);
         });
 
-        Gate::define('manage-sharing', function(User $user, Sharing $sharing){
-            return $user->id === $sharing->owner->id || $sharing->activeUsers()->get()->pluck('id')->contains($user->id);
-        });
+        //Gate::define('manage-sharing', function(User $user, Sharing $sharing){
+        //    return $user->id === $sharing->owner->id || $sharing->activeUsers()->get()->pluck('id')->contains($user->id);
+        //});
 
         Gate::define('confirm-credential', function(User $user, Sharing $sharing){
             return $user->id !== $sharing->owner->id && // se non sono owner

@@ -6,6 +6,6 @@ use BenSampo\Enum\Enum;
 
 final class SharingVisibility extends Enum
 {
-    const Public = 0;
-    const Private = 1;
+    const Private = 0;
+    const Public = 1;
 }

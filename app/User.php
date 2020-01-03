@@ -181,7 +181,7 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
             ->whereStatus(SharingStatus::Joined)
             ->whereNull('owner');
     }
-    public function sharingOwners(){
+    /*public function sharingOwners(){
         return $this->belongsToMany(Sharing::class)
             ->using(SharingUser::class)
             ->as('sharing_status')
@@ -189,8 +189,10 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
             ->withTimestamps()
             ->whereStatus(SharingStatus::Joined)
             ->whereOwner(true);
+    }*/
+    public function sharingOwners(){
+        return $this->hasMany(Sharing::class, 'owner_id', 'id');
     }
-
 
     public function customers()
     {

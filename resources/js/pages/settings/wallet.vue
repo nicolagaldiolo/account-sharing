@@ -77,6 +77,7 @@
     import InfiniteLoading from 'vue-infinite-loading'
     import axios from 'axios'
     import Transaction from '~/components/Transaction'
+    import { helperMixin } from '~/mixins/helperMixin'
     import MoneyFormat from "vue-money-format";
 
 export default {
@@ -129,14 +130,8 @@ export default {
       },
 
       async infiniteHandler ($state) {
-          const params = this.search_fields
-          var queryString = Object.keys(params).filter(key => {
-              if (params[key]) {
-                  return key
-              }
-          }).map(key => key + '=' + params[key]).join('&')
 
-          axios.get('/api/settings/transactions' + ((queryString) ? '?' + queryString : '')).then(({ data }) => {
+          axios.get('/api/settings/transactions' + this.getQueryString(this.search_fields)).then(({ data }) => {
               if (data.data.length) {
                   this.lists.push(...data.data)
                   $state.loaded()

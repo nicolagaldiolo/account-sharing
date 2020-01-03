@@ -28,7 +28,7 @@ class AppServiceProvider extends ServiceProvider
 
         User::observe(UserObserver::class);
         Sharing::observe(SharingObserver::class);
-        Resource::withoutWrapping();
+        //Resource::withoutWrapping();
     }
 
     /**

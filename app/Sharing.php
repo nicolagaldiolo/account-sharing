@@ -19,7 +19,7 @@ class Sharing extends Model
 
     // https://stackoverflow.com/questions/36750540/accessing-a-database-value-in-a-models-constructor-in-laravel-5-2
     // Alla crezione del modello condiziono dimamicamente i campi che voglio nascondere previa condizione
-    public function newFromBuilder($attributes = [], $connection = null)
+    /*public function newFromBuilder($attributes = [], $connection = null)
     {
         $model = parent::newFromBuilder($attributes, $connection);
         $user = Auth::user();
@@ -30,6 +30,7 @@ class Sharing extends Model
 
         return $model;
     }
+    */
 
     protected $fillable = [
         'name',
@@ -44,11 +45,31 @@ class Sharing extends Model
         'username',
         'password'
     ];
+
+    protected $with = [
+        'category',
+        'owner'
+    ];
+
+    /**
+     * The "booting" method of the model.
+     *
+     * @return void
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::addGlobalScope('country', function ($builder) {
+            $builder->whereHas('category');
+        });
+    }
+
     protected $appends = [
-        'availability',
-        'visility_list',
-        'owner',
-        'sharing_state_machine'
+        //'availability',
+        //'visility_list',
+        //'owner',
+        //'sharing_state_machine'
     ];
 
     protected $toevaluate = [
@@ -117,7 +138,7 @@ class Sharing extends Model
             ->as('sharing_status')
             ->withPivot(['id','status','owner','credential_updated_at'])
             ->whereStatus(SharingStatus::Joined)
-            ->whereOwner(null)
+            ->where('user_id', '<>', $this->owner_id)
             ->withTimestamps();
     }
 
@@ -126,8 +147,7 @@ class Sharing extends Model
         return $this->hasOneThrough('App\Subscription', 'App\SharingUser', 'sharing_id', 'sharing_user_id', 'id', 'id');
     }
 
-    /*
-    public function owner()
+    /*public function owner()
     {
         return $this->belongsToMany(User::class)
             ->using(SharingUser::class)
@@ -135,13 +155,12 @@ class Sharing extends Model
             ->withPivot(['id','status','owner','credential_updated_at'])
             ->whereStatus(SharingStatus::Joined)
             ->whereOwner(1)
-            ->withTimestamps();
-    }
-    */
+            ->withTimestamps()
+    }*/
 
-    public function getOwnerAttribute()
+    public function owner()
     {
-        return $this->activeUsers()->whereOwner(true)->first();
+        return $this->belongsTo(User::class, 'owner_id', 'id');
     }
 
     public function getSharingStateMachineAttribute()

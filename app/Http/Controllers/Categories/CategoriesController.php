@@ -37,10 +37,10 @@ class CategoriesController extends Controller
         };
 
         // Se ho già creato una condivisione con quella categoria o la categoria non è customizable non posso creare altre condivisioni dello stesso tipo
-        $mycategories = Auth::user()->sharingOwners()->get()->pluck('category_id');
-        $categories = Category::all()->each(function($category) use($mycategories){
+        //$mycategories = Auth::user()->sharingOwners()->get()->pluck('category_id');
+        $categories = Category::all(); /*->each(function($category) use($mycategories){
             $category->available = !$mycategories->contains($category->id) || $category->customizable;
-        });
+        });*/
 
         $data = [
             'categories' => $categories,

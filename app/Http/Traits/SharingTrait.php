@@ -4,6 +4,7 @@ namespace App\Http\Traits;
 
 use App\Enums\SharingStatus;
 use App\Enums\SubscriptionStatus;
+use App\MyClasses\Support\Facade\Stripe;
 use App\Sharing;
 use App\SharingUser;
 use App\Subscription;
@@ -65,22 +66,7 @@ trait SharingTrait {
             $transition = 'pay';
 
             if ($stateMachine->can($transition)) {
-
-                /*
-                    $customer = $item->customers()->where('user_pl_account_id', $me->id)->firstOrFail();
-
-                    // Creo la subscription
-                    $subscription = \Stripe\Subscription::create([
-                        "customer" => $customer->customer_id,
-                        "items" => [
-                            [
-                                "plan" => $sharing->stripe_plan,
-                            ],
-                        ],
-                        "application_fee_percent" => 10,
-                    ], ['stripe_account' => $me->pl_account_id]);
-                    */
-
+                //$subscription = Stripe::createSubscription($sharing, $user);
                 $subscription = \Stripe\Subscription::create([
                     'customer' => $user->pl_customer_id,
                     'items' => [

@@ -70,7 +70,7 @@ export const actions = {
     try {
       let param = (type.length > 0) ? `?type=${type}` : '';
       const { data } = await axios.get('/api/sharings' + param);
-      commit(types.FETCH_SHARINGS_SUCCESS, { sharings: data })
+      commit(types.FETCH_SHARINGS_SUCCESS, { sharings: data.data })
     } catch (e) {
       commit(types.FETCH_SHARINGS_FAILURE)
     }

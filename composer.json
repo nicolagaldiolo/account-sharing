@@ -13,6 +13,7 @@
         "laravel/framework": "5.8.*",
         "laravel/socialite": "^4.0",
         "laravel/tinker": "^1.0",
+        "maatwebsite/excel": "^3.1",
         "pusher/pusher-php-server": "^4.0",
         "sebdesign/laravel-state-machine": "^1.4",
         "stripe/stripe-php": "^7.3",

@@ -88,18 +88,6 @@
               </div>
             </div>
 
-            <!-- Visibility -->
-            <div class="form-group row">
-              <label class="col-md-3 col-form-label text-md-right">Visibilità</label>
-              <div class="col-md-7">
-                <select v-model="form.visibility" :class="{ 'is-invalid': form.errors.has('visibility') }" class="form-control" name="visibility">
-                  <option value="">Scegli la visibilità</option>
-                  <option v-for="(visibility, index) in sharings_visibility" :key="index" :value="index">{{visibility}}</option>
-                </select>
-                <has-error :form="form" field="visibility" />
-              </div>
-            </div>
-
             <div class="form-group row">
               <label class="col-md-3 col-form-label text-md-right">Termini di servizio</label>
               <div class="col-md-7">

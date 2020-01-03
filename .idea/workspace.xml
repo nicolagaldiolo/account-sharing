@@ -2,22 +2,39 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="80fbe383-e517-4357-96d8-8ee0108f1222" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/accountSharing.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/accountSharing.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Settings/ProfileController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Settings/ProfileController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Category.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Category.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Enums/SharingVisibility.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Enums/SharingVisibility.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Categories/CategoriesController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Categories/CategoriesController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Sharings/SharingsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Sharings/SharingsController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Resources/User.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Resources/User.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Traits/SharingTrait.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Traits/SharingTrait.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/MyClasses/Stripe.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/MyClasses/Stripe.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Providers/AppServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Providers/AppServiceProvider.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Providers/AuthServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Providers/AuthServiceProvider.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Sharing.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Sharing.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/User.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/User.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config/custom.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/custom.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/migrations/2014_10_12_000000_create_users_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2014_10_12_000000_create_users_table.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/pages/settings/firstinfo.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/settings/firstinfo.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/pages/settings/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/settings/index.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/pages/settings/verifyaccount.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/settings/verifyaccount.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/SchemaER.graphml" beforeDir="false" afterPath="$PROJECT_DIR$/database/SchemaER.graphml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/factories/CategoryFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/factories/__CategoryFactory.php__" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/factories/SharingFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/factories/SharingFactory.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/factories/UserFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/factories/UserFactory.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2019_07_17_191311_create_categories_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2019_07_17_191311_create_categories_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2019_07_17_191346_create_sharings_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2019_07_17_191346_create_sharings_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2019_11_22_061734_create_connect_customers_table.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/seeds/SeedFakeData.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeds/SeedFakeData.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/SharingCard.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/Transaction.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Transaction.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/pages/home.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/home.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/pages/settings/wallet.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/settings/wallet.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/pages/sharings/create.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/sharings/create.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/pages/sharings/lists.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/sharings/lists.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/router/routes.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/router/routes.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/store/modules/lang.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/store/modules/lang.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/store/mutation-types.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/store/mutation-types.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/index.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/api.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/store/modules/sharings.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/store/modules/sharings.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -73,6 +90,13 @@
       </path>
     </expand>
     <select />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Vue Single File Component" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -277,6 +301,10 @@
       <path value="$PROJECT_DIR$/vendor/guzzlehttp/psr7" />
       <path value="$PROJECT_DIR$/vendor/guzzlehttp/guzzle" />
       <path value="$PROJECT_DIR$/vendor/stripe/stripe-php" />
+      <path value="$PROJECT_DIR$/vendor/markbaker/matrix" />
+      <path value="$PROJECT_DIR$/vendor/markbaker/complex" />
+      <path value="$PROJECT_DIR$/vendor/phpoffice/phpspreadsheet" />
+      <path value="$PROJECT_DIR$/vendor/maatwebsite/excel" />
     </include_path>
   </component>
   <component name="PhpXdebugProxy" ide_key="PHPSTORM" port="9000" />
@@ -311,11 +339,11 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/resources/js/components" />
+      <recent name="$PROJECT_DIR$/storage" />
+      <recent name="$PROJECT_DIR$/import_data" />
       <recent name="$PROJECT_DIR$/app/MyClasses/Support/Facade" />
       <recent name="$PROJECT_DIR$/app/Http/Controllers/Sharings" />
-      <recent name="$PROJECT_DIR$/resources/js/pages/sharings" />
-      <recent name="$PROJECT_DIR$/resources/js/pages/categories" />
-      <recent name="$PROJECT_DIR$/database" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Zweb\xampp\htdocs\account-sharing\resources\js\pages\settings" />
@@ -451,6 +479,8 @@
       <workItem from="1577175989508" duration="2428000" />
       <workItem from="1577446175977" duration="7179000" />
       <workItem from="1577454444297" duration="33286000" />
+      <workItem from="1577956387026" duration="28021000" />
+      <workItem from="1578035160097" duration="908000" />
     </task>
     <servers />
   </component>
@@ -474,31 +504,35 @@
     </option>
   </component>
   <component name="WindowStateProjectService">
-    <state x="814" y="346" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1577171212097">
+    <state x="1018" y="485" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1577987602076">
       <screen x="0" y="23" width="2560" height="1417" />
+    </state>
+    <state x="1018" y="485" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1577987602076" />
+    <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1577959830793">
+      <screen x="0" y="23" width="1440" height="877" />
     </state>
     <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1440.877/-552.-1417.2560.1417@0.23.1440.877" timestamp="1577121148379" />
     <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1440.877/1440.-736.2560.1417@0.23.1440.877" timestamp="1576917394621" />
-    <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1440.877@0.23.1440.877" timestamp="1577015059317" />
+    <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1440.877@0.23.1440.877" timestamp="1577959830793" />
     <state x="814" y="346" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1577171212097" />
     <state x="465" y="315" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1" timestamp="1577453181213">
       <screen x="0" y="23" width="1440" height="877" />
     </state>
     <state x="465" y="315" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/0.23.1440.877@0.23.1440.877" timestamp="1577453181213" />
-    <state x="547" y="357" key="com.intellij.ide.util.TipDialog" timestamp="1577454445887">
+    <state x="547" y="357" key="com.intellij.ide.util.TipDialog" timestamp="1578035160291">
       <screen x="0" y="23" width="1440" height="877" />
     </state>
     <state x="547" y="357" key="com.intellij.ide.util.TipDialog/0.23.1440.877/1440.-736.2560.1417@0.23.1440.877" timestamp="1576914818414" />
-    <state x="547" y="357" key="com.intellij.ide.util.TipDialog/0.23.1440.877@0.23.1440.877" timestamp="1577454445887" />
+    <state x="547" y="357" key="com.intellij.ide.util.TipDialog/0.23.1440.877@0.23.1440.877" timestamp="1578035160291" />
     <state x="973" y="563" key="com.intellij.ide.util.TipDialog/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1576820891296" />
-    <state x="517" y="381" width="1616" height="798" key="find.popup" timestamp="1577718307895">
-      <screen x="62" y="0" width="2498" height="1440" />
+    <state x="960" y="488" width="639" height="486" key="find.popup" timestamp="1577987753580">
+      <screen x="0" y="23" width="2560" height="1417" />
     </state>
     <state x="408" y="-952" width="1215" height="786" key="find.popup/0.23.1440.877/-552.-1417.2560.1417@-552.-1417.2560.1417" timestamp="1577120645150" />
     <state x="540" y="311" width="684" height="487" key="find.popup/0.23.1440.877/-552.-1417.2560.1417@0.23.1440.877" timestamp="1577120722384" />
     <state x="540" y="311" width="683" height="486" key="find.popup/0.23.1440.877/1440.-736.2560.1417@0.23.1440.877" timestamp="1576930160377" />
-    <state x="509" y="311" width="931" height="486" key="find.popup/0.23.1440.877@0.23.1440.877" timestamp="1577458143304" />
-    <state x="960" y="488" width="639" height="486" key="find.popup/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1577168888913" />
+    <state x="228" y="243" width="931" height="486" key="find.popup/0.23.1440.877@0.23.1440.877" timestamp="1577976413479" />
+    <state x="960" y="488" width="639" height="486" key="find.popup/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1577987753580" />
     <state x="517" y="381" width="1616" height="798" key="find.popup/2622.142.1858.1080/62.0.2498.1440@62.0.2498.1440" timestamp="1577718307895" />
     <state x="945" y="348" width="670" height="676" key="search.everywhere.popup" timestamp="1576827583025">
       <screen x="0" y="23" width="2560" height="1417" />
