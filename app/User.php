@@ -5,6 +5,7 @@ namespace App;
 use App\Enums\SharingStatus;
 use App\Notifications\VerifyEmail;
 use App\Notifications\ResetPassword;
+use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -169,40 +170,34 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
         return $this->belongsToMany(Sharing::class)
             ->using(SharingUser::class)
             ->as('sharing_status')
-            ->withPivot(['id','status','owner','credential_updated_at'])
+            ->withPivot(['id','status','credential_updated_at'])
             ->withTimestamps();
     }
     public function activeSharing(){
         return $this->belongsToMany(Sharing::class)
             ->using(SharingUser::class)
             ->as('sharing_status')
-            ->withPivot(['id','status','owner','credential_updated_at'])
+            ->withPivot(['id','status','credential_updated_at'])
             ->withTimestamps()
-            ->whereStatus(SharingStatus::Joined)
-            ->whereNull('owner');
+            ->whereStatus(SharingStatus::Joined);
     }
-    /*public function sharingOwners(){
-        return $this->belongsToMany(Sharing::class)
-            ->using(SharingUser::class)
-            ->as('sharing_status')
-            ->withPivot(['id','status','owner'])
-            ->withTimestamps()
-            ->whereStatus(SharingStatus::Joined)
-            ->whereOwner(true);
-    }*/
     public function sharingOwners(){
         return $this->hasMany(Sharing::class, 'owner_id', 'id');
+    }
+
+    public function sharingUser(Sharing $sharing)
+    {
+        return $this->hasOne(SharingUser::class)->where('sharing_id', $sharing->id);
+    }
+
+    public function subscriptions(){
+        return $this->hasManyThrough(Subscription::class, SharingUser::class, 'user_id', 'sharing_user_id');
     }
 
     public function customers()
     {
         return $this->hasMany(ConnectCustomer::class, 'user_pl_customer_id', 'id');
     }
-
-    //public function customersAsOwner()
-    //{
-    //    return $this->hasMany(ConnectCustomer::class, 'user_pl_account_id', 'id');
-    //}
 
     public function chats(){
         return $this->hasMany(Chat::class);

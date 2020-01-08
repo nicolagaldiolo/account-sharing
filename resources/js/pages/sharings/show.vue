@@ -6,8 +6,6 @@
           <div class="col-sm-6">
             <div class="card">
               <div class="card-body">
-                <!--<img :src="sharing.owner.photo_url">-->
-                <!--<h5 class="card-title">{{sharing.owner.name}}</h5>-->
                 <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
                 <a href="#" class="btn btn-primary">Go somewhere</a>
               </div>
@@ -18,7 +16,6 @@
               <div class="card-body">
                 <h5 class="card-title">{{sharing.name}}</h5>
                 <p class="card-text">{{sharing.description}}</p>
-                <!--<a href="#" class="btn btn-primary">Go somewhere</a>-->
               </div>
             </div>
           </div>
@@ -26,46 +23,41 @@
       </div>
     </section>
     <div class="container">
-      <div v-if="owner || joined">
-
-        <div v-if="userSubscription === 4" class="alert alert-danger" role="alert">
-          Attenzione ci sono problemi con i pagamenti.
-          <router-link :to="{ name: 'sharing.restore' }" class="alert-link">Completa pagamento</router-link>
-        </div>
-
-        <!--<a v-if="availability" class="btn btn-primary btn-lg btn-block">Invita altra gente</a>
-        <div v-if="sharing.sharing_state_machine.transitions.length">
-          <a v-for="(transition, index) in sharing.sharing_state_machine.transitions" :key="index" href="#" @click.prevent="doTransition(transition.value)" class="btn btn-primary btn-lg btn-block">
-            {{transition.metadata.title}}
-          </a>
-        </div>-->
-      </div>
-      <div v-else-if="foreign">
+      <div v-if="foreign">
         <a @click.prevent="doTransition()" class="btn btn-primary btn-lg btn-block">Entra nel gruppo</a>
       </div>
       <div v-else>
-        <div v-if="sharing.sharing_state_machine.transitions.length">
-          <a v-for="(transition, index) in sharing.sharing_state_machine.transitions" :key="index" href="#" @click.prevent="doTransition(transition.value)" class="btn btn-primary btn-lg btn-block">
-            {{transition.metadata.title}}
-          </a>
+        <div v-if="joined">
+          <!--<div v-if="userSubscription === 4" class="alert alert-danger" role="alert">
+            Attenzione ci sono problemi con i pagamenti.
+            <router-link :to="{ name: 'sharing.restore' }" class="alert-link">Completa pagamento</router-link>
+          </div>-->
+
+          <div v-if="sharing.status.transitions.length">
+            <a v-for="(transition, index) in sharing.status.transitions" :key="index" href="#" @click.prevent="doTransition(transition.value)" class="btn btn-primary btn-lg btn-block">
+              {{transition.metadata.title}}
+            </a>
+          </div>
         </div>
-        <div v-else class="alert alert-primary text-center" role="alert">
-          {{sharing.sharing_state_machine.status.metadata.title}}
-        </div>
+
+        <a v-if="availability && (joined || owner)" class="btn btn-primary btn-lg btn-block">Invita altra gente</a>
       </div>
     </div>
 
-    <div v-if="joined">
+    <div v-if="joined || owner">
       <div class="container mt-4">
         <div class="row">
           <div class="col-md-4">
             <h4>Membri del gruppo</h4>
 
-            <div v-for="(user, index) in sharing.active_users" :key="index" class="media text-muted pt-3">
-              <member-item :owner="owner" :user="user" :authUser="authUser"/>
+            <div v-for="(member, index) in members" :key="index" class="media text-muted pt-3">
+              <member-item :sharingId="sharing.id" :owner="sharing.owner" :member="member" :authUser="authUser"/>
             </div>
 
             <hr>
+
+            <h1>Credenziali non ancora inserite dall'admin</h1>
+
             <h4>Credenziali di accesso</h4>
             <div class="custom-control custom-switch ml-auto">
               <input type="checkbox" @click="credentialToggle" class="custom-control-input" id="customSwitch1">
@@ -87,14 +79,14 @@
               </div>
               <v-button class="btn-block" v-if="owner" :disabled="saveCredentialReady" :loading="form.busy" type="success">Aggiorna credenziali</v-button>
             </form>
-            <a class="btn btn-block btn-success" @click.prevent="confirmCredentials" v-if="joinerCredentialConfirmed.iMustConfirm.length && !owner && joined">Conferma credenziali</a>
+            <a class="btn btn-block btn-success" @click.prevent="confirmCredentials" v-if="joinerCredentialConfirmed.iMustConfirm()">Conferma credenziali</a>
             <hr>
             <div class="card">
-              <div class="card-header">
+              <!--<div class="card-header">
                 <strong>Stato delle credenziali</strong><br>
                 <span>{{ joinerCredentialConfirmed.confirmed.length > 0 ? 'Credenziali confermate' : 'Credenziali non confermate' }} {{joinerCredentialConfirmed.confirmed.length}}/{{joinerCredentialConfirmed.total.length}} utenti</span>
-              </div>
-              <ul class="list-group list-group-flush">
+              </div>-->
+              <!--<ul class="list-group list-group-flush">
                 <li v-for="(user, index) in joinerCredentialConfirmed.confirmed" :key="index" class="list-group-item">
                   <img class="mr-2 rounded-circle" :src="user.photo_url" style="width: 32px; height: 32px;">
                   <div class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
@@ -102,18 +94,17 @@
                     <span class="d-block">Credenzilai confermate il {{user.sharing_status.credential_updated_at | moment("D MMMM YYYY")}}</span>
                   </div>
                 </li>
-              </ul>
+              </ul>-->
             </div>
 
 
           </div>
           <div class="col-md-8">
-            <Chat :authUser="authUser" :sharing="sharing" :joined="joined" :owner="owner"/>
+            <!--<Chat :authUser="authUser" :sharing="sharing" :joined="joined" :owner="owner"/>-->
           </div>
         </div>
       </div>
     </div>
-
   </div>
 </template>
 <script>
@@ -123,7 +114,9 @@
     import Chat from '~/components/Chat'
     import Form from 'vform'
     import VButton from "../../components/Button";
-    //import auth from "../../middleware/auth"
+    import auth from "../../middleware/auth"
+    //import moment from 'moment'
+
 
     export default {
         middleware: 'auth',
@@ -134,25 +127,23 @@
         },
 
         data: () => ({
-            form: new Form({
+          form: new Form({
                 username: '',
                 password: ''
             }),
             showCredential: false,
+            members: [],
         }),
 
         created () {
             this.$store.dispatch('sharings/fetchSharing', this.$route.params.sharing_id);
-            /*
             window.Echo.private(`App.User.${this.authUser.id}`).notification(notifications => {
-                //console.log(notifications);
                 if(notifications.data) {
                     this.$store.dispatch('sharings/updateSharing', { sharing: notifications.data })
                     let message = (notifications.type === 'App\\Notifications\\CredentialConfirmed') ? 'Credenziali confermate' : 'Credenziali aggiornate'
                     alert(message)
                 }
             })
-            */
         },
 
         computed: {
@@ -161,10 +152,14 @@
                 authUser: 'auth/user'
             }),
             joinerCredentialConfirmed () {
-                return {
-                    iMustConfirm: this.sharing.active_users_without_owner.filter(item => this.authUser.id === item.id && !item.sharing_status.credential_updated_at),
-                    confirmed: this.sharing.active_users_without_owner.filter(item => item.sharing_status.credential_updated_at),
-                    total: this.sharing.active_users_without_owner
+              return {
+                    iMustConfirm: () => {
+                      const onwerCredentialUpdated = this.$moment(this.sharing.credential_updated_at);
+                      const userLogged = this.sharing.members.filter(user => this.authUser.id === user.id)[0];
+                      return userLogged && userLogged.credential_updated_at && onwerCredentialUpdated.isAfter(this.$moment(userLogged.credential_updated_at))
+                    },
+                    confirmed: this.sharing.members.filter(item => item.credential_updated_at),
+                    total: this.sharing.members
                 };
             },
             saveCredentialReady () {
@@ -174,18 +169,21 @@
                 return this.sharing.availability > 0
             },
             owner () {
-                return this.authUser.id === this.sharing.owner_id
+              return this.authUser.id === this.sharing.owner_id
             },
             foreign () {
-                return this.sharing.sharing_state_machine === null
+                return !this.sharing.status && !this.owner
             },
             joined () {
-                return this.sharing.sharing_state_machine !== null && this.sharing.sharing_state_machine.status.value === 3
+                return this.sharing.status && this.sharing.status.state.value === 3
             },
+            /*
             userSubscription () {
-                //const user = this.sharing.active_users.filter(user => user.id === this.authUser.id)
-                return ''//(user.length && user[0].sharing_status.subscription) ? user[0].sharing_status.subscription.status : {}
+                const user = this.sharing.active_users.filter(user => user.id === this.authUser.id)
+                return (user.length && user[0].sharing_status.subscription) ? user[0].sharing_status.subscription.status : {}
             }
+
+             */
         },
 
         watch: {
@@ -193,19 +191,20 @@
                 this.form.keys().forEach(key => {
                     this.form[key] = this.sharing[key]
                 })
+                this.members.push(this.sharing.owner, ...this.sharing.members)
             }
         },
 
 
         methods: {
-            credentialToggle () {
+          credentialToggle () {
                 this.showCredential = !this.showCredential
             },
             doTransition (transition) {
                 if(transition === 'pay') {
-                    //https://router.vuejs.org/guide/essentials/navigation.html
-                    const category = this.sharing.category.id
-                    const sharing = this.sharing.id
+
+                    const category = this.$route.params.category_id
+                    const sharing = this.$route.params.sharing_id
                     this.$router.push({ name: 'sharing.checkout', params: { category, sharing } })
                 } else {
                     let api = (transition)
@@ -225,6 +224,7 @@
                     this.$store.dispatch('sharings/updateSharing', { sharing: response.data })
                 });
             }
+
         }
     }
 </script>

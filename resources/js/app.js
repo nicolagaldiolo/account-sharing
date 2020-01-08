@@ -11,7 +11,7 @@ import '~/plugins'
 import '~/components'
 
 Vue.config.productionTip = false
-Vue.use(require('vue-moment'))
+Vue.use(require('vue-moment')) // Use inside component as this.$moment() or as {{ item.created_at | moment("D/M/YYYY") }} in template
 Vue.use(Clipboard)
 Vue.use(VueCurrencyInput)
 window.Pusher = require('pusher-js');

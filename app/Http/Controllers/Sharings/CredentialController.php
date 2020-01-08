@@ -14,6 +14,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use App\Http\Resources\Sharing as SharingResource;
 
 class CredentialController extends Controller
 {
@@ -96,9 +97,9 @@ class CredentialController extends Controller
             return [$user->id => $user->sharing_status->only(['credential_updated_at'])];
         })->toArray();
 
-        $sharing->activeUsers()->syncWithoutDetaching($ids);
+        $sharing->members()->syncWithoutDetaching($ids);
 
-        $sharingUpdated = $this->getSharing($sharing);
+        $sharingUpdated = new SharingResource($sharing);
 
         event(New \App\Events\CredentialUpdated($sharingUpdated));
 
@@ -112,7 +113,7 @@ class CredentialController extends Controller
 
         $sharing->users()->updateExistingPivot(Auth::id(), ['credential_updated_at' => Carbon::now()]);
 
-        $sharingUpdated = $this->getSharing($sharing);
+        $sharingUpdated = new SharingResource($sharing);
         event(New \App\Events\CredentialConfirmed(Auth::user(), $sharingUpdated));
 
         return $sharingUpdated;

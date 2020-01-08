@@ -27,6 +27,7 @@ class CreateSharingsTable extends Migration
             $table->bigInteger('owner_id')->unsigned();
             $table->string('username')->nullable();
             $table->string('password')->nullable();
+            $table->timestamp('credential_updated_at')->nullable();
             $table->timestamps();
             $table->softDeletes();
 

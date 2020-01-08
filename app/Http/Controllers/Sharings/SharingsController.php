@@ -18,6 +18,7 @@ use App\Payout;
 use App\Refund;
 use App\Sharing;
 use App\SharingUser;
+use App\Subscription;
 use App\Transaction;
 use App\User;
 use Carbon\Carbon;
@@ -74,24 +75,24 @@ class SharingsController extends Controller
         //
     }
 
-    public function prova()
+    public function prova(Request $request)
     {
 
-        Auth::login(User::find(3));
+        $user = Auth::login(User::find(1));
 
-        $test = Category::first();
+        //$sharing = Sharing::with(['members.subscriptions' => function($query){
+        //    $query->where('sharing_user_id', 59)->first();
+        //}])->first();
 
-        return $test->categoryAvailable;
+        $sharing = Sharing::with('members.sharingUser')->where('id', 3)->get();
 
+        dd($sharing);
+        //$sharing->load('members.subscriptions');
 
+        $account_id = Subscription::findOrFail('sub_GU7NaO7AnZr7so');
+        $test = $account_id->sharingUser->sharing->owner->pl_customer_id;
 
-        $test->each(function($item){
-            return $item->categoryAvailable;
-        });
-
-        return "aaa";
-        //return Sharing::all()->pluck('category_id');
-
+        return $test;
 
 
 
@@ -185,7 +186,9 @@ class SharingsController extends Controller
      */
     public function show(Sharing $sharing)
     {
-        return $this->getSharing($sharing);
+        $sharing->load('members');
+
+        return new SharingResource($sharing);
     }
 
     /**
@@ -206,12 +209,11 @@ class SharingsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Sharing $sharing)
+    public function update(Request $request, Sharing $sharing, User $user)
     {
-        $this->authorize('manage-sharing', $sharing);
+        $this->authorize('update-sharing', [$sharing, $user]);
 
-        $subscription = Auth::user()->sharings()->findOrFail($sharing->id)->sharing_status->subscription;
-
+        $subscription = $sharing->sharingUser($user)->first()->subscription;
 
         $response = \Stripe\Subscription::update($subscription->id, [
             'cancel_at_period_end' => !boolval($subscription->cancel_at_period_end),
@@ -219,7 +221,7 @@ class SharingsController extends Controller
 
         $this->updateSubscription($subscription, $response->toArray());
 
-        return $this->getSharing($sharing);
+        return new SharingResource($sharing);
 
     }
 
@@ -249,7 +251,7 @@ class SharingsController extends Controller
                     break;
             }
         }
-        return $this->getSharing($userSharing);
+        return new SharingResource($userSharing);
 
     }
 

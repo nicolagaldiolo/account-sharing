@@ -13,8 +13,14 @@ class SharingUser extends Pivot
     protected $guarded = [];
 
     protected $casts = [
+        'credential_updated_at' => 'datetime',
         'canceled_at' => 'datetime',
     ];
+
+    protected function getGraph()
+    {
+        return 'sharing';
+    }
 
     public function sharing(){
         return $this->belongsTo(Sharing::class);
@@ -24,11 +30,4 @@ class SharingUser extends Pivot
     {
         return $this->hasOne(Subscription::class, 'sharing_user_id', 'id');
     }
-
-
-    /*public function renewals()
-    {
-        return $this->hasMany(Renewal::class, 'sharing_user_id');
-    }
-    */
 }

@@ -3,6 +3,8 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Resources\Member as MemberResource;
 
 class Sharing extends JsonResource
 {
@@ -14,17 +16,62 @@ class Sharing extends JsonResource
      */
     public function toArray($request)
     {
+        $status = null;
+        if(!is_null($this->sharingUser)){
+            $stateMachine = $this->sharingUser->stateMachine();
+            $status = [
+                'state' => [
+                    'value' => $stateMachine->getState(),
+                    'metadata' => $stateMachine->metadata('state'),
+                ],
+                'transitions' => collect($stateMachine->getPossibleTransitions())->map(function ($value) use ($stateMachine) {
+                    return [
+                        'value' => $value,
+                        'metadata' => $stateMachine->metadata()->transition($value)
+                    ];
+                })->all()
+            ];
+        }
+
         return [
             'name' => $this->name,
             'description' => $this->description,
             'capacity' => $this->capacity,
+            'availability' => $this->availability,
             'price' => $this->price,
             'image' => $this->image,
-            'username' => $this->username,
-            'password' => $this->password,
-            'created_at' => $this->created_at,
-            'category' => $this->category,
-            'owner' => $this->owner
+
+            //$this->mergeWhen($request->is('api/sharings/*'), [
+                $this->mergeWhen(Auth::user()->can('manage-sharing', $this), [
+                    'username' => $this->username,
+                    'password' => $this->password,
+                ]),
+                'created_at' => $this->created_at,
+                'credential_updated_at' => $this->credential_updated_at,
+
+
+                /*
+                 *
+                 */
+                'id' => $this->id,
+                'visibility' => $this->visibility,
+                'renewal_frequency_id' => $this->renewal_frequency_id,
+                //'category_id' => $this->category_id,
+                'owner_id' => $this->owner_id,
+                //'category' => $this->category,
+                'owner' => $this->owner,
+                //'visility_list' => $this->visility_list,
+                //'sharing_state_machine' => $this->sharing_state_machine,
+                'active_users_without_owner' => $this->activeUsersWithoutOwner,
+                'active_users' => $this->members()->get()->each(function($user){
+                    return $user->sharing_status->subscription;
+                }),
+                $this->mergeWhen($status, [
+                    'status' => $status
+                ]),
+                'members' => MemberResource::collection($this->whenLoaded('members'))
+            //])
         ];
+
     }
 }

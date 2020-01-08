@@ -3,8 +3,9 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\Subscription as SubscriptionResource;
 
-class User extends JsonResource
+class Member extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -34,8 +35,9 @@ class User extends JsonResource
             'photo_url' => $this->photo_url,
             'username' => $this->username,
             'registration_completed' => $this->registration_completed,
-            'additional_data_needed' => $this->additional_data_needed
+            'additional_data_needed' => $this->additional_data_needed,
+            'subscription' => new SubscriptionResource($this->sharing_status->subscription),
+            'credential_updated_at' => $this->sharing_status->credential_updated_at
         ];
-
     }
 }

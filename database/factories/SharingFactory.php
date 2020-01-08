@@ -23,6 +23,8 @@ $factory->define(Sharing::class, function (Faker $faker) {
         },
         'username' => $faker->username,
         'password' => $faker->password,
-        'owner_id' => factory(\App\User::class)->create()
+        'owner_id' => function() {
+            return factory(\App\User::class)->create();
+        }
     ];
 });

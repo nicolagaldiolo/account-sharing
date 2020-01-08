@@ -46,8 +46,8 @@ class Sharing extends Model
     ];
 
     protected $with = [
-        'category',
-        'owner'
+        //'category',
+        //'owner'
     ];
 
     /**
@@ -55,46 +55,50 @@ class Sharing extends Model
      *
      * @return void
      */
-    protected static function boot()
-    {
-        parent::boot();
+    //protected static function boot()
+    //{
+    //    parent::boot();
 
-        static::addGlobalScope('country', function ($builder) {
-            $builder->whereHas('category');
-        });
-    }
+    //    static::addGlobalScope('country', function ($builder) {
+    //        $builder->whereHas('category');
+    //    });
+    //}
+
+    protected $casts = [
+        'credential_updated_at' => 'datetime'
+    ];
 
     protected $appends = [
-        //'availability',
+        'availability',
         //'visility_list',
         //'owner',
         'sharing_state_machine'
     ];
 
     protected $toevaluate = [
-        'username',
-        'password'
+        //'username',
+        //'password'
     ];
 
-    public function getUsernameAttribute(){
-        return ''; //(!empty($this->username)) ? Crypt::decryptString($this->username) : $this->username;
+    public function getUsernameAttribute($value){
+        return (!is_null($value)) ? Crypt::decryptString($value) : $value;
     }
 
     public function setUsernameAttribute($value){
-        $this->attributes['username'] = Crypt::encryptString($value);
+        $this->attributes['username'] = (!is_null($value)) ? Crypt::encryptString($value) : $value;
     }
 
-    public function getPasswordAttribute(){
-        return ''; //(!empty($this->password)) ? Crypt::decryptString($this->password) : $this->password;
+    public function getPasswordAttribute($value){
+        return (!is_null($value)) ? Crypt::decryptString($value) : $value;
     }
 
     public function setPasswordAttribute($value){
-        $this->attributes['password'] = Crypt::encryptString($value);
+        $this->attributes['password'] = (!is_null($value)) ? Crypt::encryptString($value) : $value;
     }
 
 
     public function getAvailabilityAttribute(){
-        return $this->capacity - $this->activeUsers()->count();
+        return $this->capacity - $this->members()->count();
     }
 
     public function category(){
@@ -122,7 +126,7 @@ class Sharing extends Model
             ->withTimestamps();
     }
 
-    public function activeUsers(){
+    public function members(){
         return $this->belongsToMany(User::class)
             ->using(SharingUser::class)
             ->as('sharing_status')
@@ -141,28 +145,16 @@ class Sharing extends Model
             ->withTimestamps();
     }
 
-    public function subscription()
-    {
-        return $this->hasOneThrough('App\Subscription', 'App\SharingUser', 'sharing_id', 'sharing_user_id', 'id', 'id');
+    public function subscriptions(){
+        return $this->hasManyThrough(Subscription::class, SharingUser::class, 'sharing_id', 'sharing_user_id');
     }
-
-    /*public function owner()
-    {
-        return $this->belongsToMany(User::class)
-            ->using(SharingUser::class)
-            ->as('sharing_status')
-            ->withPivot(['id','status','owner','credential_updated_at'])
-            ->whereStatus(SharingStatus::Joined)
-            ->whereOwner(1)
-            ->withTimestamps()
-    }*/
 
     public function owner()
     {
         return $this->belongsTo(User::class, 'owner_id', 'id');
     }
 
-    public function getSharingStateMachineAttribute()
+    /*public function getSharingStateMachineAttribute()
     {
         $obj = $this->users()->find(Auth::id());
 
@@ -183,6 +175,13 @@ class Sharing extends Model
         } else {
             return null;
         }
+    }
+    */
+
+    public function sharingUser(User $user = null)
+    {
+        $user = is_null($user) ? Auth::user() : $user;
+        return $this->hasOne(SharingUser::class)->where('user_id', $user->id);
     }
 
     public function renewalFrequency(){
@@ -212,13 +211,5 @@ class Sharing extends Model
     public function scopeJoined($query)
     {
         return $query->whereStatus(SharingStatus::Joined);
-    }
-
-    // dato uno stato torno tutte le condivisioni in quello stato
-    public function scopeByStatus($query, $status = SharingStatus::Pending)
-    {
-        return $query->whereHas('users', function($query) use($status){
-            $query->where('status',$status);
-        });
     }
 }

@@ -14,18 +14,20 @@ use Illuminate\Support\Facades\DB;
 
 trait SharingTrait {
 
+    /*
     protected function getSharing(Sharing $sharing)
     {
 
-        //$sharing->load(['category', 'activeUsers', 'activeUsersWithoutOwner']);
-        $sharing->load(['category', 'activeUsersWithoutOwner']);
+        //$sharing->load(['category', 'members', 'activeUsersWithoutOwner']);
+        //$sharing->load(['category', 'activeUsersWithoutOwner']);
 
-        $sharing->active_users = $sharing->activeUsers()->get()->each(function($user) use($sharing){
-            return $user->sharing_status->subscription;
-        });
+        //$sharing->active_users = $sharing->activeUsers()->get()->each(function($user) use($sharing){
+        //    return $user->sharing_status->subscription;
+        //});
 
-        return $sharing;
+        return new \App\Http\Resources\Sharing($sharing);
     }
+    */
 
     protected function getSharingOwners($id = null)
     {

@@ -87,7 +87,7 @@ export const actions = {
   async fetchSharing ({ commit }, id) {
     try {
       const { data } = await axios.get('/api/sharings/' + id)
-      commit(types.FETCH_SHARING_SUCCESS, { sharing: data })
+      commit(types.FETCH_SHARING_SUCCESS, { sharing: data.data })
     } catch (e) {
       commit(types.FETCH_SHARING_FAILURE)
     }
