@@ -135,7 +135,7 @@ class Sharing extends Model
             ->withTimestamps();
     }
 
-    public function activeUsersWithoutOwner(){
+    /*public function activeUsersWithoutOwner(){
         return $this->belongsToMany(User::class)
             ->using(SharingUser::class)
             ->as('sharing_status')
@@ -143,7 +143,7 @@ class Sharing extends Model
             ->whereStatus(SharingStatus::Joined)
             ->where('user_id', '<>', $this->owner_id)
             ->withTimestamps();
-    }
+    }*/
 
     public function subscriptions(){
         return $this->hasManyThrough(Subscription::class, SharingUser::class, 'sharing_id', 'sharing_user_id');

@@ -34,6 +34,7 @@ class Sharing extends JsonResource
         }
 
         return [
+            'id' => $this->id,
             'name' => $this->name,
             'description' => $this->description,
             'capacity' => $this->capacity,
@@ -45,31 +46,32 @@ class Sharing extends JsonResource
                 $this->mergeWhen(Auth::user()->can('manage-sharing', $this), [
                     'username' => $this->username,
                     'password' => $this->password,
+                    'credential_updated_at' => $this->credential_updated_at,
                 ]),
-                'created_at' => $this->created_at,
-                'credential_updated_at' => $this->credential_updated_at,
+
+                $this->mergeWhen($status, [
+                    'status' => $status
+                ]),
+                'members' => MemberResource::collection($this->whenLoaded('members')),
+                //'created_at' => $this->created_at,
+
 
 
                 /*
                  *
                  */
-                'id' => $this->id,
-                'visibility' => $this->visibility,
-                'renewal_frequency_id' => $this->renewal_frequency_id,
+                //'visibility' => $this->visibility,
+                //'renewal_frequency_id' => $this->renewal_frequency_id,
                 //'category_id' => $this->category_id,
-                'owner_id' => $this->owner_id,
+                //'owner_id' => $this->owner_id,
                 //'category' => $this->category,
                 'owner' => $this->owner,
                 //'visility_list' => $this->visility_list,
                 //'sharing_state_machine' => $this->sharing_state_machine,
-                'active_users_without_owner' => $this->activeUsersWithoutOwner,
-                'active_users' => $this->members()->get()->each(function($user){
-                    return $user->sharing_status->subscription;
-                }),
-                $this->mergeWhen($status, [
-                    'status' => $status
-                ]),
-                'members' => MemberResource::collection($this->whenLoaded('members'))
+                //'active_users_without_owner' => $this->activeUsersWithoutOwner,
+                //'active_users' => $this->members()->get()->each(function($user){
+                //    return $user->sharing_status->subscription;
+                //})
             //])
         ];
 

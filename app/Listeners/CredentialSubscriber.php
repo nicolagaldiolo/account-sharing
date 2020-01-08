@@ -25,7 +25,7 @@ class CredentialSubscriber
     {
         $sharing = $event->sharing;
         //logger($sharing);
-        Notification::send($sharing->activeUsersWithoutOwner, new \App\Notifications\CredentialUpdated($sharing));
+        Notification::send($sharing->members, new \App\Notifications\CredentialUpdated($sharing));
     }
 
     public function onCredentialConfirmed($event)
