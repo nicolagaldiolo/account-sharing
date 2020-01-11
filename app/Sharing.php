@@ -69,10 +69,10 @@ class Sharing extends Model
     ];
 
     protected $appends = [
-        'availability',
+        //'availability',
         //'visility_list',
         //'owner',
-        'sharing_state_machine'
+        //'sharing_state_machine'
     ];
 
     protected $toevaluate = [

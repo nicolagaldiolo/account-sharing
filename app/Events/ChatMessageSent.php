@@ -11,6 +11,7 @@ use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use App\Http\Resources\Chat as ChatResource;
 
 class ChatMessageSent implements ShouldBroadcast
 {
@@ -38,7 +39,7 @@ class ChatMessageSent implements ShouldBroadcast
     public function __construct(User $user, Chat $chat)
     {
         $this->user = $user;
-        $this->chat = $chat;
+        $this->chat = new ChatResource($chat);
     }
 
     /**

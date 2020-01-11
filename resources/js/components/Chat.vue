@@ -92,14 +92,17 @@
                 current_page: 1,
                 form: new Form({
                     message: ''
-                })
+                }),
+                formatDate : 'YYYY-MM-DD'
             }
         },
 
         created () {
             if(this.owner || this.joined) {
                 window.Echo.private(`chatSharing.${this.sharing.id}`)
-                    .listen('ChatMessageSent', (e) => this.appendChatMessage(e.chat))
+                    .listen('ChatMessageSent', (e) => {
+                      this.appendChatMessage(e.chat)
+                    })
             }
         },
 
@@ -116,16 +119,15 @@
                 return this.form.message === ''
             },
 
-            chatsFormatted: function() {
-                const groupArrays = Object.keys(this.chats).map((date) => {
+            chatsFormatted: function () {
+              const chats = this.chats
+                return Object.keys(chats).map((date) => {
                     return {
                         date,
-                        chats: this.chats[date].sort( (a,b) => new Date(a.created_at) - new Date(b.created_at))
+                        chats: chats[date].sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
                     }
 
-                }).sort( (a,b) => new Date(a.date) - new Date(b.date));
-
-                return groupArrays;
+                }).sort((a, b) => new Date(a.date) - new Date(b.date))
             }
 
         },
@@ -134,7 +136,7 @@
 
             async postChatMessage () {
                 const { data } = await this.form.post(`/api/sharings/${this.sharing.id}/chat`)
-                this.appendChatMessage(data, true)
+                this.appendChatMessage(data.data, true)
             },
 
             async infiniteHandler ($state) {
@@ -145,7 +147,7 @@
                     this.$store.dispatch('sharings/fetchChats', {id, currentPage}).then(response => {
                         if (response) {
                             const chatStore = this.$store.getters['sharings/chats']
-                            if (this.current_page <= chatStore.last_page) {
+                            if (this.current_page <= chatStore.meta.last_page) {
                                 this.current_page += 1
 
                                 // devo clonare l'oggetto dello stato interno altrimenti il componente non si accorge dei cambiamenti e non scatena il redender
@@ -156,6 +158,7 @@
                                 }, clone);
 
                                 this.chats = clone;
+
                                 $state.loaded()
 
                             } else {
@@ -166,12 +169,11 @@
             },
 
             addSingleItem: function(obj, message) {
-                const date = message.created_at.split(' ')[0];
-                if (!obj[date]) {
-                    obj[date] = [];
-                }
-                obj[date].push(message);
-                return obj;
+
+              const date = this.$moment(message.created_at).format(this.formatDate)
+              if (!obj[date]) obj[date] = []
+              obj[date].push(message)
+              return obj
             },
 
             appendChatMessage: function (message, cleanForm = false) {

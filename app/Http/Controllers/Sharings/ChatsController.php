@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use App\Http\Resources\Chat as ChatResource;
 
 class ChatsController extends Controller
 {
@@ -18,9 +19,12 @@ class ChatsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Sharing $sharing)
     {
-        //
+        $this->authorize('manage-sharing', $sharing);
+
+        $collection = $sharing->chats()->with('user')->latest()->paginate(15);
+        return ChatResource::collection($collection);
     }
 
     /**
@@ -42,18 +46,22 @@ class ChatsController extends Controller
     public function store(ChatRequest $request, Sharing $sharing)
     {
         $this->authorize('manage-sharing', $sharing);
+
+        $this->validate($request, [
+            'message' => 'required'
+        ]);
+
         $user = Auth::user();
+        $chat = new Chat;
 
-        //Creo la Chat, associo le chiavi esterne e salvo
-        $chat = new Chat($request->validated());
-
-        $chat->sharing()->associate($sharing)
-            ->user()->associate($user)
-            ->save();
+        $chat->message = $request->input('message');
+        $chat->sharing()->associate($sharing);
+        $chat->user()->associate($user);
+        $chat->save();
 
         broadcast(new ChatMessageSent($user, $chat))->toOthers();
 
-        return $chat;
+        return new ChatResource($chat);
     }
 
     /**
@@ -99,12 +107,5 @@ class ChatsController extends Controller
     public function destroy($id)
     {
         //
-    }
-
-    public function getSharingChat(Sharing $sharing)
-    {
-        $this->authorize('manage-sharing', $sharing);
-
-        return $sharing->chats()->with('user')->latest()->paginate(15);
     }
 }

@@ -42,7 +42,7 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::post('sharings/{sharing}/restore/', 'Sharings\SharingsController@restore')->name('sharings.credential.restore');
 
         // Chat
-        Route::get('sharings/{sharing}/chats', 'Sharings\ChatsController@getSharingChat')->name('sharings.chats');
+        Route::get('sharings/{sharing}/chats', 'Sharings\ChatsController@index')->name('sharings.chats');
         Route::post('sharings/{sharing}/chat/', 'Sharings\ChatsController@store')->name('sharings.chat.store');
 
         // Settings
