@@ -3,23 +3,17 @@
 namespace App\Http\Controllers\Sharings;
 
 use App\Http\Requests\CredentialRequest;
-use App\Http\Traits\SharingTrait;
 use App\Mail\CredentialConfirmed;
 use App\Mail\CredentialUpdated;
 use App\Sharing;
-use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
 use App\Http\Resources\Sharing as SharingResource;
 
 class CredentialController extends Controller
 {
-
-    use SharingTrait;
 
     /**
      * Display a listing of the resource.
@@ -89,21 +83,23 @@ class CredentialController extends Controller
 
         $sharing->update($request->validated());
 
-        // Estraggo tutti gli utenti attivi, se sono l'admin setto la data di aggiornamento password as ora mentre
-        // per gli altri la spiano
 
+        // Set the credential_updated_at for the sharing
+        $sharing->credential_updated_at = Carbon::now();
+        $sharing->save();
+
+        // Remove the credential_updated_at for the sharing users
         $ids = $sharing->users->mapWithKeys(function($user, $key) {
-            $user->sharing_status->credential_updated_at = ($user->sharing_status->owner === 1) ? Carbon::now() : null;
+            $user->sharing_status->credential_updated_at = null;
             return [$user->id => $user->sharing_status->only(['credential_updated_at'])];
         })->toArray();
 
+        $sharing->load('members');
         $sharing->members()->syncWithoutDetaching($ids);
 
-        $sharingUpdated = new SharingResource($sharing);
+        event(New \App\Events\CredentialUpdated($sharing));
 
-        event(New \App\Events\CredentialUpdated($sharingUpdated));
-
-        return $sharingUpdated;
+        return new SharingResource($sharing);
 
     }
 
@@ -113,8 +109,10 @@ class CredentialController extends Controller
 
         $sharing->users()->updateExistingPivot(Auth::id(), ['credential_updated_at' => Carbon::now()]);
 
+        $sharing->load('members');
+
         $sharingUpdated = new SharingResource($sharing);
-        event(New \App\Events\CredentialConfirmed(Auth::user(), $sharingUpdated));
+        event(New \App\Events\CredentialConfirmed(Auth::user(), $sharing));
 
         return $sharingUpdated;
     }

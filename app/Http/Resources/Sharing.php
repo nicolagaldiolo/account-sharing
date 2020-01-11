@@ -8,6 +8,18 @@ use App\Http\Resources\Member as MemberResource;
 
 class Sharing extends JsonResource
 {
+
+    private $user;
+
+    public function __construct($resource, \App\User $user = null)
+    {
+        // Ensure you call the parent constructor
+        parent::__construct($resource);
+        $this->resource = $resource;
+
+        $this->user = $user;
+    }
+
     /**
      * Transform the resource into an array.
      *
@@ -16,9 +28,14 @@ class Sharing extends JsonResource
      */
     public function toArray($request)
     {
+
         $status = null;
-        if(!is_null($this->sharingUser)){
-            $stateMachine = $this->sharingUser->stateMachine();
+
+        // If user provided get the sharingUser for that user otherwise use the logged user
+        $sharingUser = is_null($this->user) ? $this->sharingUser : $this->sharingUser($this->user)->first();
+
+        if(!is_null($sharingUser)){
+            $stateMachine = $sharingUser->stateMachine();
             $status = [
                 'state' => [
                     'value' => $stateMachine->getState(),

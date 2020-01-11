@@ -86,7 +86,6 @@ class SharingsController extends Controller
 
         $sharing = Sharing::with('members.sharingUser')->where('id', 3)->get();
 
-        dd($sharing);
         //$sharing->load('members.subscriptions');
 
         $account_id = Subscription::findOrFail('sub_GU7NaO7AnZr7so');

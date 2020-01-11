@@ -24,7 +24,6 @@ class CredentialSubscriber
     public function onCredentialUpdated($event)
     {
         $sharing = $event->sharing;
-        //logger($sharing);
         Notification::send($sharing->members, new \App\Notifications\CredentialUpdated($sharing));
     }
 
@@ -33,7 +32,6 @@ class CredentialSubscriber
         $user = $event->user;
         $sharing = $event->sharing;
 
-        //logger("Credenziali Confermate");
         $sharing->owner->notify(new \App\Notifications\CredentialConfirmed($user, $sharing));
 
     }

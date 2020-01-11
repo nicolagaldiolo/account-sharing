@@ -7,6 +7,8 @@ use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use App\Http\Resources\Sharing as SharingResource;
+use Illuminate\Support\Facades\Auth;
 
 class CredentialConfirmed extends Notification implements ShouldQueue
 {
@@ -70,9 +72,8 @@ class CredentialConfirmed extends Notification implements ShouldQueue
 
     public function toBroadcast($notifiable)
     {
-        //logger($this->sharing);
         return new BroadcastMessage([
-            'data' => $this->sharing
+            'data' => new SharingResource($this->sharing)
         ]);
     }
 }

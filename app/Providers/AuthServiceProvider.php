@@ -70,9 +70,13 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         Gate::define('confirm-credential', function(User $user, Sharing $sharing){
-            return $user->id !== $sharing->owner->id && // se non sono owner
-                !$sharing->users()->findOrFail($user->id)->sharing_status->credential_updated_at && // se non ho le credenziali confermate
-                $sharing->members()->get()->pluck('id')->contains($user->id); // se sono un utente attivo
+
+            // Get the user sharing_status
+            $user_sharing_status = $sharing->users()->findOrFail($user->id)->sharing_status;
+
+            return $user->id !== $sharing->owner_id && // If i don't the owner
+                $sharing->credential_updated_at->gt($user_sharing_status->credential_updated_at) && // If sharing credentials' is after the sharing_user credential_updated_at
+                $sharing->members()->get()->pluck('id')->contains($user->id); // If i am an active user
         });
     }
 }

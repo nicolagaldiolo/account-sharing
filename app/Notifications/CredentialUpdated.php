@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Http\Resources\Sharing as SharingResource;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
@@ -70,9 +71,8 @@ class CredentialUpdated extends Notification implements ShouldQueue
 
     public function toBroadcast($notifiable)
     {
-        //logger($this->sharing);
         return new BroadcastMessage([
-            'data' => $this->sharing
+            'data' => new SharingResource($this->sharing, $notifiable)
         ]);
     }
 }

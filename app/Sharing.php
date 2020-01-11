@@ -81,19 +81,19 @@ class Sharing extends Model
     ];
 
     public function getUsernameAttribute($value){
-        return (!is_null($value)) ? Crypt::decryptString($value) : $value;
+        return (!empty($value)) ? Crypt::decryptString($value) : $value;
     }
 
     public function setUsernameAttribute($value){
-        $this->attributes['username'] = (!is_null($value)) ? Crypt::encryptString($value) : $value;
+        $this->attributes['username'] = (!empty($value)) ? Crypt::encryptString($value) : $value;
     }
 
     public function getPasswordAttribute($value){
-        return (!is_null($value)) ? Crypt::decryptString($value) : $value;
+        return (!empty($value)) ? Crypt::decryptString($value) : $value;
     }
 
     public function setPasswordAttribute($value){
-        $this->attributes['password'] = (!is_null($value)) ? Crypt::encryptString($value) : $value;
+        $this->attributes['password'] = (!empty($value)) ? Crypt::encryptString($value) : $value;
     }
 
 
@@ -158,7 +158,7 @@ class Sharing extends Model
     {
         $obj = $this->users()->find(Auth::id());
 
-        if (!is_null($obj)) {
+        if (!empty($obj)) {
             $stateMachine = \StateMachine::get($obj->sharing_status, 'sharing');
             return [
                 'status' => [
@@ -180,7 +180,7 @@ class Sharing extends Model
 
     public function sharingUser(User $user = null)
     {
-        $user = is_null($user) ? Auth::user() : $user;
+        $user = empty($user) ? Auth::user() : $user;
         return $this->hasOne(SharingUser::class)->where('user_id', $user->id);
     }
 
