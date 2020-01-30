@@ -19,12 +19,13 @@ class ServiceDataImport implements ToCollection, WithHeadingRow
 
             collect(config('custom.countries'))->keys()->each(function ($key) use ($row){
                 Category::create([
-                    'name' => $row->get('servizio'),
-                    'description' => $row->get('desc'),
-                    'capacity' => $row->get('account'),
-                    'price' => $row->get($key),
-                    'custom' => $row->get('custom'),
-                    'country' => $key
+                    'name'          => $row->get('servizio'),
+                    'description'   => $row->get('desc'),
+                    'capacity'      => $row->get('account'),
+                    'price'         => $row->get($key),
+                    'multiaccount'  => $row->get('multiaccount'),
+                    'custom'        => $row->get('custom'),
+                    'country'       => $key
                 ]);
             });
         }

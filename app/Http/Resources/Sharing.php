@@ -16,7 +16,6 @@ class Sharing extends JsonResource
         // Ensure you call the parent constructor
         parent::__construct($resource);
         $this->resource = $resource;
-
         $this->user = $user;
     }
 
@@ -28,7 +27,6 @@ class Sharing extends JsonResource
      */
     public function toArray($request)
     {
-
         $status = null;
 
         // If user provided get the sharingUser for that user otherwise use the logged user
@@ -57,39 +55,22 @@ class Sharing extends JsonResource
             'capacity' => $this->capacity,
             'availability' => $this->availability,
             'price' => $this->price,
+            'multiaccount' => $this->multiaccount,
+            'credential_status' => $this->credentialStatus,
             'image' => $this->image,
+            'created_at' => $this->created_at,
+            'owner' => new MemberResource($this->whenLoaded('owner')),
 
-            //$this->mergeWhen($request->is('api/sharings/*'), [
+            $this->mergeWhen($request->is('api/sharings/*'), [
                 $this->mergeWhen(Auth::user()->can('manage-sharing', $this), [
-                    'username' => $this->username,
-                    'password' => $this->password,
-                    'credential_updated_at' => $this->credential_updated_at,
+                    'members' => MemberResource::collection($this->whenLoaded('members')),
                 ]),
 
                 $this->mergeWhen($status, [
                     'status' => $status
                 ]),
-                'members' => MemberResource::collection($this->whenLoaded('members')),
-                //'created_at' => $this->created_at,
-
-
-
-                /*
-                 *
-                 */
-                //'visibility' => $this->visibility,
-                //'renewal_frequency_id' => $this->renewal_frequency_id,
-                //'category_id' => $this->category_id,
-                //'owner_id' => $this->owner_id,
-                //'category' => $this->category,
-                'owner' => $this->owner,
-                //'visility_list' => $this->visility_list,
-                //'sharing_state_machine' => $this->sharing_state_machine,
-                //'active_users_without_owner' => $this->activeUsersWithoutOwner,
-                //'active_users' => $this->members()->get()->each(function($user){
-                //    return $user->sharing_status->subscription;
-                //})
-            //])
+            ]),
+            'category_id' => $this->category_id
         ];
 
     }

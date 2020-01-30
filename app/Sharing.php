@@ -2,9 +2,11 @@
 
 namespace App;
 
+use App\Enums\CredentialsStatus;
 use App\Enums\RenewalFrequencies;
 use App\Enums\SharingStatus;
 use App\Enums\SharingVisibility;
+use App\Http\Traits\UtilityTrait;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -12,116 +14,68 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Gate;
+use function foo\func;
 
 class Sharing extends Model
 {
-    use SoftDeletes;
-
-    // https://stackoverflow.com/questions/36750540/accessing-a-database-value-in-a-models-constructor-in-laravel-5-2
-    // Alla crezione del modello condiziono dimamicamente i campi che voglio nascondere previa condizione
-    public function newFromBuilder($attributes = [], $connection = null)
-    {
-        $model = parent::newFromBuilder($attributes, $connection);
-        $user = Auth::user();
-        if($user) {
-            $permitted = $user->can('manage-sharing', $model);
-            if (!$permitted) $model->setHidden($model->toevaluate);
-        }
-
-        return $model;
-    }
+    use SoftDeletes, UtilityTrait;
 
     protected $fillable = [
         'name',
         'description',
         'visibility',
-        'capacity',
+        'slot',
         'price',
+        'multiaccount',
         'stripe_plan',
         'image',
         'renewal_frequency_id',
-        'category_id',
-        'username',
-        'password'
+        'category_id'
     ];
 
-    protected $with = [
-        //'category',
-        //'owner'
-    ];
+    //protected $with = [
+    //    'category'
+    //];
 
-    /**
-     * The "booting" method of the model.
-     *
-     * @return void
-     */
     //protected static function boot()
     //{
     //    parent::boot();
 
     //    static::addGlobalScope('country', function ($builder) {
-    //        $builder->whereHas('category');
+    //        $builder->has('category');
     //    });
     //}
 
-    protected $casts = [
-        'credential_updated_at' => 'datetime'
-    ];
-
-    protected $appends = [
-        //'availability',
-        //'visility_list',
-        //'owner',
-        //'sharing_state_machine'
-    ];
-
-    protected $toevaluate = [
-        //'username',
-        //'password'
-    ];
-
-    public function getUsernameAttribute($value){
-        return (!empty($value)) ? Crypt::decryptString($value) : $value;
+    public function setSlotAttribute($value){
+        $this->attributes['slot'] = $value;
+        $this->attributes['capacity'] = $this->calcCapacity($value);
     }
 
-    public function setUsernameAttribute($value){
-        $this->attributes['username'] = (!empty($value)) ? Crypt::encryptString($value) : $value;
-    }
-
-    public function getPasswordAttribute($value){
-        return (!empty($value)) ? Crypt::decryptString($value) : $value;
-    }
-
-    public function setPasswordAttribute($value){
-        $this->attributes['password'] = (!empty($value)) ? Crypt::encryptString($value) : $value;
-    }
-
-
-    public function getAvailabilityAttribute(){
-        return $this->capacity - $this->members()->count();
-    }
+    //public function getAvailabilityAttribute(){
+    //    return $this->capacity - $this->members()->count();
+    //}
 
     public function category(){
         return $this->belongsTo(Category::class);
-    }
-
-    public function users(){
-        return $this->belongsToMany(User::class)
-            ->using(SharingUser::class)
-            ->as('sharing_status')
-            ->withPivot(['id','status','credential_updated_at'])
-            ->withTimestamps();
     }
 
     public function chats(){
         return $this->hasMany(Chat::class);
     }
 
+    public function users(){
+        return $this->belongsToMany(User::class)
+            ->using(SharingUser::class)
+            ->as('sharing_status')
+            ->withPivot(['id','status','credential_status'])
+            ->withTimestamps();
+    }
+
     public function approvedUsers(){
         return $this->belongsToMany(User::class)
             ->using(SharingUser::class)
             ->as('sharing_status')
-            ->withPivot(['id','status','credential_updated_at'])
+            ->withPivot(['id','status','credential_status'])
             ->whereStatus(SharingStatus::Approved)
             ->withTimestamps();
     }
@@ -130,20 +84,44 @@ class Sharing extends Model
         return $this->belongsToMany(User::class)
             ->using(SharingUser::class)
             ->as('sharing_status')
-            ->withPivot(['id','status','credential_updated_at'])
+            ->withPivot(['id','status','credential_status'])
             ->whereStatus(SharingStatus::Joined)
             ->withTimestamps();
     }
 
-    /*public function activeUsersWithoutOwner(){
-        return $this->belongsToMany(User::class)
-            ->using(SharingUser::class)
-            ->as('sharing_status')
-            ->withPivot(['id','status','credential_updated_at'])
-            ->whereStatus(SharingStatus::Joined)
-            ->where('user_id', '<>', $this->owner_id)
-            ->withTimestamps();
-    }*/
+    public function credentials(User $user = null){
+
+        if($this->multiaccount){
+            $relation = $this->hasManyThrough(Credential::class, SharingUser::class, 'sharing_id', 'credentiable_id')
+                ->where('credentiable_type', SharingUser::class)
+                ->whereStatus(SharingStatus::Joined)
+                ->when(!is_null($user), function($query) use($user){
+                    $query->where('sharing_user.user_id', $user->id);
+                })->with('credentiable');
+        }else{
+            $relation = $this->morphMany(Credential::class, 'credentiable');
+        }
+
+        return $relation;
+    }
+
+    public function getCredentialStatusAttribute()
+    {
+        $credential_status = collect(CredentialsStatus::toArray())->map(function ($item){
+           return $key = collect([
+               'status' => $item,
+               'size' => 0
+           ]);
+        });
+
+        $this->members->pluck('sharing_status.credential_status')->each(function ($item) use ($credential_status){
+            $credential_status[CredentialsStatus::getKey($item)]['size'] = $credential_status[CredentialsStatus::getKey($item)]['size'] + 1;
+        });
+
+        return $credential_status->sortBy(function ($item){
+            return [$item['size'] * -1, $item['status'] * -1];
+        })->first()['status'];
+    }
 
     public function subscriptions(){
         return $this->hasManyThrough(Subscription::class, SharingUser::class, 'sharing_id', 'sharing_user_id');
@@ -153,30 +131,6 @@ class Sharing extends Model
     {
         return $this->belongsTo(User::class, 'owner_id', 'id');
     }
-
-    /*public function getSharingStateMachineAttribute()
-    {
-        $obj = $this->users()->find(Auth::id());
-
-        if (!empty($obj)) {
-            $stateMachine = \StateMachine::get($obj->sharing_status, 'sharing');
-            return [
-                'status' => [
-                    'value' => $stateMachine->getState(),
-                    'metadata' => $stateMachine->metadata('state'),
-                ],
-                'transitions' => collect([])->merge(collect($stateMachine->getPossibleTransitions())->map(function ($value) use ($stateMachine) {
-                    return [
-                        'value' => $value,
-                        'metadata' => $stateMachine->metadata()->transition($value)
-                    ];
-                }))->all(), // altrimenti non mi torna un array;
-            ];
-        } else {
-            return null;
-        }
-    }
-    */
 
     public function sharingUser(User $user = null)
     {
@@ -205,8 +159,15 @@ class Sharing extends Model
 
     public function scopePublic($query)
     {
+        //return $query->withCount('members')->havingRaw('`members_count` < `sharings`.`slot`')->whereVisibility(SharingVisibility::Public);
         return $query->whereVisibility(SharingVisibility::Public);
     }
+
+
+/*$posts = App\Post::withCount(['votes', 'comments' => function (Builder $query) {
+    $query->where('content', 'like', 'foo%');
+}])->get();*/
+
 
     public function scopeJoined($query)
     {

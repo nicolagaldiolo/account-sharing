@@ -2,6 +2,7 @@
 
 namespace App\Http\Traits;
 
+use App\Category;
 use App\Enums\SharingStatus;
 use App\Enums\SubscriptionStatus;
 use App\MyClasses\Support\Facade\Stripe;

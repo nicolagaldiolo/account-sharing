@@ -18,9 +18,10 @@ class CreateCategoriesTable extends Migration
             $table->string('country', 2);
             $table->string('name');
             $table->text('description')->nullable();
-            $table->integer('capacity')->nullable();
-            $table->decimal('price', 10, 2)->nullable();
+            $table->integer('capacity');
+            $table->decimal('price', 10, 2);
             $table->string('image')->nullable();
+            $table->boolean('multiaccount')->default(0);
             $table->boolean('custom')->nullable();
             $table->timestamps();
             $table->softDeletes();

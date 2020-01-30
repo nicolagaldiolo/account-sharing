@@ -14,6 +14,7 @@ $factory->define(SharingUser::class, function (Faker $faker) {
         'user_id' => function(){
             return factory(\App\User::class)->create();
         },
-        'status' => \App\Enums\SharingStatus::Pending
+        'status' => \App\Enums\SharingStatus::Pending,
+        'credential_status' => \App\Enums\CredentialsStatus::Toverify,
     ];
 });

@@ -5,6 +5,7 @@ import i18n from '~/plugins/i18n'
 import App from '~/components/App'
 import Clipboard from 'v-clipboard'
 import VueCurrencyInput from 'vue-currency-input'
+import VModal from 'vue-js-modal'
 
 import Echo from 'laravel-echo'
 import '~/plugins'
@@ -14,6 +15,7 @@ Vue.config.productionTip = false
 Vue.use(require('vue-moment')) // Use inside component as this.$moment() or as {{ item.created_at | moment("D/M/YYYY") }} in template
 Vue.use(Clipboard)
 Vue.use(VueCurrencyInput)
+Vue.use(VModal)
 window.Pusher = require('pusher-js');
 
 window.Echo = new Echo({

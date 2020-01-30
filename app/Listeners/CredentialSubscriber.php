@@ -24,15 +24,28 @@ class CredentialSubscriber
     public function onCredentialUpdated($event)
     {
         $sharing = $event->sharing;
-        Notification::send($sharing->members, new \App\Notifications\CredentialUpdated($sharing));
+        $recipient = $event->recipient;
+
+        Notification::send($sharing->members, new \App\Notifications\CredentialUpdated($sharing, $recipient));
     }
 
     public function onCredentialConfirmed($event)
     {
         $user = $event->user;
         $sharing = $event->sharing;
+        $action = $event->action;
 
-        $sharing->owner->notify(new \App\Notifications\CredentialConfirmed($user, $sharing));
+        $sharing->owner->notify(new \App\Notifications\CredentialConfirmed($user, $sharing, $action));
+
+
+        // I must advide only other not me, i can't use the toOthers() methods because is only for broadcast class
+        // https://laravel.com/docs/5.7/broadcasting#only-to-others
+        // broadcast(new ShippingStatusUpdated($update))->toOthers();
+
+        $onlyOtherUser = $sharing->members->filter(function($value) use($user){
+            return $value->id !== $user->id;
+        });
+        Notification::send($onlyOtherUser, new \App\Notifications\CredentialConfirmed($user, $sharing, $action));
 
     }
 

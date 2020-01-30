@@ -12,8 +12,9 @@ $factory->define(Sharing::class, function (Faker $faker) {
         'name' => $faker->name,
         'description' => $faker->sentence,
         'visibility' => array_rand(SharingVisibility::getValues()),
-        'capacity' => $faker->numberBetween(1,5),
+        'slot' => ($faker->numberBetween(2,6)) - 1,
         'price' => $faker->randomFloat(2, 0, 20),
+        'multiaccount' => 0,
         'image' => $faker->imageUrl(),
         'renewal_frequency_id' => function(){
             return factory(\App\RenewalFrequency::class)->create();
@@ -21,8 +22,6 @@ $factory->define(Sharing::class, function (Faker $faker) {
         'category_id' => function(){
             return factory(\App\Category::class)->create();
         },
-        'username' => $faker->username,
-        'password' => $faker->password,
         'owner_id' => function() {
             return factory(\App\User::class)->create();
         }

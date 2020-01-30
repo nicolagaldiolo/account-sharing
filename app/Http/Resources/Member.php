@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\Subscription as SubscriptionResource;
+use Illuminate\Support\Facades\Auth;
 
 class Member extends JsonResource
 {
@@ -16,28 +17,23 @@ class Member extends JsonResource
     public function toArray($request)
     {
 
+        $status = false;
+        $subscription = $credential_status = null;
+
+        if($this->sharing_status){
+            $status = true;
+            $subscription = new SubscriptionResource($this->sharing_status->subscription);
+            $credential_status = $this->sharing_status->credential_status;
+        }
+
         return [
             'id' => $this->id,
-            'name' => $this->name,
-            'surname' => $this->surname,
-            'birthday' => $this->birthday,
-            'email' => $this->email,
-            'email_verified_at' => $this->email_verified_at,
-            'pl_account_id' => $this->pl_account_id,
-            'pl_customer_id' => $this->pl_customer_id,
-            'country' => $this->country,
-            'currency' => $this->currency,
-            'phone' => $this->phone,
-            'street' => $this->street,
-            'city' => $this->city,
-            'cap' => $this->cap,
-            'tos_acceptance_at' => $this->tos_acceptance_at,
             'photo_url' => $this->photo_url,
             'username' => $this->username,
-            'registration_completed' => $this->registration_completed,
-            'additional_data_needed' => $this->additional_data_needed,
-            'subscription' => new SubscriptionResource($this->sharing_status->subscription),
-            'credential_updated_at' => $this->sharing_status->credential_updated_at
+            $this->mergeWhen($status, [
+                'subscription' => $subscription,
+                'credential_status' => $credential_status
+            ]),
         ];
     }
 }

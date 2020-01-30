@@ -1,64 +1,98 @@
+import Swal from "sweetalert2";
 <template>
   <div>
-    <div v-if="credentialConfirmed.ownerConfirmed || owner">
-      <h4>Credenziali di accesso</h4>
-      <div class="custom-control custom-switch ml-auto">
-        <input type="checkbox" @click="credentialToggle" class="custom-control-input" id="customSwitch1">
-        <label class="custom-control-label" for="customSwitch1">Mostra credenziali</label>
+    <modal name="credentialBox" width="80%" height="auto" :scrollable="true">
+      <!--<a @click="$modal.hide('credentialBox')">❌</a>-->
+      <div v-if="sharing.multiaccount && owner">
+        <div class="card">
+          <ul class="list-group list-group-flush">
+            <li v-for="(member, index) in sharing.members" :key="index" class="list-group-item">
+              <credential-member-status :member="member"></credential-member-status>
+              <p>
+                <a class="btn btn-primary" data-toggle="collapse" :href="'#multiCollapseExample' + index" role="button" aria-expanded="false" :aria-controls="'multiCollapseExample' + index">Credenziali</a>
+              </p>
+              <div class="row">
+                <div class="col-auto">
+                  <div class="collapse multi-collapse" :id="'multiCollapseExample' + index">
+                    <div class="card card-body">
+                      <credential-form :credential="getCredential(member.id)" :member="member" :authUser="authUser" :owner="owner" :sharing="sharing"></credential-form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
       </div>
-      <alert-success :form="form" message="Success!"></alert-success>
-      <form @submit.prevent="saveCredentials" @keydown="form.onKeydown($event)">
-        <div class="form-group">
-          <label>Username</label>
-          <input :readonly="!owner" v-model="form.username" name="userame" :type="(showCredential) ? 'text' : 'password'" :class="{ 'is-invalid': form.errors.has('username') }" class="form-control" placeholder="Username">
-          <a v-on:click.prevent="" href="#" class="btn btn-sm btn-primary" v-clipboard="()=>form.username">Copy</a>
-          <has-error :form="form" field="username" />
-        </div>
-        <div class="form-group">
-          <label>Password</label>
-          <input :readonly="!owner" v-model="form.password" name="password" :type="(showCredential) ? 'text' : 'password'" :class="{ 'is-invalid': form.errors.has('password') }" class="form-control" placeholder="Password">
-          <a v-on:click.prevent="" href="#" class="btn btn-sm btn-primary" v-clipboard="()=>form.password">Copy</a>
-          <has-error :form="form" field="password" />
-        </div>
-        <v-button class="btn-block" v-if="owner" :disabled="saveCredentialReady" :loading="form.busy" type="success">Aggiorna credenziali</v-button>
-      </form>
-      <!-- Action only for active user -->
-      <a class="btn btn-block btn-success" @click.prevent="confirmCredentials" v-if="credentialConfirmed.iMustConfirm">Conferma credenziali</a>
-      <hr>
-      <div class="card">
-        <div class="card-header">
-          <strong>Stato delle credenziali</strong><br>
-          <span>{{ credentialConfirmed.confirmed.length > 0 ? 'Credenziali confermate' : 'Credenziali non confermate' }} {{credentialConfirmed.confirmed.length}}/{{credentialConfirmed.total.length}} utenti</span>
-        </div>
-        <ul class="list-group list-group-flush">
-          <li v-for="(user, index) in credentialConfirmed.confirmed" :key="index" class="list-group-item">
-            <img class="mr-2 rounded-circle" :src="user.photo_url" style="width: 32px; height: 32px;">
-            <div class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
-              <strong class="text-gray-dark">{{user.name}}</strong>
-              <span class="d-block">Credenzilai confermate il {{user.credential_updated_at | moment("D MMMM YYYY")}}</span>
+      <div v-else>
+        <div v-if="ownerConfirmed || owner">
+          <div class="row">
+            <div class="col">
+              <credential-form :credential="credentials[0]" :member="getMe" :authUser="authUser" :owner="owner" :sharing="sharing"></credential-form>
             </div>
-          </li>
-        </ul>
+            <div class="col">
+              <div class="card">
+                <ul class="list-group list-group-flush">
+                  <li v-for="(member, index) in sharing.members" :key="index" class="list-group-item">
+                    <credential-member-status :member="member"></credential-member-status>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <div v-else>
+          <div class="text-center">
+            <h4>Credenziali non ancora inserite dall'admin</h4>
+            <span>Le credenziali non sono ancora state generate</span>
+            <v-link class="btn btn-block btn-success" :class="{ 'disabled': askCredentialDisableStatus }" :loading="askCredentialStatus" :action="askCredentials">Sollecita credenziali</v-link>
+          </div>
+        </div>
+      </div>
+
+
+
+    </modal>
+
+
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <fa :class="credentialStatus.class" icon="key" fixed-width />
+          <strong>Credenziali</strong><br>
+          <span>Stato: <strong>{{ credentialStatus.state}}</strong></span>
+        </div>
+        <a @click.prevent="$modal.show('credentialBox')" href="#">Gestisci credenziali</a>
       </div>
     </div>
-    <div v-else>
-      <h4>Credenziali non ancora inserite dall'admin</h4>
-      <span>Le credenziali verranno fornite al più presto</span>
-    </div>
+
   </div>
 </template>
 
 <script>
     import Form from 'vform'
-    import axios from 'axios'
     import VButton from './Button'
+    import CredentialForm from './CredentialForm'
+    import CredentialMemberStatus from './CredentialMemberStatus'
+    import { mapGetters } from 'vuex'
+    import Swal from 'sweetalert2'
+    import { helperMixin } from '~/mixins/helperMixin'
+    import VLink from "./Link";
+    import axios from "axios";
 
     export default {
 
       name: 'Credentials',
       components: {
+        VLink,
+        CredentialMemberStatus,
+        CredentialForm,
         VButton
       },
+
+      mixins: [ helperMixin ],
+
       props: {
         authUser: {
           type: Object,
@@ -79,52 +113,110 @@
           username: '',
           password: ''
         }),
+        askCredentialStatus: false,
+        askCredentialDisableStatus: false,
         showCredential: false
       }),
 
       created () {
-        window.Echo.private(`App.User.${this.authUser.id}`).notification(notifications => {
-          this.$store.dispatch('sharings/updateSharing', {sharing: notifications.data})
-          let message = (notifications.type === 'App\\Notifications\\CredentialConfirmed') ? 'Credenziali confermate' : 'Credenziali aggiornate'
-          alert(message)
+
+        this.$store.dispatch('sharings/fetchCredentials', this.$route.params.sharing_id)
+
+        window.Echo.private(`App.User.${this.authUser.id}`).notification( notifications => {
+
+          this.$store.dispatch('sharings/updateSharing', { sharing: notifications.data.sharing })
+
+          switch (notifications.type) {
+            case 'App\\Notifications\\CredentialUpdated' :
+              this.$store.dispatch('sharings/fetchCredentials', this.$route.params.sharing_id)
+              if (!this.sharing.multiaccount || notifications.data.recipient.id === this.authUser.id) {
+                Swal.fire({
+                  type: 'success',
+                  title: 'Credenziali aggiornate',
+                  text: 'Credenziali aggiornate da ' + notifications.data.user,
+                  confirmButtonText: 'Ok'
+                })
+              }
+              break
+            case 'App\\Notifications\\CredentialConfirmed' :
+
+              // Show swal only for owner not others members
+              if (notifications.data.sharing.owner.id === this.authUser.id) {
+                if (notifications.data.action === 1) {
+                  Swal.fire({
+                    type: 'success',
+                    title: 'Credenziali confermate',
+                    text: 'Credenziali confermate da ' + notifications.data.user,
+                    confirmButtonText: 'Ok'
+                  })
+                } else if (notifications.data.action === 2) {
+
+                  Swal.fire({
+                    type: 'error',
+                    title: 'Credenziali errate',
+                    text: notifications.data.user + ' ha confermato che le credenziali sono errate',
+                    confirmButtonText: 'Ok'
+                  })
+                }
+              }
+              break
+          }
+        }),
+
+        this.form.keys().forEach(key => {
+          this.form[key] = this.sharing[key]
         })
       },
 
       computed: {
-        credentialConfirmed () {
-          const ownerConfirmed = this.sharing.credential_updated_at;
-          const userLogged = this.sharing.members.filter(user => this.authUser.id === user.id)[0]
-          const userLoggedConfirmed = userLogged && userLogged.credential_updated_at
+        ...mapGetters({
+          credentials: 'sharings/credentials'
+        }),
 
-          return {
-            ownerConfirmed: ownerConfirmed,
-            iMustConfirm: (userLogged && !userLoggedConfirmed) || (ownerConfirmed && userLoggedConfirmed && this.$moment(ownerConfirmed).isAfter(this.$moment(userLoggedConfirmed))),
-            confirmed: this.sharing.members.filter(member => {
-              const memberConfirmed = member.credential_updated_at
-              return memberConfirmed && ownerConfirmed && this.$moment(memberConfirmed).isAfter(ownerConfirmed)
-            }),
-            total: this.sharing.members
-          };
+        credentialStatus () {
+          return this.calcCredentialStatus(this.sharing ? this.sharing.credential_status : 0)
         },
-        saveCredentialReady () {
-          return !this.form.username || !this.form.password
+
+        ownerConfirmed () {
+          return (this.sharing.multiaccount) ? this.getCredential(this.authUser.id) : (this.credentials.length > 0)
+        },
+        getMe () {
+          return this.sharing.members.find(user => this.authUser.id === user.id)
         },
       },
 
       methods: {
-        credentialToggle () {
-          this.showCredential = !this.showCredential
+        getCredential (id) {
+          return this.credentials.find(item => item.user_id === id)
         },
-
-        async saveCredentials () {
-          const { data } = await this.form.patch(`/api/sharings/${this.sharing.id}/credential`)
-          if (data) this.$store.dispatch('sharings/updateSharing', { sharing: data.data })
-        },
-        async confirmCredentials () {
-          axios.post(`/api/sharings/${this.sharing.id}/credential`).then(response => {
-            this.$store.dispatch('sharings/updateSharing', { sharing: response.data.data })
-          });
+        askCredentials () {
+          this.askCredentialStatus = true;
+          axios.get(`/api/sharings/${this.sharing.id}/getcredentials`).then(response => {
+            if (response.data.data) {
+              Swal.fire({
+                type: 'success',
+                title: 'Credenziali richieste all\'admin',
+                text: 'Verrai avvisato appena le credenziali saranno disponibili'
+              })
+            }
+            this.askCredentialStatus = false
+            this.askCredentialDisableStatus = true
+            this.$modal.hide('credentialBox')
+          })
         }
-      }
+      },
     }
 </script>
+<style>
+  .v--modal{
+    padding: 20px;
+  }
+
+  .c-green{
+    color: #1c7430;
+  }
+
+  .c-red{
+    color: red;
+  }
+</style>

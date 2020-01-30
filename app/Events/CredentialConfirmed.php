@@ -23,10 +23,11 @@ class CredentialConfirmed
     public $user;
     public $sharing;
 
-    public function __construct($user, $sharing)
+    public function __construct($user, $sharing, $action)
     {
         $this->user = $user;
         $this->sharing = $sharing;
+        $this->action = $action;
     }
 
     /**

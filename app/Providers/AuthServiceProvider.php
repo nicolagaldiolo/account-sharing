@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Category;
+use App\Enums\CredentialsStatus;
 use App\Enums\SharingStatus;
 use App\Enums\SubscriptionStatus;
 use App\Invoice;
@@ -69,14 +70,15 @@ class AuthServiceProvider extends ServiceProvider
                 ($user->id === $userToDelete->id && $sharing->members()->get()->pluck('id')->contains($userToDelete->id));
         });
 
-        Gate::define('confirm-credential', function(User $user, Sharing $sharing){
+        Gate::define('confirm-credential', function(User $user, Sharing $sharing, $action){
 
             // Get the user sharing_status
             $user_sharing_status = $sharing->users()->findOrFail($user->id)->sharing_status;
 
             return $user->id !== $sharing->owner_id && // If i don't the owner
-                $sharing->credential_updated_at->gt($user_sharing_status->credential_updated_at) && // If sharing credentials' is after the sharing_user credential_updated_at
-                $sharing->members()->get()->pluck('id')->contains($user->id); // If i am an active user
+                $user_sharing_status->credential_status == CredentialsStatus::Toverify && // If sharing credentials' is after the sharing_user credential_updated_at
+                $sharing->members()->get()->pluck('id')->contains($user->id) && // If i am an active user
+                ($action === CredentialsStatus::Confirmed || $action === CredentialsStatus::Wrong); // If status os confirm or wrong
         });
     }
 }

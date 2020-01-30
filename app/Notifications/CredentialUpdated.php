@@ -20,10 +20,12 @@ class CredentialUpdated extends Notification implements ShouldQueue
      */
 
     public $sharing;
+    public $recipient;
 
-    public function __construct($sharing)
+    public function __construct($sharing, $recipient)
     {
         $this->sharing = $sharing;
+        $this->recipient = $recipient;
     }
 
     /**
@@ -34,10 +36,7 @@ class CredentialUpdated extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return [
-            'mail',
-            'broadcast'
-        ];
+        return $this->getChannels($notifiable);
     }
 
     /**
@@ -48,12 +47,13 @@ class CredentialUpdated extends Notification implements ShouldQueue
      */
     public function toMail($notifiable)
     {
+
         return (new MailMessage)
-                    ->subject(config('app.name') . ': ' . $this->sharing->name . ' - Credenziali aggiornate')
-                    ->greeting('Ciao ' . $notifiable->name)
-                    ->line("Le credenziali della condivisione {$this->sharing->name} sono state aggiornate. Accedi all'app e verifica le credenziali")
-                    ->action('Verifica credenziali', url(config('app.url') . "/category/" . $this->sharing->category->id . "/sharing/" . $this->sharing->id))
-                    ->line('Thank you for using our application!');
+            ->subject(config('app.name') . ': ' . $this->sharing->name . ' - Credenziali aggiornate')
+            ->greeting('Ciao ' . $notifiable->name)
+            ->line("Le credenziali della condivisione {$this->sharing->name} sono state aggiornate. Accedi all'app e verifica le credenziali")
+            ->action('Verifica credenziali', url(config('app.url') . "/category/" . $this->sharing->category->id . "/sharing/" . $this->sharing->id))
+            ->line('Thank you for using our application!');
     }
 
     /**
@@ -72,7 +72,24 @@ class CredentialUpdated extends Notification implements ShouldQueue
     public function toBroadcast($notifiable)
     {
         return new BroadcastMessage([
-            'data' => new SharingResource($this->sharing, $notifiable)
+            'data' => [
+                'sharing' => new SharingResource($this->sharing, $notifiable),
+                'user' => $this->sharing->owner->username,
+                'recipient' => $this->recipient
+            ]
         ]);
     }
+
+
+    protected function getChannels($notifiable)
+    {
+        $channels = ['broadcast'];
+
+        if(!$this->recipient || $this->recipient && $notifiable->id === $this->recipient->id){
+            array_push($channels, 'mail');
+        }
+
+        return $channels;
+    }
+
 }

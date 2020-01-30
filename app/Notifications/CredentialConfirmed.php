@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Enums\CredentialsStatus;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
@@ -21,11 +22,13 @@ class CredentialConfirmed extends Notification implements ShouldQueue
      */
     public $user;
     public $sharing;
+    public $action;
 
-    public function __construct($user, $sharing)
+    public function __construct($user, $sharing, $action)
     {
         $this->user = $user;
         $this->sharing = $sharing;
+        $this->action = $action;
     }
 
     /**
@@ -36,10 +39,7 @@ class CredentialConfirmed extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return [
-            'mail',
-            'broadcast'
-        ];
+        return $this->getChannels($notifiable);
     }
 
     /**
@@ -50,11 +50,19 @@ class CredentialConfirmed extends Notification implements ShouldQueue
      */
     public function toMail($notifiable)
     {
-        return (new MailMessage)
-            ->subject(config('app.name') . ': ' . $this->sharing->name . ' - Credenziali confermate')
-            ->greeting('Ciao ' . $notifiable->name)
-            ->line($this->user->name . ' ha appena confermato che le credenziali di ' . $this->sharing->name . ' che hai salvato sono valide.')
-            ->line('Ora tutti gli utenti di ' . config('app.name') . ' sapranno che sei un admin affidabile.');
+        if($this->action === CredentialsStatus::Confirmed){
+            return (new MailMessage)
+                ->subject(config('app.name') . ': ' . $this->sharing->name . ' - Credenziali confermate')
+                ->greeting('Ciao ' . $notifiable->name)
+                ->line($this->user->name . ' ha appena confermato che le credenziali di ' . $this->sharing->name . ' che hai salvato sono valide.')
+                ->line('Ora tutti gli utenti di ' . config('app.name') . ' sapranno che sei un admin affidabile.');
+        }else if ($this->action === CredentialsStatus::Wrong) {
+            return (new MailMessage)
+                ->subject(config('app.name') . ': ' . $this->sharing->name . ' - Credenziali errate')
+                ->greeting('Ciao ' . $notifiable->name)
+                ->line($this->user->name . ' ha appena confermato che le credenziali di ' . $this->sharing->name . ' che hai salvato sono errate.')
+                ->line('Ti preghiamo di fornire delle credenziali corrette.');
+        }
     }
 
     /**
@@ -73,7 +81,22 @@ class CredentialConfirmed extends Notification implements ShouldQueue
     public function toBroadcast($notifiable)
     {
         return new BroadcastMessage([
-            'data' => new SharingResource($this->sharing)
+            'data' => [
+                'sharing' => new SharingResource($this->sharing, $notifiable),
+                'user' => $this->user->username,
+                'action' => $this->action
+            ]
         ]);
+    }
+
+    protected function getChannels($notifiable)
+    {
+        $channels = ['broadcast'];
+
+        if($notifiable->id === $this->sharing->owner->id || !$this->sharing->members->pluck('id')->contains($this->user->id)){
+            array_push($channels, 'mail');
+        }
+
+        return $channels;
     }
 }

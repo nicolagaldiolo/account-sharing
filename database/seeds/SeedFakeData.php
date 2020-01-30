@@ -19,7 +19,7 @@ use Faker\Factory as Faker;
 class SeedFakeData extends Seeder
 {
 
-    use \App\Http\Traits\SharingTrait;
+    use \App\Http\Traits\SharingTrait, \App\Http\Traits\UtilityTrait;
 
     /**
      * Run the database seeds.
@@ -102,12 +102,11 @@ class SeedFakeData extends Seeder
                 $sharing = factory(Sharing::class)->create([
                     'name' => $category->name,
                     'price' => $category->price,
+                    'multiaccount' => $category->multiaccount,
                     'renewal_frequency_id' => $renewalFrequencies->random(1)->pluck('id')->first(),
                     'category_id' => $category->id,
                     'owner_id' => $me->id,
-                    'username' => is_null($sharing_random_value) ? null : $faker->username,
-                    'password' => is_null($sharing_random_value) ? null : $faker->password,
-                    'credential_updated_at' => is_null($sharing_random_value) ? null : $current_data
+                    'slot' => $this->getFreeSlot($category),
                 ]);
 
                 $stripeObj->createPlan($sharing);
@@ -115,7 +114,7 @@ class SeedFakeData extends Seeder
                 // Assign random user for every sharing
                 $usersToManage = $users->where('country', $me->country)->where('id', '<>', $me->id);
 
-                // Set a creadential_updated_at field if is set in the sharing
+                // Set a credential_updated_at field if is set in the sharing
                 $usersToAttach = $usersToManage->random(min($usersToManage->count(), 4))->pluck('id')->mapWithKeys(function($id){
 
                     $sharing_status = SharingStatus::getValues();
@@ -135,7 +134,24 @@ class SeedFakeData extends Seeder
                     $this->createSubscription($item, $sharing);
                 });
 
-                $sharing->members()->get()->each(function($member) use($sharing, $new_credential_updated_at, $user_random_value){
+                if(!is_null($sharing_random_value)){
+
+                    $data = [
+                        'username' => $faker->username,
+                        'password' => $faker->password,
+                        'credential_updated_at' => $current_data
+                    ];
+
+                    if(!$sharing->multiaccount){
+                        $sharing->credential()->create($data);
+                    }else{
+                        $sharing->members()->get()->each(function($member) use($data, $sharing){
+                            $member->sharingUser($sharing)->first()->credential()->create($data);
+                        });
+                    }
+                }
+
+                $sharing->members()->get()->each(function($member) use($faker, $sharing, $new_credential_updated_at, $sharing_random_value, $user_random_value){
 
                     // Create 5 chat messages for every member
                     factory(Chat::class, 5)->create([
@@ -144,9 +160,15 @@ class SeedFakeData extends Seeder
                     ]);
 
                     // Set the credential_updated_at field for some members (only if credential isset in the sharing from owner)
-                    $member->sharings()->updateExistingPivot($sharing->id, [
-                        'credential_updated_at' => (!is_null($sharing->credential_updated_at) && !is_null($user_random_value)) ? $new_credential_updated_at : null
-                    ]);
+                    if(!is_null($user_random_value)){
+
+                        $credentialObj = $sharing->multiaccount ? $member->sharingUser($sharing)->first()->credential : $sharing->credential;
+                        if(!is_null($credentialObj) && !is_null($credentialObj->credential_updated_at)){
+                            $member->sharings()->updateExistingPivot($sharing->id, [
+                                'credential_status' => \App\Enums\CredentialsStatus::Confirmed
+                            ]);
+                        }
+                    }
                 });
 
                 /*

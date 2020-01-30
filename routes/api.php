@@ -36,10 +36,12 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::patch('sharings/{sharing}/user/{user}/update', 'Sharings\SharingsController@update')->name('sharings.renewal.update');
         Route::patch('sharings/{sharing}/transitions/{transition?}', 'Sharings\SharingsController@transition')->name('sharings.transition');
         Route::patch('sharings/{sharing}/user/{user}/transition-user/{transition}', 'Sharings\SharingsController@transitionUser')->name('sharings.user.transition');
-        Route::patch('sharings/{sharing}/credential/', 'Sharings\CredentialController@update')->name('sharings.credential.update');
-        Route::post('sharings/{sharing}/credential/', 'Sharings\CredentialController@confirm')->name('sharings.credential.confirm');
-        Route::post('sharings/{sharing}/subscribe/', 'Sharings\SharingsController@subscribe')->name('sharings.credential.subscribe');
-        Route::post('sharings/{sharing}/restore/', 'Sharings\SharingsController@restore')->name('sharings.credential.restore');
+        Route::get('sharings/{sharing}/credentials/', 'Sharings\CredentialController@index')->name('sharings.credentials');
+        Route::get('sharings/{sharing}/getcredentials/', 'Sharings\CredentialController@get')->name('sharings.getcredentials');
+        Route::patch('sharings/{sharing}/credential/{recipient?}', 'Sharings\CredentialController@update')->name('sharings.credentials.update');
+        Route::post('sharings/{sharing}/credential/{type}', 'Sharings\CredentialController@confirm')->name('sharings.credentials.confirm');
+        Route::post('sharings/{sharing}/subscribe/', 'Sharings\SharingsController@subscribe')->name('sharings.credentials.subscribe');
+        Route::post('sharings/{sharing}/restore/', 'Sharings\SharingsController@restore')->name('sharings.credentials.restore');
 
         // Chat
         Route::get('sharings/{sharing}/chats', 'Sharings\ChatsController@index')->name('sharings.chats');

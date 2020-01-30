@@ -13,7 +13,6 @@ class SharingUser extends Pivot
     protected $guarded = [];
 
     protected $casts = [
-        'credential_updated_at' => 'datetime',
         'canceled_at' => 'datetime',
     ];
 
@@ -29,5 +28,10 @@ class SharingUser extends Pivot
     public function subscription()
     {
         return $this->hasOne(Subscription::class, 'sharing_user_id', 'id');
+    }
+
+    public function credential()
+    {
+        return $this->morphOne(Credential::class, 'credentiable');
     }
 }

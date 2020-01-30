@@ -6,6 +6,7 @@ use App\Category;
 use App\Enums\RefundApplicationStatus;
 use App\Enums\RenewalStatus;
 use App\Enums\SharingStatus;
+use App\Enums\SharingVisibility;
 use App\Enums\SubscriptionStatus;
 use App\Http\Requests\CredentialRequest;
 use App\Http\Requests\SharingRequest;
@@ -58,7 +59,7 @@ class SharingsController extends Controller
                 $sharings = SharingResource::collection(Auth::user()->sharings()->joined()->paginate(12));
                 break;
             default:
-                $sharings = SharingResource::collection(Sharing::public()->paginate(12));
+                $sharings = SharingResource::collection(Sharing::with('owner')->public()->paginate(12));
                 break;
         }
 
@@ -80,18 +81,22 @@ class SharingsController extends Controller
 
         $user = Auth::login(User::find(1));
 
+        $sharing = Sharing::find(1);
+
+        return $sharing;
+
         //$sharing = Sharing::with(['members.subscriptions' => function($query){
         //    $query->where('sharing_user_id', 59)->first();
         //}])->first();
 
-        $sharing = Sharing::with('members.sharingUser')->where('id', 3)->get();
+        $sharing = Sharing::withCount('members')->havingRaw('`members_count` < `sharings`.`slot`')->get();
 
         //$sharing->load('members.subscriptions');
 
-        $account_id = Subscription::findOrFail('sub_GU7NaO7AnZr7so');
-        $test = $account_id->sharingUser->sharing->owner->pl_customer_id;
+        //$account_id = Subscription::findOrFail('sub_GU7NaO7AnZr7so');
+        //$test = $account_id->sharingUser->sharing->owner->pl_customer_id;
 
-        return $test;
+        return "aaa"; //$sharing;
 
 
 
@@ -166,11 +171,6 @@ class SharingsController extends Controller
         // Create the sharing
         $sharing = $user->sharingOwners()->create($request->validated());
 
-        // Attach the sharing to user
-        $user->sharings()->save($sharing, [
-            'status' => SharingStatus::Joined,
-        ]);
-
         // Create stripe plan
         Stripe::createPlan($sharing);
 
@@ -185,7 +185,7 @@ class SharingsController extends Controller
      */
     public function show(Sharing $sharing)
     {
-        $sharing->load('members');
+        $sharing->load(['members','owner']);
 
         return new SharingResource($sharing);
     }

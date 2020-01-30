@@ -4,12 +4,12 @@
     <div class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
 
       <div v-if="isOwner">
-        <strong class="text-gray-dark">{{member.name}}</strong>
+        <strong class="text-gray-dark">{{member.username}}</strong>
         <span class="d-block">Admin</span>
       </div>
       <div v-else>
         <div>
-          <strong class="text-gray-dark">{{member.name}}</strong>
+          <strong class="text-gray-dark">{{member.username}}</strong>
         </div>
 
         <span v-if="member.subscription && member.subscription.created_at" class="d-block">Membro dal {{ member.subscription.created_at | moment("D MMMM YYYY") }}</span>

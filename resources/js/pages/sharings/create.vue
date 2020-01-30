@@ -64,15 +64,15 @@
               </div>
             </div>
 
-            <!-- Capacity -->
+            <!-- Slot -->
             <div class="form-group row">
               <label class="col-md-3 col-form-label text-md-right">Posti disponibili</label>
               <div class="col-md-7">
-                <select v-model="form.capacity" :class="{ 'is-invalid': form.errors.has('capacity') }" class="form-control" name="capacity">
+                <select v-model="form.slot" :class="{ 'is-invalid': form.errors.has('slot') }" class="form-control" name="slot">
                   <option value="">Seleziona i posti liberi</option>
-                  <option v-for="index in category.capacity" :key="index" :value="index">{{ index }}</option>
+                  <option v-for="index in category.slot" :key="index" :value="index">{{ index }}</option>
                 </select>
-                <has-error :form="form" field="capacity" />
+                <has-error :form="form" field="slot" />
               </div>
             </div>
 
@@ -143,7 +143,7 @@
         name: '',
         description: '',
         price: '',
-        capacity: '',
+        slot: '',
         visibility: '',
         renewal_frequency_id: '',
         category_id: '',

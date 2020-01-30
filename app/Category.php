@@ -2,13 +2,14 @@
 
 namespace App;
 
+use App\Http\Traits\UtilityTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 
 class Category extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, UtilityTrait;
 
     protected $fillable = [
         'name',
@@ -17,6 +18,7 @@ class Category extends Model
         'price',
         'image',
         'custom',
+        'multiaccount',
         'country'
     ];
 
@@ -29,9 +31,14 @@ class Category extends Model
     {
         parent::boot();
 
-        static::addGlobalScope('country', function ($builder) {
-            $builder->where('country', Auth::user()->country);
-        });
+        // NON POSSO PERCHé CI SONO CASI IN CUI l'UTENTE NON C'è, quando si crea un job ad esempio (trovare alternativa)
+        //static::addGlobalScope('country', function ($builder) {
+        //    $builder->where('country', Auth::user()->country);
+        //});
+    }
+
+    public function getSlotAttribute(){
+        return $this->getFreeSlot($this);
     }
 
     public function sharings()

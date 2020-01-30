@@ -6,6 +6,7 @@ export const state = {
   sharings: [],
   sharing: {},
   chats: {},
+  credentials: [],
   sharingRequests: []
 }
 
@@ -14,6 +15,7 @@ export const getters = {
   sharings: state => state.sharings,
   sharing: state => state.sharing,
   chats: state => state.chats,
+  credentials: state => state.credentials,
   sharingRequests: state => state.sharingRequests
 }
 
@@ -35,12 +37,26 @@ export const mutations = {
     state.sharing = []
   },
 
+  [types.FETCH_CREDENTIALS_SUCCESS] (state, { credentials }) {
+    state.credentials = credentials
+  },
+
+  [types.FETCH_CREDENTIALS_FAILURE] (state) {
+    state.credentials = []
+  },
+
+  [types.SAVE_CREDENTIALS_SUCCESS] (state, credentials) {
+    const newCredentials = state.credentials.filter(item => item.id !== credentials.id)
+    newCredentials.push(credentials)
+    state.credentials = newCredentials
+  },
+
   [types.FETCH_CHATS_SUCCESS] (state, { chats }) {
     state.chats = chats
   },
 
   [types.FETCH_CHATS_FAILURE] (state) {
-    state.chats = []
+    state.chats = {}
   },
 
   [types.FETCH_SHARING_REQUESTS_SUCCESS] (state, { sharingRequests }) {
@@ -111,5 +127,18 @@ export const actions = {
     } catch (e) {
       commit(types.FETCH_SHARING_REQUESTS_FAILURE)
     }
+  },
+
+  async fetchCredentials ({ commit }, id) {
+    try {
+      const { data } = await axios.get(`/api/sharings/${id}/credentials`)
+      commit(types.FETCH_CREDENTIALS_SUCCESS, { credentials: data.data })
+    } catch (e) {
+      commit(types.FETCH_CREDENTIALS_FAILURE)
+    }
+  },
+
+  saveCredentials ({ commit }, payload) {
+    commit(types.SAVE_CREDENTIALS_SUCCESS, payload)
   }
 }

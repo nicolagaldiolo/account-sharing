@@ -19,6 +19,7 @@ class User extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'surname' => $this->surname,
+            'username' => $this->username,
             'birthday' => $this->birthday,
             'email' => $this->email,
             'email_verified_at' => $this->email_verified_at,
@@ -32,7 +33,6 @@ class User extends JsonResource
             'cap' => $this->cap,
             'tos_acceptance_at' => $this->tos_acceptance_at,
             'photo_url' => $this->photo_url,
-            'username' => $this->username,
             'registration_completed' => $this->registration_completed,
             'additional_data_needed' => $this->additional_data_needed
         ];

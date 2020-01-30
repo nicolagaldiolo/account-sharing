@@ -17,8 +17,8 @@ class CreateSharingUserTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('sharing_id');
             $table->unsignedBigInteger('user_id');
-            $table->tinyInteger('status')->unsigned()->default(\App\Enums\SharingStatus::Pending);
-            $table->timestamp('credential_updated_at')->nullable();
+            $table->tinyInteger('status')->default(\App\Enums\SharingStatus::Pending);
+            $table->tinyInteger('credential_status')->default(\App\Enums\CredentialsStatus::Toverify);
             $table->timestamps();
             $table->unique( ['sharing_id','user_id'] );
             $table->foreign('sharing_id')->on('sharings')->references('id');

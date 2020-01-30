@@ -21,10 +21,12 @@ class CredentialUpdated
      */
 
     public $sharing;
+    public $recipient;
 
-    public function __construct($sharing)
+    public function __construct($sharing, $recipient)
     {
         $this->sharing = $sharing;
+        $this->recipient = $recipient;
     }
 
     /**

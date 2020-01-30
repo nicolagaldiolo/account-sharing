@@ -52,12 +52,11 @@
       <div class="container mt-4">
         <div class="row">
           <div class="col-md-4">
+            <credentials :authUser="authUser" :owner="owner" :sharing="sharing"></credentials>
             <h4>Membri del gruppo</h4>
             <div v-for="(member, index) in globalMembers" :key="index" class="media text-muted pt-3">
               <member-item :sharingId="sharing.id" :owner="sharing.owner" :member="member" :authUser="authUser"/>
             </div>
-            <hr>
-            <credentials :authUser="authUser" :owner="owner" :sharing="sharing"></credentials>
           </div>
           <div class="col-md-8">
             <Chat :authUser="authUser" :sharing="sharing" :joined="joined" :owner="owner"/>

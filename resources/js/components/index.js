@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Card from './Card'
 import Child from './Child'
 import Button from './Button'
+import Link from './Link'
 import Checkbox from './Checkbox'
 import { HasError, AlertErrors, AlertError, AlertSuccess } from 'vform'
 
@@ -10,6 +11,7 @@ import { HasError, AlertErrors, AlertError, AlertSuccess } from 'vform'
   Card,
   Child,
   Button,
+  Link,
   Checkbox,
   HasError,
   AlertError,
