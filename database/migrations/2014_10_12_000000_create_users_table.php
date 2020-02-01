@@ -27,6 +27,7 @@ class CreateUsersTable extends Migration
             $table->string('pl_customer_id')->nullable()->index();
             $table->string('country', 2)->nullable();
             $table->string('currency', 3)->nullable();
+            $table->boolean('admin')->default(0);
             $table->timestamp('tos_acceptance_at')->nullable();
             $table->rememberToken();
             $table->timestamps();

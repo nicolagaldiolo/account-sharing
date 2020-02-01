@@ -17,13 +17,7 @@
         </div>
       </div>
     </div>
-
   </div>
-  <!--<card :title="$t('home')">
-    <h1>Ciao</h1>
-    {{ $t('you_are_logged_in') }}
-  </card>
-  -->
 </template>
 
 <script>
@@ -31,11 +25,14 @@
   import SharingCard from "../../components/SharingCard";
 
   export default {
-    components: {SharingCard},
-    middleware: 'auth',
+    components: {
+      SharingCard
+    },
 
-    created() {
-      this.$store.dispatch('categories/fetchCategory', this.$route.params.category_id);
+    created () {
+      this.$store.dispatch('categories/fetchCategory', this.$route.params.category_id).then(() => {
+        if (!this.$store.getters['categories/category'].id) this.$router.push({ name: 'home' })
+      });
     },
 
     computed: mapGetters({

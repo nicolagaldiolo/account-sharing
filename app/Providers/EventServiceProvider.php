@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Listeners\CredentialSubscriber;
+use App\Listeners\SharingSubscriber;
 use App\Listeners\SharingTransitionListener;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Auth\Events\Registered;
@@ -26,7 +27,8 @@ class EventServiceProvider extends ServiceProvider
     ];
 
     protected $subscribe = [
-        CredentialSubscriber::class
+        CredentialSubscriber::class,
+        SharingSubscriber::class
     ];
 
     /**

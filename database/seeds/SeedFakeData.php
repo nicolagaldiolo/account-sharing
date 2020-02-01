@@ -51,7 +51,8 @@ class SeedFakeData extends Seeder
             'name' => env('DEMONAME', 'Firstname'),
             'surname' => env('DEMOLASTNAME', 'Lastname'),
             'email' => env('DEMOEMAIL', 'demouser@example.com'),
-            'password' => bcrypt(env('DEMOPASS', 'password'))
+            'password' => bcrypt(env('DEMOPASS', 'password')),
+            'admin' => 1
         ])->merge(factory(\App\User::class, 9)->create());
 
         // Create a customer for every users and attach them a default payment method

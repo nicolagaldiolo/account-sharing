@@ -207,4 +207,9 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     {
         return $this->hasMany(Payout::class, 'account_id', 'pl_account_id');
     }
+
+    public function scopeAdmin($query)
+    {
+        return $query->whereAdmin(1);
+    }
 }

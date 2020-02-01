@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Gate;
 use function foo\func;
+use function GuzzleHttp\Psr7\_parse_request_uri;
 
 class Sharing extends Model
 {
@@ -24,6 +25,7 @@ class Sharing extends Model
         'name',
         'description',
         'visibility',
+        'status',
         'slot',
         'price',
         'multiaccount',
@@ -51,9 +53,9 @@ class Sharing extends Model
         $this->attributes['capacity'] = $this->calcCapacity($value);
     }
 
-    //public function getAvailabilityAttribute(){
-    //    return $this->capacity - $this->members()->count();
-    //}
+    public function getAvailabilityAttribute(){
+        return $this->slot - $this->members()->count();
+    }
 
     public function category(){
         return $this->belongsTo(Category::class);
@@ -107,20 +109,7 @@ class Sharing extends Model
 
     public function getCredentialStatusAttribute()
     {
-        $credential_status = collect(CredentialsStatus::toArray())->map(function ($item){
-           return $key = collect([
-               'status' => $item,
-               'size' => 0
-           ]);
-        });
-
-        $this->members->pluck('sharing_status.credential_status')->each(function ($item) use ($credential_status){
-            $credential_status[CredentialsStatus::getKey($item)]['size'] = $credential_status[CredentialsStatus::getKey($item)]['size'] + 1;
-        });
-
-        return $credential_status->sortBy(function ($item){
-            return [$item['size'] * -1, $item['status'] * -1];
-        })->first()['status'];
+        return $this->calcCredentialStatus($this);
     }
 
     public function subscriptions(){

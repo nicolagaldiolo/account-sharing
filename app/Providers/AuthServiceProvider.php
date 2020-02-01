@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Category;
 use App\Enums\CredentialsStatus;
+use App\Enums\SharingApprovationStatus;
 use App\Enums\SharingStatus;
 use App\Enums\SubscriptionStatus;
 use App\Invoice;
@@ -33,6 +34,12 @@ class AuthServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->registerPolicies();
+
+        Gate::define('change-sharing-status', function (User $user, Sharing $sharing, $action){
+            return $user->admin &&
+                $sharing->status === SharingApprovationStatus::Pending &&
+                in_array($action, SharingApprovationStatus::toArray());
+        });
 
         Gate::define('manage-own-sharing', function(User $user, $sharing){
             return $user->id === $sharing->owner_id;
@@ -70,13 +77,20 @@ class AuthServiceProvider extends ServiceProvider
                 ($user->id === $userToDelete->id && $sharing->members()->get()->pluck('id')->contains($userToDelete->id));
         });
 
+        Gate::define('ask-credential', function(User $user, Sharing $sharing){
+            // Get the user sharing_status
+            $user_sharing_status = $sharing->users()->findOrFail($user->id)->sharing_status;
+
+            return $user_sharing_status->credential_status == CredentialsStatus::Toverify && // If sharing credentials' to verify
+                $sharing->members()->get()->pluck('id')->contains($user->id); // If i am an active user;
+        });
+
         Gate::define('confirm-credential', function(User $user, Sharing $sharing, $action){
 
             // Get the user sharing_status
             $user_sharing_status = $sharing->users()->findOrFail($user->id)->sharing_status;
 
-            return $user->id !== $sharing->owner_id && // If i don't the owner
-                $user_sharing_status->credential_status == CredentialsStatus::Toverify && // If sharing credentials' is after the sharing_user credential_updated_at
+            return $user_sharing_status->credential_status == CredentialsStatus::Toverify && // If sharing credentials' to verify
                 $sharing->members()->get()->pluck('id')->contains($user->id) && // If i am an active user
                 ($action === CredentialsStatus::Confirmed || $action === CredentialsStatus::Wrong); // If status os confirm or wrong
         });

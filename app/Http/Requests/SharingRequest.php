@@ -36,7 +36,7 @@ class SharingRequest extends FormRequest
 
         return [
             'name'                  => 'required|max:255',
-            'description'           => 'sometimes|max:750',
+            'description'           => 'required|max:750',
             'visibility'            => ['required', new EnumValue(SharingVisibility::class, false)],
             'slot'                  => 'required|numeric|max:' . ($this->getFreeSlot($category)),
             'price'                 => 'required|numeric|min:1' . $max_price,

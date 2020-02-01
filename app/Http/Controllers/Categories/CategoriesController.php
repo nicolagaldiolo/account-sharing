@@ -21,7 +21,7 @@ class CategoriesController extends Controller
      */
     public function index(Request $request)
     {
-        return new CategoryCollection(Category::with('categoryForbidden')->get());
+        return new CategoryCollection(Category::where('country', Auth::user()->country)->with('categoryForbidden')->get());
     }
 
     /**

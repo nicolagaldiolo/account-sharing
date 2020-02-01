@@ -56,5 +56,5 @@ export default [
       { path: 'paymentmethods', name: 'settings.paymentmethods', component: page('settings/paymentmethods.vue') }
     ] },
 
-  { path: '*', component: page('errors/404.vue') }
+  { path: '*', name: '404', component: page('errors/404.vue') }
 ]

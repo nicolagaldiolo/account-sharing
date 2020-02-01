@@ -144,6 +144,7 @@ class CredentialController extends Controller
 
     public function get(Sharing $sharing)
     {
+        $this->authorize('ask-credential', $sharing);
 
         $sharing->owner->notify(new \App\Notifications\AskCredentials($sharing, Auth::user()));
 

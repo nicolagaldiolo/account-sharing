@@ -34,7 +34,8 @@ class User extends JsonResource
             'tos_acceptance_at' => $this->tos_acceptance_at,
             'photo_url' => $this->photo_url,
             'registration_completed' => $this->registration_completed,
-            'additional_data_needed' => $this->additional_data_needed
+            'additional_data_needed' => $this->additional_data_needed,
+            'admin' => $this->admin
         ];
 
     }

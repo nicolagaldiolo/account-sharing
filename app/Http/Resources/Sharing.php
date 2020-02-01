@@ -27,14 +27,14 @@ class Sharing extends JsonResource
      */
     public function toArray($request)
     {
-        $status = null;
+        $userStatus = null;
 
         // If user provided get the sharingUser for that user otherwise use the logged user
         $sharingUser = is_null($this->user) ? $this->sharingUser : $this->sharingUser($this->user)->first();
 
         if(!is_null($sharingUser)){
             $stateMachine = $sharingUser->stateMachine();
-            $status = [
+            $userStatus = [
                 'state' => [
                     'value' => $stateMachine->getState(),
                     'metadata' => $stateMachine->metadata('state'),
@@ -50,10 +50,12 @@ class Sharing extends JsonResource
 
         return [
             'id' => $this->id,
+            'category_id' => $this->category_id,
             'name' => $this->name,
             'description' => $this->description,
             'capacity' => $this->capacity,
             'availability' => $this->availability,
+            'status' => $this->status,
             'price' => $this->price,
             'multiaccount' => $this->multiaccount,
             'credential_status' => $this->credentialStatus,
@@ -66,11 +68,10 @@ class Sharing extends JsonResource
                     'members' => MemberResource::collection($this->whenLoaded('members')),
                 ]),
 
-                $this->mergeWhen($status, [
-                    'status' => $status
+                $this->mergeWhen($userStatus, [
+                    'user_status' => $userStatus
                 ]),
             ]),
-            'category_id' => $this->category_id
         ];
 
     }

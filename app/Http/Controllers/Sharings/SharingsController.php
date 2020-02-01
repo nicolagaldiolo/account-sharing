@@ -5,9 +5,12 @@ namespace App\Http\Controllers\Sharings;
 use App\Category;
 use App\Enums\RefundApplicationStatus;
 use App\Enums\RenewalStatus;
+use App\Enums\SharingApprovationStatus;
 use App\Enums\SharingStatus;
 use App\Enums\SharingVisibility;
 use App\Enums\SubscriptionStatus;
+use App\Events\SharingCreated;
+use App\Events\SharingStatusUpdated;
 use App\Http\Requests\CredentialRequest;
 use App\Http\Requests\SharingRequest;
 use App\Http\Resources\Transaction as TransactionResource;
@@ -29,6 +32,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use App\MyClasses\Support\Facade\Stripe;
+use Illuminate\Support\Facades\Notification;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpParser\Builder;
 
@@ -168,11 +172,33 @@ class SharingsController extends Controller
 
         $user = Auth::user();
 
-        // Create the sharing
-        $sharing = $user->sharingOwners()->create($request->validated());
+        $dataValidated = $request->validated();
+        $dataValidated['status'] = ($category->custom) ? SharingApprovationStatus::Pending: SharingApprovationStatus::Approved;
 
-        // Create stripe plan
-        Stripe::createPlan($sharing);
+
+        // Create the sharing
+        $sharing = $user->sharingOwners()->create($dataValidated);
+
+        event(New SharingCreated($sharing));
+
+        return new SharingResource($sharing);
+    }
+
+    public function changeStatus(Sharing $sharing, $action)
+    {
+        $action = intval($action);
+
+        $this->authorize('change-sharing-status', [$sharing, $action]);
+
+        // Update the sharing
+        $sharing->status = $action;
+        $sharing->save();
+
+        event(New SharingStatusUpdated($sharing));
+
+        if($sharing->status === SharingApprovationStatus::Refused){
+            $sharing->delete();
+        }
 
         return new SharingResource($sharing);
     }

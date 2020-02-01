@@ -17,10 +17,11 @@ class CreateSharingsTable extends Migration
             $table->bigIncrements('id');
             $table->string('name');
             $table->text('description');
-            $table->tinyInteger('visibility')->unsigned()->default(1);
+            $table->tinyInteger('visibility')->unsigned()->default(\App\Enums\SharingVisibility::Public);
+            $table->tinyInteger('status')->unsigned()->default(\App\Enums\SharingApprovationStatus::Pending);
             $table->integer('capacity');
             $table->integer('slot');
-            $table->decimal('price', 10, 2)->nullable();
+            $table->decimal('price', 10, 2);
             $table->boolean('multiaccount')->default(0);
             $table->string('stripe_plan')->nullable();
             $table->string('image')->nullable();

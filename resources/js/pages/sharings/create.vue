@@ -1,3 +1,4 @@
+import Swal from "sweetalert2";
 <template>
   <div>
     <section class="jumbotron text-center">
@@ -5,8 +6,7 @@
         <h1 class="jumbotron-heading">Crea condivisione</h1>
         <p class="lead text-muted">Something short and leading about the collection below—its contents, the creator, etc. Make it short and sweet, but not too short so folks don’t simply skip over it entirely.</p>
 
-        <alert-error :form="form" :message="message"></alert-error>
-
+        <alert-error :form="form" :message="form.message"></alert-error>
       </div>
     </section>
     <div class="container">
@@ -23,7 +23,6 @@
         <neededinfo v-if="user.additional_data_needed"></neededinfo>
         <card v-else :title="`Nuovo ${category.name}`">
           <form @submit.prevent="create" @keydown="form.onKeydown($event)">
-            <!--<alert-success :form="form" :message="$t('info_updated')" />-->
 
             <!-- Renewal frequency -->
             <div class="form-group row">
@@ -59,7 +58,7 @@
             <div class="form-group row">
               <label class="col-md-3 col-form-label text-md-right">Prezzo del servizio</label>
               <div class="col-md-7">
-                <currency-input :disabled="!category.custom" v-model="form.price" :currency="user.currency" :locale="user.country" distraction-free="false" :class="{ 'is-invalid': form.errors.has('price') }" class="form-control" type="text"/>
+                <currency-input :disabled="!category.custom" v-model="form.price" :currency="user.currency" :locale="user.country" :distraction-free="false" :class="{ 'is-invalid': form.errors.has('price') }" class="form-control" type="text"/>
                 <has-error :form="form" field="price" />
               </div>
             </div>
@@ -129,6 +128,7 @@
   import { mapGetters } from 'vuex'
   import Neededinfo from '../settings/neededinfo'
   import MoneyFormat from 'vue-money-format'
+  import Swal from 'sweetalert2'
 
   export default {
     components: {
@@ -142,11 +142,11 @@
       form: new Form({
         name: '',
         description: '',
-        price: '',
-        slot: '',
-        visibility: '',
-        renewal_frequency_id: '',
-        category_id: '',
+        price: 0,
+        slot: 0,
+        visibility: 0,
+        renewal_frequency_id: 0,
+        category_id: 0,
         service_igree: 0
       })
     }),
@@ -156,15 +156,29 @@
         this.category = category;
 
         this.form.keys().forEach(key => {
-          this.form[key] = this.category[key]
-        });
-        this.form.category_id = this.category.id;
+          this.form[key] = (key === 'price') ? parseFloat(this.category[key]) : this.category[key]
+        })
+        this.form.category_id = this.category.id
       },
       async create () {
+
         const { data } = await this.form.post('/api/sharings')
 
         // Redirect to sharing.
-        this.$router.push({ name: 'sharing.show', params: { category_id: this.form.category_id, sharing_id: data.id }})
+        this.$router.push( { name: 'sharing.show', params: { category_id: data.data.category_id, sharing_id: data.data.id }})
+        if(data.data.status === 0){
+          Swal.fire({
+            type: 'warning',
+            title: 'Condivisione in fase di approvazione',
+            text: 'Attendere comunicazione da parte dello staff per iniziare a condividere'
+          })
+        }else{
+          Swal.fire({
+            type: 'success',
+            title: 'Condivisione creata con successo',
+            text: 'Inizia a condividere'
+          })
+        }
       }
     },
 
@@ -177,6 +191,6 @@
       categories: 'categories/categories',
       renewal_frequencies: 'categories/renewal_frequencies',
       sharings_visibility: 'categories/sharings_visibility'
-    })
+    }),
   }
 </script>

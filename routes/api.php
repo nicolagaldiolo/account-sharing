@@ -36,6 +36,7 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::patch('sharings/{sharing}/user/{user}/update', 'Sharings\SharingsController@update')->name('sharings.renewal.update');
         Route::patch('sharings/{sharing}/transitions/{transition?}', 'Sharings\SharingsController@transition')->name('sharings.transition');
         Route::patch('sharings/{sharing}/user/{user}/transition-user/{transition}', 'Sharings\SharingsController@transitionUser')->name('sharings.user.transition');
+        Route::patch('sharings/{sharing}/status/{action}', 'Sharings\SharingsController@changeStatus')->name('sharings.status.change');
         Route::get('sharings/{sharing}/credentials/', 'Sharings\CredentialController@index')->name('sharings.credentials');
         Route::get('sharings/{sharing}/getcredentials/', 'Sharings\CredentialController@get')->name('sharings.getcredentials');
         Route::patch('sharings/{sharing}/credential/{recipient?}', 'Sharings\CredentialController@update')->name('sharings.credentials.update');

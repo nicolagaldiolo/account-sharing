@@ -27,8 +27,7 @@ class Category extends JsonResource
             'price' => $this->price,
             //'capacity' => $this->capacity,
             'slot' => $this->slot,
-            // I don't create a sharing if i already created one in this category
-            'forbidden' => $this->whenLoaded('categoryForbidden', true)
+            'forbidden' => $this->whenLoaded('categoryForbidden', $this->custom ? false : true)
         ];
     }
 }

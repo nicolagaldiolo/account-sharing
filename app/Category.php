@@ -22,21 +22,6 @@ class Category extends Model
         'country'
     ];
 
-    /**
-     * The "booting" method of the model.
-     *
-     * @return void
-     */
-    protected static function boot()
-    {
-        parent::boot();
-
-        // NON POSSO PERCHé CI SONO CASI IN CUI l'UTENTE NON C'è, quando si crea un job ad esempio (trovare alternativa)
-        //static::addGlobalScope('country', function ($builder) {
-        //    $builder->where('country', Auth::user()->country);
-        //});
-    }
-
     public function getSlotAttribute(){
         return $this->getFreeSlot($this);
     }
@@ -47,6 +32,7 @@ class Category extends Model
     }
 
     public function categoryForbidden()
+    // I don't create a sharing if i already created one in this category
     {
         return $this->hasOne(Sharing::class)->where('owner_id', Auth::user()->id);
     }
