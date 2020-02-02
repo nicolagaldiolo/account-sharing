@@ -22,6 +22,21 @@ class Category extends Model
         'country'
     ];
 
+    /**
+     * The "booting" method of the model.
+     *
+     * @return void
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::addGlobalScope('country', function ($builder) {
+            $builder->where('country', Auth::user()->country);
+        });
+    }
+
+
     public function getSlotAttribute(){
         return $this->getFreeSlot($this);
     }

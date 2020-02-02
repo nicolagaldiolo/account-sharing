@@ -51,7 +51,7 @@ class AskCredentials extends Notification implements ShouldQueue
             ->subject(config('app.name') . ': ' . $this->sharing->name . ' - Richiesta credenziali')
             ->greeting('Ciao ' . $notifiable->name)
             ->line($this->user->name . ' ha appena sollecitato l\'invio delle credenziali per la condivisione ' . $this->sharing->name . '.')
-            ->action('Aggiungi credenziali', url(config('app.url') . "/category/" . $this->sharing->category->id . "/sharing/" . $this->sharing->id))
+            ->action('Aggiungi credenziali', url(config('app.url') . "/category/" . $this->sharing->category_id . "/sharing/" . $this->sharing->id))
             ->line('Thank you for using our application!');
     }
 

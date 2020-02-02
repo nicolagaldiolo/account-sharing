@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="container mt-4">
-      <!--
+
       <h2>Categorie</h2>
       <div class="row">
         <div class="col" v-for="category in categories" :key="category.id">
@@ -11,7 +11,6 @@
           </router-link>
         </div>
       </div>
-      -->
 
       <sharings title="Condivisioni"></sharings>
 

@@ -1,6 +1,5 @@
-import Swal from "sweetalert2";
 <template>
-  <div>
+  <div v-if="sharing.id">
     <div v-if="authUser.admin && sharingPending" class="pt-2 pb-2 mb-4 text-white bg-danger">
       <div class="container">
         <div class="d-flex align-items-center">
@@ -22,17 +21,68 @@ import Swal from "sweetalert2";
         <div class="row">
           <div class="col-sm-6">
             <div class="card">
-              <div class="card-body">
-                <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                <a href="#" class="btn btn-primary">Go somewhere</a>
+              <div class="card-body text-center">
+                <img class="rounded-circle" width="80" :src="sharing.owner.photo_url">
+                <h4>{{sharing.owner.username}}</h4>
+                <span>Attivo dal {{ sharing.owner.created_at | moment("D MMMM YYYY") }}</span>
               </div>
             </div>
           </div>
           <div class="col-sm-6">
             <div class="card">
               <div class="card-body">
-                <h5 class="card-title">{{sharing.name}}</h5>
-                <p class="card-text">{{sharing.description}}</p>
+                <div class="d-flex justify-content-between">
+                  <h5 class="card-title">{{sharing.name}}<br><small>{{sharing.description}}</small></h5>
+                  <div class="text-right">
+                    <h5 class="mb-0"><strong>{{sharing.availability}}/{{sharing.capacity}}</strong></h5>
+                    Posti liberi
+                  </div>
+                </div>
+                <ul class="list-group">
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Ricorrenza pagamento
+                    <strong>{{ sharing.renewal_frequency }}</strong>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Data di creazione
+                    <strong>{{ sharing.created_at | moment("D MMMM YYYY") }}</strong>
+                  </li>
+                  <li v-if="sharing.owner.id === authUser.id" class="list-group-item list-group-item-dark d-flex justify-content-between align-items-center">
+                    <strong>Riceverai</strong>
+                    <h4><money-format :value="sharing.price_no_fee" :locale="authUser.country" :currency-code="authUser.currency" :subunit-value=false :hide-subunits=false></money-format></h4>
+                  </li>
+                  <li v-else class="list-group-item list-group-item-dark d-flex justify-content-between align-items-center">
+                    <strong>Totale da pagare</strong>
+                    <h4><money-format :value="sharing.price_with_fee" :locale="authUser.country" :currency-code="authUser.currency" :subunit-value=false :hide-subunits=false></money-format></h4>
+                  </li>
+                </ul>
+
+                <div v-if="sharingApproved" class="mt-4">
+
+                  <div v-if="foreign">
+                    <v-link class="btn-lg btn-block" type="success" :loading="confirmStatus" :action="doTransition">Entra nel gruppo</v-link>
+                  </div>
+                  <div v-else>
+
+                    <!--<div v-if="userSubscription === 4" class="alert alert-danger" role="alert">
+                      Attenzione ci sono problemi con i pagamenti.
+                      <router-link :to="{ name: 'sharing.restore' }" class="alert-link">Completa pagamento</router-link>
+                    </div>-->
+
+                    <div v-if="sharing.user_status && !joined">
+                      <div v-if="sharing.user_status.transitions.length">
+                        <div v-for="(transition, index) in sharing.user_status.transitions" :key="index">
+                          <v-link class="btn-lg btn-block" type="success" :data-action='transition.value' :action="doTransition">{{transition.metadata.title}}</v-link>
+                        </div>
+                      </div>
+                      <div v-else class="alert alert-primary text-center" role="alert">
+                        {{sharing.user_status.state.metadata.title}}
+                      </div>
+                    </div>
+                  </div>
+                  <a href="#" v-if="availability" class="mt-2 btn btn-outline-secondary btn-block">Invita i tuoi amici</a>
+
+                </div>
               </div>
             </div>
           </div>
@@ -43,30 +93,6 @@ import Swal from "sweetalert2";
     <div class="container">
 
       <div v-if="sharingApproved">
-        <div v-if="foreign">
-          <a @click.prevent="doTransition()" class="btn btn-primary btn-lg btn-block">Entra nel gruppo</a>
-        </div>
-        <div v-else>
-
-          <!--<div v-if="userSubscription === 4" class="alert alert-danger" role="alert">
-            Attenzione ci sono problemi con i pagamenti.
-            <router-link :to="{ name: 'sharing.restore' }" class="alert-link">Completa pagamento</router-link>
-          </div>-->
-
-          <div v-if="sharing.user_status && !joined">
-            <div v-if="sharing.user_status.transitions.length">
-              <a v-for="(transition, index) in sharing.user_status.transitions" :key="index" href="#" @click.prevent="doTransition(transition.value)" class="btn btn-primary btn-lg btn-block">
-                {{transition.metadata.title}}
-              </a>
-            </div>
-            <div v-else class="alert alert-primary text-center" role="alert">
-              {{sharing.user_status.state.metadata.title}}
-            </div>
-          </div>
-
-          <a v-if="availability && (joined || owner)" class="btn btn-primary btn-lg btn-block">Invita i tuoi amici</a>
-        </div>
-
         <div v-if="joined || owner" class="mt-4">
           <div class="row">
             <div class="col-md-4">
@@ -96,12 +122,14 @@ import Swal from "sweetalert2";
     import MemberItem from '~/components/MemberItem'
     import Chat from '~/components/Chat'
     import Credentials from '~/components/Credentials'
+    import MoneyFormat from 'vue-money-format'
 
     export default {
         components: {
           Credentials,
           MemberItem,
-          Chat
+          Chat,
+          MoneyFormat
         },
 
         data: () => ({
@@ -113,7 +141,7 @@ import Swal from "sweetalert2";
         created () {
 
           this.$store.dispatch('sharings/fetchSharing', this.$route.params.sharing_id).then(() => {
-            if (!this.$store.getters['sharings/sharing'].id && this.$store.getters['sharings/sharing'].category_id === +this.$route.params.category_id) {
+            if (!this.$store.getters['sharings/sharing'].id || this.$store.getters['sharings/sharing'].category_id !== +this.$route.params.category_id) {
               this.$router.push({ name: 'home' })
             }
           })
@@ -197,19 +225,22 @@ import Swal from "sweetalert2";
               })
             },
 
-            doTransition (transition) {
-                if(transition === 'pay') {
-                    const category = this.$route.params.category_id
-                    const sharing = this.$route.params.sharing_id
-                    this.$router.push({ name: 'sharing.checkout', params: { category, sharing } })
-                } else {
-                    let api = (transition)
-                        ? `/api/sharings/${this.sharing.id}/transitions/${transition}`
-                        : `/api/sharings/${this.sharing.id}/transitions`
-                    axios.patch(api).then((response) => {
-                        this.$store.dispatch('sharings/updateSharing', { sharing: response.data })
-                    })
-                }
+            doTransition (event) {
+
+              const action = event.target.getAttribute('data-action');
+
+              if(action === 'pay') {
+                  const category = this.$route.params.category_id
+                  const sharing = this.$route.params.sharing_id
+                  this.$router.push({ name: 'sharing.checkout', params: { category, sharing } })
+              } else {
+                  let api = (action)
+                      ? `/api/sharings/${this.sharing.id}/transitions/${action}`
+                      : `/api/sharings/${this.sharing.id}/transitions`
+                  axios.patch(api).then((response) => {
+                    this.$store.dispatch('sharings/updateSharing', { sharing: response.data.data })
+                  })
+              }
             }
 
         }

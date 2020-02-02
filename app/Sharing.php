@@ -2,20 +2,12 @@
 
 namespace App;
 
-use App\Enums\CredentialsStatus;
-use App\Enums\RenewalFrequencies;
 use App\Enums\SharingStatus;
 use App\Enums\SharingVisibility;
 use App\Http\Traits\UtilityTrait;
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\Gate;
-use function foo\func;
-use function GuzzleHttp\Psr7\_parse_request_uri;
 
 class Sharing extends Model
 {
@@ -39,14 +31,14 @@ class Sharing extends Model
     //    'category'
     //];
 
-    //protected static function boot()
-    //{
-    //    parent::boot();
+    protected static function boot()
+    {
+        parent::boot();
 
-    //    static::addGlobalScope('country', function ($builder) {
-    //        $builder->has('category');
-    //    });
-    //}
+        static::addGlobalScope('country', function ($builder) {
+            $builder->has('category');
+        });
+    }
 
     public function setSlotAttribute($value){
         $this->attributes['slot'] = $value;
@@ -55,6 +47,14 @@ class Sharing extends Model
 
     public function getAvailabilityAttribute(){
         return $this->slot - $this->members()->count();
+    }
+
+    public function getPriceNoFeeAttribute(){
+        return $this->price / $this->capacity;
+    }
+
+    public function getPriceWithFeeAttribute(){
+        return ($this->price / $this->capacity) + (floatval(config('custom.stripe.stripe_fee')) / 100) + (floatval(config('custom.stripe.platform_fee')) / 100);
     }
 
     public function category(){
@@ -148,8 +148,8 @@ class Sharing extends Model
 
     public function scopePublic($query)
     {
-        //return $query->withCount('members')->havingRaw('`members_count` < `sharings`.`slot`')->whereVisibility(SharingVisibility::Public);
-        return $query->whereVisibility(SharingVisibility::Public);
+        return $query->withCount('members')->havingRaw('`members_count` < `sharings`.`slot`')->whereVisibility(SharingVisibility::Public);
+        //return $query->whereVisibility(SharingVisibility::Public);
     }
 
 

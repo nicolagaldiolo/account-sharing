@@ -3,38 +3,20 @@
 namespace App\Http\Controllers\Sharings;
 
 use App\Category;
-use App\Enums\RefundApplicationStatus;
 use App\Enums\RenewalStatus;
 use App\Enums\SharingApprovationStatus;
-use App\Enums\SharingStatus;
-use App\Enums\SharingVisibility;
-use App\Enums\SubscriptionStatus;
 use App\Events\SharingCreated;
 use App\Events\SharingStatusUpdated;
 use App\Http\Requests\CredentialRequest;
 use App\Http\Requests\SharingRequest;
-use App\Http\Resources\Transaction as TransactionResource;
 use App\Http\Resources\Sharing as SharingResource;
+use App\Http\Resources\SharingCollection;
 use App\Http\Traits\SharingTrait;
-use App\Imports\ServiceDataImport;
-use App\Invoice;
-use App\Payout;
-use App\Refund;
 use App\Sharing;
-use App\SharingUser;
-use App\Subscription;
-use App\Transaction;
 use App\User;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Gate;
-use App\MyClasses\Support\Facade\Stripe;
-use Illuminate\Support\Facades\Notification;
-use Maatwebsite\Excel\Facades\Excel;
-use PhpParser\Builder;
 
 class SharingsController extends Controller
 {
@@ -63,7 +45,12 @@ class SharingsController extends Controller
                 $sharings = SharingResource::collection(Auth::user()->sharings()->joined()->paginate(12));
                 break;
             default:
-                $sharings = SharingResource::collection(Sharing::with('owner')->public()->paginate(12));
+
+                //DISABILITO MOMENTANEAMENTE LA PAGINAZIONE PERCHè CREA PROBLEMI CON LA QUERY, DA SISTEMARE
+                // https://github.com/laravel/framework/issues/3105
+
+                //$sharings = SharingResource::collection(Sharing::with('owner')->public()->paginate(12));
+                $sharings = SharingResource::collection(Sharing::with('owner')->public()->get());
                 break;
         }
 
@@ -82,7 +69,7 @@ class SharingsController extends Controller
 
     public function prova(Request $request)
     {
-
+        /*
         $user = Auth::login(User::find(1));
 
         $sharing = Sharing::find(1);
@@ -118,7 +105,7 @@ class SharingsController extends Controller
         //$user->save();
 
         if (empty($user->pl_account_id)) {
-            /*$account = \Stripe\Account::create([
+            $account = \Stripe\Account::create([
                 'country' => 'GB',
                 'email' => $user->email,
                 'type' => 'custom',
@@ -155,8 +142,9 @@ class SharingsController extends Controller
 
             $user->pl_account_id = $account->id;
             $user->save();
-            */
+
         }
+        */
     }
 
     /**
@@ -276,6 +264,7 @@ class SharingsController extends Controller
                     break;
             }
         }
+        $userSharing->load(['members','owner']);
         return new SharingResource($userSharing);
 
     }

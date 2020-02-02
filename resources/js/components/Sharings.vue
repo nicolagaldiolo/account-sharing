@@ -7,6 +7,7 @@
           <div class="card">
             <router-link :to="{ name: 'sharing.show', params: { category_id: sharing.category_id, sharing_id: sharing.id } }">
               <img :src="sharing.image" class="card-img-top" alt="...">
+              <span>Vai alla scheda</span>
             </router-link>
             <div class="card-body">
               <p class="card-text">

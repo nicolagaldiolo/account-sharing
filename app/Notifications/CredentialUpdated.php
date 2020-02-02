@@ -52,7 +52,7 @@ class CredentialUpdated extends Notification implements ShouldQueue
             ->subject(config('app.name') . ': ' . $this->sharing->name . ' - Credenziali aggiornate')
             ->greeting('Ciao ' . $notifiable->name)
             ->line("Le credenziali della condivisione {$this->sharing->name} sono state aggiornate. Accedi all'app e verifica le credenziali")
-            ->action('Verifica credenziali', url(config('app.url') . "/category/" . $this->sharing->category->id . "/sharing/" . $this->sharing->id))
+            ->action('Verifica credenziali', url(config('app.url') . "/category/" . $this->sharing->category_id . "/sharing/" . $this->sharing->id))
             ->line('Thank you for using our application!');
     }
 
