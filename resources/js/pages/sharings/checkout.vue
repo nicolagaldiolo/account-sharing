@@ -6,14 +6,33 @@
           <paymentmethods checkout-mode="true"></paymentmethods>
         </div>
         <div class="col-md-4">
-          <card title="Credit Card">
-            <h5>{{sharing.name}}</h5>
-            <h2>{{sharing.price}}</h2>
-            <template v-slot:footer>
-              <div>
-                <button @click.prevent="pay">Conferma pagamento</button>
-              </div>
-            </template>
+          <card :title="sharing.name">
+            <img class="rounded-circle" width="50" :src="sharing.owner.photo_url">
+            <h5>{{sharing.owner.username}}</h5>
+            <hr>
+
+            <ul class="list-group">
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Periodo
+                <strong>{{ $moment(today).format('D MMM YYYY') }} -> {{ $moment(today).add(1, 'M').format('D MMM YYYY') }}</strong>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Rinnovo
+                <strong>{{ sharing.renewal_frequency }}</strong>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Contributo spese
+                <strong><money-format :value="sharing.price_no_fee" :locale="authUser.country" :currency-code="authUser.currency" :subunit-value=false :hide-subunits=false></money-format></strong>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Spese di gestione
+                <strong><money-format :value="fee" :locale="authUser.country" :currency-code="authUser.currency" :subunit-value=false :hide-subunits=false></money-format></strong>
+              </li>
+              <li class="list-group-item list-group-item-dark d-flex justify-content-between align-items-center">
+                <strong>Totale da pagare</strong>
+                <h4><money-format :value="sharing.price_with_fee" :locale="authUser.country" :currency-code="authUser.currency" :subunit-value=false :hide-subunits=false></money-format></h4>
+              </li>
+            </ul>
           </card>
         </div>
       </div>
@@ -24,27 +43,31 @@
 import { mapGetters } from 'vuex'
 import axios from 'axios'
 import paymentmethods from '../settings/paymentmethods';
+import MoneyFormat from 'vue-money-format'
 
 export default {
   middleware: [
     'userCanPay'
   ],
   components: {
-    paymentmethods
+    paymentmethods,
+    MoneyFormat
   },
 
   data: () => ({
-      stripe: window.Stripe(window.config.stripeKey)
+    today: new Date(),
+    fee: (parseInt(window.config.platformFee) + parseInt(window.config.stripeFee)) / 100,
+    stripe: window.Stripe(window.config.stripeKey)
   }),
 
   created () {
   },
 
   computed: {
-      ...mapGetters({
-          sharing: 'sharings/sharing',
-          authUser: 'auth/user'
-      })
+    ...mapGetters({
+        sharing: 'sharings/sharing',
+        authUser: 'auth/user'
+    })
   }
 }
 </script>

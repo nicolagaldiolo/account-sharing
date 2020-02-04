@@ -7,6 +7,8 @@ $config = [
     'githubAuth' => config('services.github.client_id'),
     'stripeKey' => config('services.stripe.key'),
     'limitUserAge' => config('custom.limit_user_age'),
+    'stripeFee' => config('custom.stripe.stripe_fee'),
+    'platformFee' => config('custom.stripe.platform_fee'),
 ];
 @endphp
 <!DOCTYPE html>

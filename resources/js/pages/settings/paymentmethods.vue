@@ -88,6 +88,19 @@ export default {
   mounted () {
     // Create a Stripe client.
 
+    /*
+    this.$nextTick(function () {
+      if (document.getElementById('card-element') != null) {
+        //contactsdb.$mount('#app-contactsdb');
+        console.log("Eccolo");
+      }else{
+        console.log("Niente");
+      }
+      // Code that will run only after the
+      // entire view has been rendered
+    })
+    */
+
 
     // Create an instance of Elements.
     var element = this.stripe.elements();
