@@ -45,6 +45,11 @@ class AuthServiceProvider extends ServiceProvider
             return $user->id === $sharing->owner_id;
         });
 
+        Gate::define('can-add-payment-method', function($user, $paymentMethodTotal){
+            // Aggiungere anche divieto di iscrizione da parte dell'owner
+            return config('custom.stripe.max_payment_method') > $paymentMethodTotal;
+        });
+
         Gate::define('can-subscribe', function($user, $sharingUser){
             // Aggiungere anche divieto di iscrizione da parte dell'owner
             return $user->id === $sharingUser->user_id && $sharingUser->status === SharingStatus::Approved;

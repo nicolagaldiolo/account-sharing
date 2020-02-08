@@ -2,11 +2,19 @@
 
 namespace App\Http\Controllers\Stripe;
 
+use App\Http\Resources\PaymentMethod;
+use App\Http\Resources\PaymentMethodCollection;
+use App\Http\Resources\Setupintent;
 use App\Http\Traits\StripeTrait;
 use App\MyClasses\Support\Facade\Stripe;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+
+/*
+ * For generate apiResource from third parts API
+ * https://medium.com/@jeffochoa/consuming-third-pary-apis-with-laravel-resources-c13a0c7dc945
+ */
 
 class PaymentMethodsController extends Controller
 {
@@ -17,17 +25,18 @@ class PaymentMethodsController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    public function setupintent()
-    {
-        return \Stripe\SetupIntent::create([
-            'payment_method_types' => ['card'],
-        ]);
-    }
-
-
     public function index()
     {
-        return $this->getPaymentMethods();
+        $stripeCustomer = Stripe::getCustomer();
+        $paymentMethods = \Stripe\PaymentMethod::all([
+            'customer' => $stripeCustomer->id,
+            'type' => 'card',
+        ]);
+
+        return (new PaymentMethodCollection(collect($paymentMethods->data)))->additional(
+            ['meta' => [
+                'defaultPaymentMethod' => $stripeCustomer->invoice_settings->default_payment_method,
+            ]]);
     }
 
     /**
@@ -49,28 +58,29 @@ class PaymentMethodsController extends Controller
     public function store(Request $request)
     {
 
-        $paymentMethod = $request->payment_method;
+        $newPaymentMethod = $request->payment_method;
         $customer_id = Auth::user()->pl_customer_id;
-
-        $payment_method = \Stripe\PaymentMethod::retrieve($paymentMethod);
-        $payment_method->attach(['customer' => $customer_id]);
 
         $allPaymentelements = \Stripe\PaymentMethod::all([
             'customer' => $customer_id,
             'type' => 'card',
         ]);
 
-        // If i've only one set it to default
-        if(count($allPaymentelements->data) == 1) {
-            \Stripe\Customer::update($customer_id, [
-                    'invoice_settings' => [
-                        'default_payment_method' => $paymentMethod,
-                    ],
-                ]
-            );
-        }
+        $this->authorize('can-add-payment-method', count($allPaymentelements->data));
 
-        return $this->getPaymentMethods();
+        $payment_method = \Stripe\PaymentMethod::retrieve($newPaymentMethod);
+        $payment_method->attach(['customer' => $customer_id]);
+
+        \Stripe\Customer::update($customer_id, [
+                'invoice_settings' => [
+                    'default_payment_method' => $newPaymentMethod,
+                ],
+            ]
+        );
+
+        return (new PaymentMethod(PaymentMethod::make(json_decode($payment_method->toJSON(), true))->resolve()))->additional(['meta' => [
+            'defaultPaymentMethod' => $newPaymentMethod,
+        ]]);
     }
 
     /**
@@ -106,14 +116,18 @@ class PaymentMethodsController extends Controller
     {
         $paymentMethod = $request->payment_method;
 
-        \Stripe\Customer::update(Auth::user()->stripe_customer_id, [
+        \Stripe\Customer::update(Auth::user()->pl_customer_id, [
                 'invoice_settings' => [
                     'default_payment_method' => $paymentMethod,
                 ],
             ]
         );
 
-        return $this->getPaymentMethods();
+        return [
+            'data' => [
+                'defaultPaymentMethod' => $paymentMethod,
+            ]
+        ];
     }
 
     /**
@@ -125,23 +139,22 @@ class PaymentMethodsController extends Controller
     public function destroy(Request $request)
     {
         $paymentMethod = $request->payment_method;
+        $oldPaymentMethod = \Stripe\PaymentMethod::retrieve($paymentMethod);
+        $oldPaymentMethod->detach();
 
-        $payment_method = \Stripe\PaymentMethod::retrieve($paymentMethod);
-        $payment_method->detach();
-
-        return $this->getPaymentMethods();
+        return new PaymentMethod(PaymentMethod::make(json_decode($oldPaymentMethod->toJSON(), true))->resolve());
     }
 
-    protected function getPaymentMethods()
+    public function setupintent()
     {
-        $stripeCustomer = Stripe::getCustomer();
+        $setup_intent = \Stripe\SetupIntent::create([
+            'payment_method_types' => ['card'],
+        ]);
 
         return [
-            'methods' => \Stripe\PaymentMethod::all([
-                'customer' => $stripeCustomer->id,
-                'type' => 'card',
-            ]),
-            'defaultPaymentMethod' => $stripeCustomer->invoice_settings->default_payment_method
+            'data' => [
+                'client_secret' => $setup_intent->client_secret
+            ]
         ];
     }
 

@@ -80,6 +80,9 @@ class WebhookController extends Controller
 
         $object = $payload['data']['object'];
 
+        $user = User::findOrFail($object['customer']);
+        Auth::login($user);
+
         DB::transaction(function() use($object){
 
             $account_id = Subscription::findOrFail($object['subscription'])->sharingUser->sharing->owner->pl_account_id;

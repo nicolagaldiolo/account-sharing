@@ -9,6 +9,7 @@ $config = [
     'limitUserAge' => config('custom.limit_user_age'),
     'stripeFee' => config('custom.stripe.stripe_fee'),
     'platformFee' => config('custom.stripe.platform_fee'),
+    'maxPaymentMethod' => config('custom.stripe.max_payment_method'),
 ];
 @endphp
 <!DOCTYPE html>

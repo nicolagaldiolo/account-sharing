@@ -102,7 +102,7 @@ class SeedFakeData extends Seeder
 
                 $sharing = factory(Sharing::class)->create([
                     'name' => $category->name,
-                    'price' => $category->price,
+                    'price' => ($category->price <= 0) ? 20.00 : $category->price, // force price for custom group
                     'multiaccount' => $category->multiaccount,
                     'renewal_frequency_id' => $renewalFrequencies->random(1)->pluck('id')->first(),
                     'category_id' => $category->id,
@@ -144,10 +144,10 @@ class SeedFakeData extends Seeder
                     ];
 
                     if(!$sharing->multiaccount){
-                        $sharing->credential()->create($data);
+                        $sharing->credentials()->create($data);
                     }else{
                         $sharing->members()->get()->each(function($member) use($data, $sharing){
-                            $member->sharingUser($sharing)->first()->credential()->create($data);
+                            $member->sharingUser($sharing)->first()->credentials()->create($data);
                         });
                     }
                 }

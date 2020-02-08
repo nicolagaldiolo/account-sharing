@@ -124,6 +124,7 @@ class Sharing extends Model
     public function sharingUser(User $user = null)
     {
         $user = empty($user) ? Auth::user() : $user;
+
         return $this->hasOne(SharingUser::class)->where('user_id', $user->id);
     }
 

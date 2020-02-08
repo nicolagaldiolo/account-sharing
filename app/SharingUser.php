@@ -30,7 +30,7 @@ class SharingUser extends Pivot
         return $this->hasOne(Subscription::class, 'sharing_user_id', 'id');
     }
 
-    public function credential()
+    public function credentials()
     {
         return $this->morphOne(Credential::class, 'credentiable');
     }

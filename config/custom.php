@@ -21,7 +21,8 @@ return [
             'secret_connect' => env('STRIPE_CONNECT_WEBHOOK_SECRET'),
             'tolerance' => env('STRIPE_WEBHOOK_TOLERANCE', 300),
         ],
-        'default_currency' => env('STRIPE_DEFAULT_CURRENCY', 'eur')
+        'default_currency' => env('STRIPE_DEFAULT_CURRENCY', 'eur'),
+        'max_payment_method' => env('MAX_PAYMENT_METHOD', 10)
     ],
 
     'countries' => [

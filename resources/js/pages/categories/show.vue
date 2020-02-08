@@ -31,7 +31,7 @@
 
     created () {
       this.$store.dispatch('categories/fetchCategory', this.$route.params.category_id).then(() => {
-        if (!this.$store.getters['categories/category'].id) this.$router.push({ name: 'home' })
+        if (!this.$store.getters['categories/category'].id) this.$router.push({ name: '404' })
       });
     },
 

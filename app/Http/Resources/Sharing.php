@@ -8,17 +8,15 @@ use App\Http\Resources\Member as MemberResource;
 
 class Sharing extends JsonResource
 {
-    /*
     private $user;
 
-    public function __construct($resource, \App\User $user = null)
+    public function __construct($resource, $user = null)
     {
         // Ensure you call the parent constructor
         parent::__construct($resource);
         $this->resource = $resource;
         $this->user = $user;
     }
-    */
 
     /**
      * Transform the resource into an array.
@@ -69,7 +67,6 @@ class Sharing extends JsonResource
             'created_at' => $this->created_at,
             'owner' => new MemberResource($this->whenLoaded('owner')),
             'renewal_frequency' => $this->renewalFrequency->frequency,
-
             $this->mergeWhen($request->is('api/sharings/*'), [
                 $this->mergeWhen(Auth::user()->can('manage-sharing', $this), [
                     'members' => MemberResource::collection($this->whenLoaded('members')),

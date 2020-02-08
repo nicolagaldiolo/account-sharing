@@ -52,7 +52,6 @@ export const actions = {
   async fetchUser ({ commit }) {
     try {
       const { data } = await axios.get('/api/user')
-
       commit(types.FETCH_USER_SUCCESS, { user: data.data })
     } catch (e) {
       commit(types.FETCH_USER_FAILURE)
@@ -73,7 +72,6 @@ export const actions = {
 
   async fetchOauthUrl (ctx, { provider }) {
     const { data } = await axios.post(`/api/oauth/${provider}`)
-
     return data.url
   }
 }

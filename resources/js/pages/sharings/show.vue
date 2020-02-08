@@ -80,7 +80,9 @@
                       </div>
                     </div>
                   </div>
+
                   <a href="#" v-if="availability" class="mt-2 btn btn-outline-secondary btn-block">Invita i tuoi amici</a>
+                  <div v-else class="alert alert-primary text-center" role="alert">Gruppo al completo</div>
 
                 </div>
               </div>
@@ -142,7 +144,7 @@
 
           this.$store.dispatch('sharings/fetchSharing', this.$route.params.sharing_id).then(() => {
             if (!this.$store.getters['sharings/sharing'].id || this.$store.getters['sharings/sharing'].category_id !== +this.$route.params.category_id) {
-              this.$router.push({ name: 'home' })
+              this.$router.push({ name: '404' })
             }
           })
         },

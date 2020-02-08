@@ -15,21 +15,6 @@ use Illuminate\Support\Facades\DB;
 
 trait SharingTrait {
 
-    /*
-    protected function getSharing(Sharing $sharing)
-    {
-
-        //$sharing->load(['category', 'members', 'activeUsersWithoutOwner']);
-        //$sharing->load(['category', 'activeUsersWithoutOwner']);
-
-        //$sharing->active_users = $sharing->activeUsers()->get()->each(function($user) use($sharing){
-        //    return $user->sharing_status->subscription;
-        //});
-
-        return new \App\Http\Resources\Sharing($sharing);
-    }
-    */
-
     protected function getSharingOwners($id = null)
     {
         $sharings = Auth::user()->sharingOwners();
@@ -51,8 +36,6 @@ trait SharingTrait {
     protected function createSubscription($user, Sharing $sharing)
     {
 
-        $subscription = null;
-
         // Nel caso sto lanciando questo script in maniera programmatica (seed)
         if(Auth::id() != $user->id){
             Auth::login($user);
@@ -63,10 +46,10 @@ trait SharingTrait {
 
         $stateMachine = \StateMachine::get($sharingStatus, 'sharing');
 
-
-        DB::transaction(function() use ($stateMachine, $sharingStatus, $user, $sharing) {
+        return DB::transaction(function() use ($stateMachine, $sharingStatus, $user, $sharing) {
 
             $transition = 'pay';
+            $subscription = null;
 
             if ($stateMachine->can($transition)) {
                 //$subscription = Stripe::createSubscription($sharing, $user);
@@ -91,9 +74,9 @@ trait SharingTrait {
                 $stateMachine->apply($transition);
                 $sharingStatus->save();
             }
-        });
 
-        return $subscription;
+            return $subscription;
+        });
 
     }
 

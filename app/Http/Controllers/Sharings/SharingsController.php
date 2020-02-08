@@ -50,7 +50,7 @@ class SharingsController extends Controller
                 // https://github.com/laravel/framework/issues/3105
 
                 //$sharings = SharingResource::collection(Sharing::with('owner')->public()->paginate(12));
-                $sharings = SharingResource::collection(Sharing::with('owner')->public()->get());
+                $sharings = SharingResource::collection(Sharing::with('owner')->public()->get(), Auth::user());
                 break;
         }
 
@@ -287,15 +287,15 @@ class SharingsController extends Controller
             $payment_method = \Stripe\PaymentMethod::retrieve($newPaymentMethod);
 
             $customerPaymentMethods = \Stripe\PaymentMethod::all([
-                'customer' => $user->stripe_customer_id,
+                'customer' => $user->pl_customer_id,
                 'type' => 'card',
             ]);
 
             if(!collect($customerPaymentMethods->data)->pluck('id')->contains($payment_method->id)){
-                $payment_method->attach(['customer' => $user->stripe_customer_id]);
+                $payment_method->attach(['customer' => $user->pl_customer_id]);
             }
 
-            \Stripe\Customer::update($user->stripe_customer_id, [
+            \Stripe\Customer::update($user->pl_customer_id, [
                     'invoice_settings' => [
                         'default_payment_method' => $payment_method->id,
                     ],
@@ -345,15 +345,15 @@ class SharingsController extends Controller
             $payment_method = \Stripe\PaymentMethod::retrieve($newPaymentMethod);
 
             $customerPaymentMethods = \Stripe\PaymentMethod::all([
-                'customer' => $user->stripe_customer_id,
+                'customer' => $user->pl_customer_id,
                 'type' => 'card',
             ]);
 
             if(!collect($customerPaymentMethods->data)->pluck('id')->contains($payment_method->id)){
-                $payment_method->attach(['customer' => $user->stripe_customer_id]);
+                $payment_method->attach(['customer' => $user->pl_customer_id]);
             }
 
-            \Stripe\Customer::update($user->stripe_customer_id, [
+            \Stripe\Customer::update($user->pl_customer_id, [
                     'invoice_settings' => [
                         'default_payment_method' => $payment_method->id,
                     ],
@@ -363,19 +363,19 @@ class SharingsController extends Controller
             // Se esiste già una Subscription incompleta la gestisco
             // altrimenti ne creo una nuova
 
-            try{
+            //try{
 
                 $subscription = \Stripe\Subscription::retrieve($userSharing->subscription->id);
 
-                if($subscription->status !== 'incomplete') {
-                    throw new \Exception('Subscription not available');
-                }else {
+                //if($subscription->status !== 'incomplete') {
+                //    throw new \Exception('Subscription not available');
+                //}else {
                     $invoice = \Stripe\Invoice::retrieve(['id' => $subscription->latest_invoice]);
-                    try {
+                    //try {
                         $invoice->pay();
-                    } catch (\Exception $e) {
-                    }
-                }
+                    //} catch (\Exception $e) {
+                    //}
+                //}
 
                 $subscription = \Stripe\Subscription::retrieve([
                     'id' => $userSharing->subscription->id,
@@ -384,13 +384,13 @@ class SharingsController extends Controller
                     ]
                 ]);
 
-            }catch(\Exception $e){
+            //}catch(\Exception $e){
 
-                logger($e);
+            //    logger($e);
 
-                $subscription = $this->createSubscription($user, $sharing);
+            //    $subscription = $this->createSubscription($user, $sharing);
 
-            }
+            //}
 
             return $subscription;
 
@@ -399,6 +399,47 @@ class SharingsController extends Controller
         }
 
     }
+
+    /*
+     * public function subscribe(Request $request, Sharing $sharing)
+    {
+        $user = Auth::user();
+        $userSharing = $user->sharings()->find($sharing->id)->sharing_status;
+
+        $stateMachine = \StateMachine::get($userSharing, 'sharing');
+
+        if($stateMachine->can('pay')) {
+
+            if($userSharing->subscription){
+                $incompleteSubscription = \Stripe\Subscription::retrieve($userSharing->subscription->id);
+
+                if($incompleteSubscription->status !== 'incomplete') {
+                    abort(403, 'Action not authorized');
+                }
+
+                $invoice = \Stripe\Invoice::retrieve(['id' => $incompleteSubscription->latest_invoice]);
+                $invoice->pay();
+
+                $subscription = \Stripe\Subscription::retrieve([
+                    'id' => $userSharing->subscription->id,
+                    'expand' => [
+                        'latest_invoice.payment_intent'
+                    ]
+                ]);
+
+            }else{
+                $subscription = $this->createSubscription($user, $sharing);
+            }
+
+            return $subscription;
+
+        }else{
+            abort(403, 'Action not authorized');
+        }
+
+    }
+     *
+     */
 
     public function transitionUser(Request $request, Sharing $sharing, User $user, $transition)
     {

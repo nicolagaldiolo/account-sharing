@@ -31,9 +31,9 @@ class Category extends Model
     {
         parent::boot();
 
-        static::addGlobalScope('country', function ($builder) {
-            $builder->where('country', Auth::user()->country);
-        });
+        //static::addGlobalScope('country', function ($builder) {
+        //    $builder->where('country', Auth::user()->country);
+        //});
     }
 
 

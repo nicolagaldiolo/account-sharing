@@ -1,74 +1,60 @@
 <template>
-  <div>
-    <card title="Credit Card">
-      <div v-if="paymentmethods.methods.data.length">
 
-        <div v-for="paymentmethod in paymentmethods.methods.data" :key="paymentmethod.id">
-          <h5 class="card-title">{{paymentmethod.card.brand}}</h5>
-          <strong>{{paymentmethod.card.last4}}</strong>
-          Scadenza: <span>{{paymentmethod.card.exp_month}}</span>/<span>{{paymentmethod.card.exp_year}}</span>
-          <span v-if="paymentmethod.id === paymentmethods.defaultPaymentMethod" class="badge badge-pill badge-primary">Default</span>
-          <a v-else class="btn btn-link" href="#" @click.prevent="setDefaultPaymentMethods(paymentmethod.id)">Rendi default</a>
-          <a v-if="paymentmethod.id !== paymentmethods.defaultPaymentMethod && paymentmethods.methods.data.length > 1" class="btn btn-link" href="#" @click.prevent="removePaymentMethod(paymentmethod.id)">Elimina carta</a>
+  <div v-if="paymentmethods">
+    <card title="Credit Card" v-if="paymentmethods.length">
+        <div class="d-flex flex-wrap">
+          <div v-for="paymentmethod in paymentmethods" :key="paymentmethod.id">
+            <credit-card :paymentmethod="paymentmethod" :defaultPaymentmethod="defaultPaymentmethod" :eraseable="paymentmethods.length > 1"/>
+          </div>
         </div>
-        <button class="btn btn-primary btn-lg btn-block" v-if="checkoutMode && !showCardForm" @click.prevent="subscribeWithDefaultPaymentMethod">Iscriviti</button>
-      </div>
-      <div v-else>
-        <h1>Non hai metodi di pagamento configurati, aggiungine uno</h1>
-      </div>
+
+        <div v-if="maxPaymentMethod > paymentmethods.length">
+          <button class="mt-5 btn btn btn-outline-secondary btn-lg btn-block" @click.prevent="newCardForm">Nuova carta</button>
+          <div v-if="showCardForm">
+            <credit-card-new :checkoutMode="checkoutMode" v-on:payment-method-added="subscribe"/>
+          </div>
+        </div>
+
       <template v-slot:footer>
-        <div v-if="showCardForm || paymentmethods.methods.data.length <= 0">
-          <div>
-            <label for="card-element">
-              Credit or debit card
-            </label>
-            <div id="card-element">
-              <!-- A Stripe Element will be inserted here. -->
-            </div>
-
-            <!-- Used to display form errors. -->
-            <div id="card-errors" role="alert"></div>
-          </div>
-
-          <div v-if="checkoutMode">
-            <button class="btn btn-primary btn-lg btn-block" @click.prevent="subscribeWithNewPaymentMethod">Iscriviti</button>
-          </div>
-          <div v-else>
-            <button @click.prevent="addPaymentMethod">Aggiungi carta</button>
-          </div>
-        </div>
-
+        <button class="btn btn-primary btn-lg btn-block" v-if="checkoutMode && !showCardForm" @click.prevent="subscribe">Iscriviti</button>
       </template>
+
     </card>
-    <button class="btn btn btn-outline-secondary btn-lg btn-block" @click.prevent="newCardForm">Nuova carta</button>
+    <card v-else title="Credit Card">
+      <div class="text-center">
+        <fa icon="credit-card" size="4x"/>
+        <h5 class="mt-2">Non hai metodi di pagamento configurati<br>aggiungine uno</h5>
+      </div>
+
+      <div v-if="maxPaymentMethod > paymentmethods.length">
+        <button class="mt-5 btn btn btn-outline-secondary btn-lg btn-block" @click.prevent="newCardForm">Nuova carta</button>
+        <div v-if="showCardForm">
+          <credit-card-new :checkoutMode="checkoutMode" v-on:payment-method-added="subscribe"/>
+        </div>
+      </div>
+    </card>
+
   </div>
+
 
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 import axios from 'axios'
+import CreditCard from '../../components/CreditCard'
+import CreditCardNew from '../../components/CreditCardNew'
+import Swal from 'sweetalert2'
 
 export default {
+  components: {
+    CreditCard,
+    CreditCardNew
+  },
   data: () => ({
-    style: {
-      base: {
-        color: '#32325d',
-        fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
-        fontSmoothing: 'antialiased',
-        fontSize: '16px',
-        '::placeholder': {
-          color: '#aab7c4'
-        }
-      },
-      invalid: {
-        color: '#fa755a',
-        iconColor: '#fa755a'
-      }
-    },
-    mytestcard: '',
     stripe: window.Stripe(window.config.stripeKey),
-    showCardForm: false
+    showCardForm: false,
+    maxPaymentMethod: window.config.maxPaymentMethod,
   }),
 
     props: {
@@ -78,143 +64,59 @@ export default {
 
   computed: mapGetters({
     paymentmethods: 'stripe/paymentmethods',
+    defaultPaymentmethod: 'stripe/defaultPaymentmethod',
     authUser: 'auth/user'
   }),
 
   created () {
-    this.$store.dispatch('stripe/fetchPaymentMethods')
-  },
-
-  mounted () {
-    // Create a Stripe client.
-
-    /*
-    this.$nextTick(function () {
-      if (document.getElementById('card-element') != null) {
-        //contactsdb.$mount('#app-contactsdb');
-        console.log("Eccolo");
-      }else{
-        console.log("Niente");
-      }
-      // Code that will run only after the
-      // entire view has been rendered
-    })
-    */
-
-
-    // Create an instance of Elements.
-    var element = this.stripe.elements();
-
-    // Custom styling can be passed to options when creating an Element.
-    // (Note that this demo uses a wider set of styles than the guide below.)
-
-
-    // Create an instance of the card Element.
-    this.mytestcard = element.create('card', {style: this.style});
-
-    // Add an instance of the card Element into the `card-element` <div>.
-
-    setTimeout(()=>this.mytestcard.mount('#card-element') , 5000);
-
-
-    // Handle real-time validation errors from the card Element.
-    this.mytestcard.addEventListener('change', function(event) {
-      var displayError = document.getElementById('card-errors');
-      if (event.error) {
-        displayError.textContent = event.error.message;
-      } else {
-        displayError.textContent = '';
-      }
-    });
-
-
+    this.$store.dispatch('stripe/fetchPaymentMethods');
   },
 
   methods: {
-
       newCardForm () {
           this.showCardForm = !this.showCardForm
       },
 
-      setDefaultPaymentMethods (id) {
-      this.$store.dispatch('stripe/setDefaultPaymentMethods', id)
-    },
+      subscribe () {
 
-      removePaymentMethod (id) {
-        this.$store.dispatch('stripe/removePaymentMethod', id)
-    },
+        this.showCardForm = false
 
-      addPaymentMethod () {
-
-        axios.get('/api/settings/setupintent').then(function (result) {
-            if (result.error) {
-                // Display error.message in your UI.
-            } else {
-                const clientSecret = result.data.client_secret;
-
-                this.stripe.confirmCardSetup(clientSecret, {
-                        payment_method: {
-                            card: this.mytestcard,
-                            billing_details: {
-                                email: this.authUser.email
-                            }
-                        }
-                    }
-                ).then(function(result) {
-                    if (result.error) {
-                        // Display error.message in your UI.
-                        console.log(result.error);
-                    } else {
-                        this.$store.dispatch('stripe/addPaymentMethod', result.setupIntent.payment_method)
-                    }
-                }.bind(this));
-
-            }
-        }.bind(this))
-      },
-
-      subscribeWithNewPaymentMethod () {
-          this.stripe.createPaymentMethod('card', this.mytestcard).then(data => {
-              this.subscribe(data.paymentMethod.id)
-          })
-      },
-
-      subscribeWithDefaultPaymentMethod () {
-          this.subscribe(this.paymentmethods.defaultPaymentMethod);
-      },
-
-      subscribe (paymentMethod) {
-
+        if (this.checkoutMode) {
           const api = this.action === 'subscribe'
-              ? `/api/sharings/${this.$route.params.sharing_id}/subscribe`
-              : `/api/sharings/${this.$route.params.sharing_id}/restore`
+            ? `/api/sharings/${this.$route.params.sharing_id}/subscribe`
+            : `/api/sharings/${this.$route.params.sharing_id}/restore`
 
           axios.post(api, {
-              payment_method: paymentMethod
+            payment_method: this.defaultPaymentmethod
           }).then((response) => {
-              //Outcome 1: Payment succeeds
-              if (response.data.status === 'active' && response.data.latest_invoice.payment_intent.status === 'succeeded') {
-                  this.redirectToSharing();
-                  //Outcome 3: Payment fails
-              } else if (response.data.status === 'incomplete' && response.data.latest_invoice.payment_intent.status === 'requires_payment_method') {
-                  console.log("PROBLEMI COL METODO DI PAGAMENTO 22222");
-                  alert(response);
+            //Outcome 1: Payment succeeds
+
+            console.log(response);
+
+            if (response.data.status === 'active' && response.data.latest_invoice.payment_intent.status === 'succeeded') {
+              alert("TUTTO OK, PUOI ENRTRARE");
+              this.redirectToSharing();
+              //Outcome 3: Payment fails
+            } else if (response.data.status === 'incomplete' && response.data.latest_invoice.payment_intent.status === 'requires_payment_method') {
+              console.log("PROBLEMI COL METODO DI PAGAMENTO 22222");
+              alert(response);
 
               // posso entrare qui se sono on session e quindi sto facendo il primo pagamento (incomplete) oppure a seguito di un pagamento fallito in fase di rinnovo (past_due)
-              } else if ((response.data.status === 'incomplete' || response.data.status === 'past_due') && response.data.latest_invoice.payment_intent.status === 'requires_action') {
-                  console.log("AZIONE RICHIESTA");
-                  const paymentIntentSecret = response.data.latest_invoice.payment_intent.client_secret;
-                  this.stripe.handleCardPayment(paymentIntentSecret).then(function (result) {
-                      if (result.error) {
-                          console.log("PROBLEMI COL METODO DI PAGAMENTO 11111");
-                          alert(response);
-                      } else {
-                          this.redirectToSharing();
-                          // The payment has succeeded. Display a success message.
-                      }
-                  }.bind(this));
-              }
+            } else if ((response.data.status === 'incomplete' || response.data.status === 'past_due') && response.data.latest_invoice.payment_intent.status === 'requires_action') {
+              console.log("AZIONE RICHIESTA");
+              const paymentIntentSecret = response.data.latest_invoice.payment_intent.client_secret;
+              this.stripe.handleCardPayment(paymentIntentSecret).then((result) => {
+                if (result.error) {
+                  console.log("PROBLEMI COL METODO DI PAGAMENTO 11111");
+                  alert(response);
+                } else {
+                  this.redirectToSharing();
+                  // The payment has succeeded. Display a success message.
+                }
+              });
+            }
           })
+        }
       },
 
     redirectToSharing () {
@@ -227,38 +129,6 @@ export default {
             }
         })
     }
-  }
+  },
 }
 </script>
-
-<style>
-
-  .StripeElement {
-    box-sizing: border-box;
-
-    height: 40px;
-
-    padding: 10px 12px;
-
-    border: 1px solid transparent;
-    border-radius: 4px;
-    background-color: white;
-
-    box-shadow: 0 1px 3px 0 #e6ebf1;
-    -webkit-transition: box-shadow 150ms ease;
-    transition: box-shadow 150ms ease;
-  }
-
-  .StripeElement--focus {
-    box-shadow: 0 1px 3px 0 #cfd7df;
-  }
-
-  .StripeElement--invalid {
-    border-color: #fa755a;
-  }
-
-  .StripeElement--webkit-autofill {
-    background-color: #fefde5 !important;
-  }
-
-</style>
