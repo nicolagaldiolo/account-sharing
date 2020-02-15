@@ -20,7 +20,7 @@
           <y:Geometry height="257.3603035250853" width="220.33333333333337" x="519.428746393341" y="-143.48690987436595"/>
           <y:Fill color="#E8EEF7" color2="#B7C9E3" transparent="false"/>
           <y:BorderStyle color="#000000" type="line" width="1.0"/>
-          <y:NodeLabel alignment="center" autoSizePolicy="content" backgroundColor="#B7C9E3" configuration="com.yworks.entityRelationship.label.name" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasLineColor="false" height="18.1328125" horizontalTextPosition="center" iconTextGap="4" modelName="internal" modelPosition="t" textColor="#000000" verticalTextPosition="bottom" visible="true" width="35.27734375" x="92.52799479166663" xml:space="preserve" y="4.0">users</y:NodeLabel>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" backgroundColor="#B7C9E3" configuration="com.yworks.entityRelationship.label.name" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasLineColor="false" height="18.1328125" horizontalTextPosition="center" iconTextGap="4" modelName="internal" modelPosition="t" textColor="#000000" verticalTextPosition="bottom" visible="true" width="35.27734375" x="92.52799479166674" xml:space="preserve" y="4.0">users</y:NodeLabel>
           <y:NodeLabel alignment="left" autoSizePolicy="content" configuration="com.yworks.entityRelationship.label.attributes" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="201.859375" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="top" visible="true" width="109.64453125" x="2.0" xml:space="preserve" y="30.1328125">id
 name
 surname
@@ -304,10 +304,10 @@ updated_at
     <node id="n16">
       <data key="d6">
         <y:GenericNode configuration="com.yworks.entityRelationship.big_entity">
-          <y:Geometry height="172.0" width="128.33333333333337" x="556.9068817147835" y="-560.7059239041365"/>
+          <y:Geometry height="203.08790661276396" width="128.33333333333337" x="556.9068817147834" y="-591.7938305169005"/>
           <y:Fill color="#E8EEF7" color2="#B7C9E3" transparent="false"/>
           <y:BorderStyle color="#000000" type="line" width="1.0"/>
-          <y:NodeLabel alignment="center" autoSizePolicy="content" backgroundColor="#B7C9E3" configuration="com.yworks.entityRelationship.label.name" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasLineColor="false" height="18.1328125" horizontalTextPosition="center" iconTextGap="4" modelName="internal" modelPosition="t" textColor="#000000" verticalTextPosition="bottom" visible="true" width="50.916015625" x="38.70865885416663" xml:space="preserve" y="4.0">invoices</y:NodeLabel>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" backgroundColor="#B7C9E3" configuration="com.yworks.entityRelationship.label.name" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasLineColor="false" height="18.1328125" horizontalTextPosition="center" iconTextGap="4" modelName="internal" modelPosition="t" textColor="#000000" verticalTextPosition="bottom" visible="true" width="50.916015625" x="38.70865885416674" xml:space="preserve" y="4.0">invoices</y:NodeLabel>
           <y:NodeLabel alignment="left" autoSizePolicy="content" configuration="com.yworks.entityRelationship.label.attributes" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="145.328125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="top" visible="true" width="94.298828125" x="2.0" xml:space="preserve" y="30.1328125">id
 stripe_id
 customer_id
@@ -675,7 +675,7 @@ credential_updated_at<y:LabelModel><y:ErdAttributesNodeLabelModel/></y:LabelMode
     <edge id="e13" source="n16" target="n13">
       <data key="d10">
         <y:PolyLineEdge>
-          <y:Path sx="-64.17170778115178" sy="-32.183082970341616" tx="0.0" ty="0.0"/>
+          <y:Path sx="-64.17170778115178" sy="-37.999970632509125" tx="0.0" ty="0.0"/>
           <y:LineStyle color="#000000" type="line" width="1.0"/>
           <y:Arrows source="crows_foot_many_optional" target="none"/>
           <y:BendStyle smoothed="false"/>
@@ -835,7 +835,7 @@ credential_updated_at<y:LabelModel><y:ErdAttributesNodeLabelModel/></y:LabelMode
     <edge id="e29" source="n16" target="n22">
       <data key="d10">
         <y:PolyLineEdge>
-          <y:Path sx="64.19244724050839" sy="71.43585324918888" tx="0.0" ty="0.0"/>
+          <y:Path sx="64.19244724050839" sy="84.34742961322314" tx="0.0" ty="0.0"/>
           <y:LineStyle color="#000000" type="line" width="1.0"/>
           <y:Arrows source="crows_foot_one_optional" target="none"/>
           <y:BendStyle smoothed="false"/>

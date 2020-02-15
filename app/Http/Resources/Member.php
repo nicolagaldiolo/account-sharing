@@ -20,6 +20,7 @@ class Member extends JsonResource
         $status = false;
         $subscription = $credential_status = null;
 
+
         if($this->sharing_status){
             $status = true;
             $subscription = new SubscriptionResource($this->sharing_status->subscription);

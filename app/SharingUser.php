@@ -25,6 +25,10 @@ class SharingUser extends Pivot
         return $this->belongsTo(Sharing::class);
     }
 
+    public function user(){
+        return $this->belongsTo(User::class);
+    }
+
     public function subscription()
     {
         return $this->hasOne(Subscription::class, 'sharing_user_id', 'id');

@@ -3,13 +3,16 @@
 namespace App\Http\Controllers\Stripe;
 
 use App\ConnectCustomer;
+use App\Enums\PaymentIntentStatus;
 use App\Enums\RefundApplicationStatus;
 use App\Enums\RefundStripeStatus;
 use App\Enums\SharingStatus;
 use App\Enums\SubscriptionStatus;
+use App\Events\SharingSubscription;
 use App\Http\Middleware\VerifyWebhookSignature;
 use App\Http\Traits\SharingTrait;
 use App\Invoice;
+use App\MyClasses\Support\Facade\Stripe;
 use App\Refund;
 use App\Sharing;
 use App\SharingUser;
@@ -24,6 +27,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
+use function foo\func;
 
 class WebhookController extends Controller
 {
@@ -55,7 +59,7 @@ class WebhookController extends Controller
         $method = 'handle'.Str::studly(str_replace('.', '_', $payload['type']));
 
         logger($method);
-        logger($payload);
+        //logger($payload);
 
         //WebhookReceived::dispatch($payload);
 
@@ -77,13 +81,19 @@ class WebhookController extends Controller
      */
     protected function handleInvoicePaymentSucceeded(array $payload)
     {
-
+        /* FINO A QUANDO RISOLVI PROBLEMA ACCOUNT_ID
         $object = $payload['data']['object'];
 
-        $user = User::findOrFail($object['customer']);
+        logger("1");
+
+        $user = User::where('pl_customer_id', $object['customer'])->firstOrFail();
         Auth::login($user);
 
+        logger("2");
+
         DB::transaction(function() use($object){
+
+            logger("3");
 
             $account_id = Subscription::findOrFail($object['subscription'])->sharingUser->sharing->owner->pl_account_id;
 
@@ -95,15 +105,20 @@ class WebhookController extends Controller
                 'payment_intent' => $object['payment_intent'],
                 'total' => $object['total'],
                 'currency' => $object['currency'],
-                'last4' => '4567'
+                'last4' => '1234'
             ]);
 
+            logger("4");
+
             $invoice->transactions()->create();
+
+            logger("5");
 
             // creo dei refunds fake
             //$invoice->refunds()->create()->transactions()->create();
 
         });
+        */
 
 
         /*
@@ -136,6 +151,9 @@ class WebhookController extends Controller
             "destination" => $account_id,
         ]);
         */
+
+        logger("6");
+
         logger('Payment successffull');
 
         return $this->successMethod();
@@ -154,6 +172,51 @@ class WebhookController extends Controller
     }
 
 
+    protected function handleCustomerSubscriptionCreated(array $payload)
+    {
+        logger("Sottoscrizione creata");
+
+        $object = $payload['data']['object'];
+        $subscription = Subscription::findOrFail($object['id']);
+
+        //if ($subscription->status === SubscriptionStatus::active && $subscription->sharingUser->status === SharingStatus::Joined) {
+        //    event(New SharingSubscription($subscription->sharingUser));
+        //};
+
+        DB::transaction(function() use ($user, $sharing, $transition) {
+
+            if(Auth::id() != $user->id) Auth::login($user); // If i run the script off-session (webhook or seed)
+
+            $sharingStatus = $user->sharings()->find($sharing->id)->sharing_status;
+            $stateMachine = \StateMachine::get($sharingStatus, 'sharing');
+
+            $sharingStatus->subscription()->create([
+                'id' => $stripeSubscription->id,
+                'status' => SubscriptionStatus::getValue($stripeSubscription->status),
+                'current_period_end_at' => $stripeSubscription->current_period_end
+            ]);
+
+            if(SubscriptionStatus::getValue($stripeSubscription->status) === SubscriptionStatus::active){
+                $stateMachine->apply($transition);
+                $sharingStatus->save();
+
+                logger("Utente è dentro 1");
+            }
+
+            $stripeSubscription;
+
+
+        });
+
+
+
+
+
+
+
+        return $this->successMethod();
+    }
+
 
     /**
      * Cambio di stato della sottoscrizione
@@ -161,46 +224,11 @@ class WebhookController extends Controller
      */
     protected function handleCustomerSubscriptionUpdated(array $payload)
     {
-        /*
-        $status = $payload['data']['object']['status'];
+        $object = $payload['data']['object'];
 
-        $subscription_id = $payload['data']['object']['id'];
-        $userSharing = Subscription::where('id', $subscription_id)->firstOrFail()->sharingUser;
+        logger("Sottoscrizione aggiornata");
 
-        $user = User::findOrFail($userSharing->user_id);
-        Auth::login($user);
-
-        //$stateMachine = \StateMachine::get($userSharing, 'sharing');
-
-        $this->updateSubscription($userSharing->subscription, $payload['data']['object']);
-
-        //if($stateMachine->getState() === SharingStatus::Joined){
-            // Se la sottoscrizione è attiva
-            //if($status === 'active') {
-
-
-
-            // Altrimenti se è scaduta, nel caso in cui il pagamento sia fallito
-            //}elseif ($status === 'past_due'){
-
-            //    logger("Sottoscrizione scaduta");
-
-            //}
-        //}else{
-        //    abort(403);
-        //}
-        */
-
-        return $this->successMethod();
-    }
-
-    /**
-     * Conferma creazione della sottoscrizione
-     *
-     */
-    protected function handleCustomerSubscriptionCreated(array $payload)
-    {
-        //logger($payload);
+        $this->updateSubscription($object, 'pay');
 
         return $this->successMethod();
     }

@@ -51,7 +51,6 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         Gate::define('can-subscribe', function($user, $sharingUser){
-            // Aggiungere anche divieto di iscrizione da parte dell'owner
             return $user->id === $sharingUser->user_id && $sharingUser->status === SharingStatus::Approved;
         });
 

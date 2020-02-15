@@ -60,8 +60,7 @@ export default {
     stripe: window.Stripe(window.config.stripeKey)
   }),
 
-  created () {
-  },
+  created () {},
 
   computed: {
     ...mapGetters({

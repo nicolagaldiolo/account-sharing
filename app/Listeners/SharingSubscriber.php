@@ -5,6 +5,7 @@ namespace App\Listeners;
 use App\Enums\SharingApprovationStatus;
 use App\Events\SharingCreated;
 use App\Events\SharingStatusUpdated;
+use App\Events\SharingSubscription;
 use App\MyClasses\Support\Facade\Stripe;
 use App\User;
 use Illuminate\Queue\InteractsWithQueue;
@@ -54,6 +55,17 @@ class SharingSubscriber
         $sharing->owner->notify(new \App\Notifications\SharingStatusUpdated($sharing));
     }
 
+    public function onSharingSubscription($event)
+    {
+        $sharingUser = $event->sharingUser;
+
+        // Send Mail to owner
+        $sharingUser->sharing->owner->notify(new \App\Notifications\SharingNewMember($sharingUser->sharing, $sharingUser->user, true));
+
+        // Send Mail to user
+        $sharingUser->user->notify(new \App\Notifications\SharingNewMember($sharingUser->sharing, $sharingUser->user));
+    }
+
     /**
      * Handle the event.
      *
@@ -75,6 +87,11 @@ class SharingSubscriber
         $event->listen(
             SharingStatusUpdated::class,
             'App\Listeners\SharingSubscriber@onSharingStatusUpdated'
+        );
+
+        $event->listen(
+            SharingSubscription::class,
+            'App\Listeners\SharingSubscriber@onSharingSubscription'
         );
     }
 }

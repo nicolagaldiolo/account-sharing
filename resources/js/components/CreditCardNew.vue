@@ -9,9 +9,9 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
   import axios from 'axios'
   import Swal from 'sweetalert2'
+  import {mapGetters} from "vuex";
 
   export default {
     name: 'CreditCardNew',
@@ -48,13 +48,8 @@
     },
 
     computed: mapGetters({
-      paymentmethods: 'stripe/paymentmethods',
       authUser: 'auth/user'
     }),
-
-    created () {
-      this.$store.dispatch('stripe/fetchPaymentMethods');
-    },
 
     mounted () {
       // Create a Stripe client.
@@ -107,6 +102,7 @@
               }
             })
           } catch (e) {
+            //console.log(e);
             Swal.fire({
               type: 'error',
               title: 'Errore generico',
@@ -144,7 +140,7 @@
   }
 </script>
 
-<style>
+<style scoped>
 
   .StripeElement {
     box-sizing: border-box;

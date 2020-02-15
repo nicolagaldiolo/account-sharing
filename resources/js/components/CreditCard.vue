@@ -55,20 +55,30 @@
 
       removePaymentMethod (event) {
         this.removeStatus = true
-        const id = event.target.getAttribute('data-action')
-        this.$store.dispatch('stripe/removePaymentMethod', id).then((result) => {
-          if (result) {
-            Swal.fire({
-              type: 'success',
-              title: 'Metodo di pagamento eliminato con successo'
+        Swal.fire({
+          type: 'warning',
+          title: 'Sicuro di voler procedere?',
+          showCancelButton: true
+        }).then((result) => {
+          if (result.value) {
+            const id = event.target.getAttribute('data-action')
+            this.$store.dispatch('stripe/removePaymentMethod', id).then((result) => {
+              if (result) {
+                Swal.fire({
+                  type: 'success',
+                  title: 'Metodo di pagamento eliminato con successo'
+                })
+              } else {
+                Swal.fire({
+                  type: 'error',
+                  title: 'Errore, si prega di riprovare piu tardi'
+                })
+              }
+              this.removeStatus = false
             })
           } else {
-            Swal.fire({
-              type: 'error',
-              title: 'Errore, si prega di riprovare piu tardi'
-            })
+            this.removeStatus = false
           }
-          this.removeStatus = false
         })
       }
     },

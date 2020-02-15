@@ -132,7 +132,7 @@ class SeedFakeData extends Seeder
 
 
                 $sharing->approvedUsers()->get()->each(function($item) use($me, $sharing) {
-                    $this->createSubscription($item, $sharing);
+                    $this->createSubscription($item, $sharing, 'pay');
                 });
 
                 if(!is_null($sharing_random_value)){

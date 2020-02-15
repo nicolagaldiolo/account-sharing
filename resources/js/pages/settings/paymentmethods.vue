@@ -1,24 +1,22 @@
 <template>
 
   <div v-if="paymentmethods">
-    <card title="Credit Card" v-if="paymentmethods.length">
-        <div class="d-flex flex-wrap">
-          <div v-for="paymentmethod in paymentmethods" :key="paymentmethod.id">
-            <credit-card :paymentmethod="paymentmethod" :defaultPaymentmethod="defaultPaymentmethod" :eraseable="paymentmethods.length > 1"/>
-          </div>
+    <card v-if="paymentmethods.length" title="Credit Card">
+      <div class="d-flex flex-wrap">
+        <div v-for="paymentmethod in paymentmethods" :key="paymentmethod.id">
+          <credit-card :paymentmethod="paymentmethod" :defaultPaymentmethod="defaultPaymentmethod" :eraseable="paymentmethods.length > 1"/>
         </div>
+      </div>
 
-        <div v-if="maxPaymentMethod > paymentmethods.length">
-          <button class="mt-5 btn btn btn-outline-secondary btn-lg btn-block" @click.prevent="newCardForm">Nuova carta</button>
-          <div v-if="showCardForm">
-            <credit-card-new :checkoutMode="checkoutMode" v-on:payment-method-added="subscribe"/>
-          </div>
+      <div v-if="maxPaymentMethod > paymentmethods.length">
+        <button class="mt-5 btn btn btn-outline-secondary btn-lg btn-block" @click.prevent="newCardForm">Nuova carta</button>
+        <div v-if="showCardForm">
+          <credit-card-new :checkoutMode="checkoutMode" v-on:payment-method-added="subscribe"/>
         </div>
-
+      </div>
       <template v-slot:footer>
-        <button class="btn btn-primary btn-lg btn-block" v-if="checkoutMode && !showCardForm" @click.prevent="subscribe">Iscriviti</button>
+        <v-link v-if="checkoutMode && !showCardForm" :class="['btn-lg btn-block']" type="primary" :loading="loading" :action="subscribe">Iscriviti</v-link>
       </template>
-
     </card>
     <card v-else title="Credit Card">
       <div class="text-center">
@@ -33,9 +31,7 @@
         </div>
       </div>
     </card>
-
   </div>
-
 
 </template>
 
@@ -55,6 +51,7 @@ export default {
     stripe: window.Stripe(window.config.stripeKey),
     showCardForm: false,
     maxPaymentMethod: window.config.maxPaymentMethod,
+    loading: false,
   }),
 
     props: {
@@ -70,65 +67,93 @@ export default {
 
   created () {
     this.$store.dispatch('stripe/fetchPaymentMethods');
+
+    console.log('Eccomi')
+    window.Echo.private(`App.User.${this.authUser.id}`).notification(notifications => {
+      console.log('Ricevuto', notifications)
+    })
+
   },
 
   methods: {
-      newCardForm () {
-          this.showCardForm = !this.showCardForm
-      },
+    newCardForm () {
+      this.showCardForm = !this.showCardForm
+    },
 
-      subscribe () {
+    subscribe () {
+      this.showCardForm = false
+      this.loading = true
 
-        this.showCardForm = false
+      if (this.checkoutMode) {
+        const api = this.action === 'subscribe'
+          ? `/api/sharings/${this.$route.params.sharing_id}/subscribe`
+          : `/api/sharings/${this.$route.params.sharing_id}/restore`
 
-        if (this.checkoutMode) {
-          const api = this.action === 'subscribe'
-            ? `/api/sharings/${this.$route.params.sharing_id}/subscribe`
-            : `/api/sharings/${this.$route.params.sharing_id}/restore`
-
-          axios.post(api, {
-            payment_method: this.defaultPaymentmethod
-          }).then((response) => {
-            //Outcome 1: Payment succeeds
-
-            console.log(response);
-
-            if (response.data.status === 'active' && response.data.latest_invoice.payment_intent.status === 'succeeded') {
-              alert("TUTTO OK, PUOI ENRTRARE");
-              this.redirectToSharing();
-              //Outcome 3: Payment fails
-            } else if (response.data.status === 'incomplete' && response.data.latest_invoice.payment_intent.status === 'requires_payment_method') {
-              console.log("PROBLEMI COL METODO DI PAGAMENTO 22222");
-              alert(response);
-
-              // posso entrare qui se sono on session e quindi sto facendo il primo pagamento (incomplete) oppure a seguito di un pagamento fallito in fase di rinnovo (past_due)
-            } else if ((response.data.status === 'incomplete' || response.data.status === 'past_due') && response.data.latest_invoice.payment_intent.status === 'requires_action') {
-              console.log("AZIONE RICHIESTA");
-              const paymentIntentSecret = response.data.latest_invoice.payment_intent.client_secret;
-              this.stripe.handleCardPayment(paymentIntentSecret).then((result) => {
-                if (result.error) {
-                  console.log("PROBLEMI COL METODO DI PAGAMENTO 11111");
-                  alert(response);
-                } else {
-                  this.redirectToSharing();
-                  // The payment has succeeded. Display a success message.
-                }
-              });
-            }
-          })
-        }
-      },
+        axios.post(api).then((response) => {
+          if (response.data.data.status === 1 && response.data.meta.latest_invoice.payment_intent.status === 'succeeded') {
+            // Outcome 1: Payment succeeds (Subscription active)
+            //this.redirectToSharing()
+            console.log('redirectToSharing');
+          } else if (response.data.data.status === 2 && response.data.meta.latest_invoice.payment_intent.status === 'requires_payment_method') {
+            // Outcome 2: Payment fails (Subscription incomplete)
+            this.paymentFailed()
+          } else if ((response.data.data.status === 2 || response.data.data.status === 4) && response.data.meta.latest_invoice.payment_intent.status === 'requires_action') {
+            // Outcome 3: Subscription incomplete or past_due and action require
+            const paymentIntentSecret = response.data.meta.latest_invoice.payment_intent.client_secret;
+            this.stripe.handleCardPayment(paymentIntentSecret).then((result) => {
+              if (result.error) {
+                this.paymentFailed()
+              } else {
+                axios.post(`/api/sharings/${this.$route.params.sharing_id}/subscribe-confirm`).then((response) => {
+                  if (response.data.data.subscription && response.data.data.subscription.status === 1) {
+                    console.log('redirectToSharing');
+                  } else {
+                    this.genericError()
+                  }
+                })
+              }
+            })
+          } else {
+            // Outcome 4: other cases
+            this.genericError()
+          }
+        })
+      }
+    },
 
     redirectToSharing () {
-        alert("Complimenti, sei iscritto");
+      Swal.fire({
+        type: 'success',
+        title: 'Pagamento avvenuto con successo',
+        text: 'Goditi la tua condivisione'
+      }).then((result) => {
         this.$router.push({
-            name: 'sharing.show',
-            params: {
-                category_id: this.$route.params.category_id,
-                sharing_id: this.$route.params.sharing_id
-            }
+          name: 'sharing.show',
+          params: {
+            category_id: this.$route.params.category_id,
+            sharing_id: this.$route.params.sharing_id
+          }
         })
+      })
+    },
+    paymentFailed () {
+      Swal.fire({
+        type: 'Error',
+        title: 'Pagamento fallito',
+        text: 'Siamo spiacenti, il pagamento non è andato a buon fine, si prega di utilizzare un\'altro metodo di pagamento'
+      }).then(result => {
+        this.loading = false
+      })
+    },
+    genericError () {
+      Swal.fire({
+        type: 'error',
+        title: 'Errore generico',
+        text: 'Si è verificato un errore, riprovare più tardi'
+      }).then(result => {
+        this.loading = false
+      })
     }
-  },
+  }
 }
 </script>
