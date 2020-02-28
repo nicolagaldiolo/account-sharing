@@ -123,36 +123,32 @@ export default {
     }),
 
     emptyMessage: function () {
-        return this.form.message === ''
+      return this.form.message === ''
     },
 
+    // Order the chat Message
     chatsFormatted: function () {
       const chats = this.chats_parsed
-        return Object.keys(chats).map((date) => {
-            return {
-                date,
-                chats: chats[date].sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
-            }
-        }).sort((a, b) => new Date(a.date) - new Date(b.date))
+      return Object.keys(chats).map((date) => {
+        return {
+          date,
+          chats: chats[date].sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+        }
+      }).sort((a, b) => new Date(a.date) - new Date(b.date))
     }
 
   },
 
   watch: {
     chats (data) {
-
       if (data.data && data.data.length) {
-
-        // devo clonare l'oggetto dello stato interno altrimenti il componente non si accorge dei cambiamenti e non scatena il redender
-        const clone = Object.assign({}, this.chats_parsed);
+        const clone = Object.assign({})
         data.data.reduce((obj, chat) => {
-          return this.addSingleItem(obj, chat);
-        }, clone);
+          return this.addSingleItem(obj, chat)
+        }, clone)
         this.chats_parsed = clone
-
         this.loading_state.loaded()
       }
-
       if (this.current_page < data.meta.last_page) {
         this.current_page += 1
       } else {
@@ -170,19 +166,16 @@ export default {
 
     async infiniteHandler (state) {
       this.loading_state = state
-
       const obj = {
         id: this.$route.params.sharing_id,
         params: this.getQueryString({
           page: this.current_page
         })
       }
-
       this.$store.dispatch('sharings/fetchChats', obj)
     },
 
-    addSingleItem: function(obj, message) {
-
+    addSingleItem: function (obj, message) {
       const date = this.$moment(message.created_at).format(this.formatDate)
       if (!obj[date]) obj[date] = []
       obj[date].push(message)
@@ -190,10 +183,8 @@ export default {
     },
 
     appendChatMessage: function (message, cleanForm = false) {
-      // devo clonare l'oggetto dello stato interno altrimenti il componente non si accorge dei cambiamenti e non scatena il redender
-      const clone = Object.assign({}, this.chats);
-
-      this.chats = this.addSingleItem(clone, message);
+      const clone = Object.assign({}, this.chats_parsed)
+      this.chats_parsed = this.addSingleItem(clone, message)
       this.scrollChatBox = true
       if (cleanForm) {
         this.form.message = ''
