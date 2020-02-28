@@ -2,14 +2,14 @@
 
 namespace App;
 
-use App\Http\Traits\UtilityTrait;
+use App\Http\Traits\Utility;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 
 class Category extends Model
 {
-    use SoftDeletes, UtilityTrait;
+    use SoftDeletes, Utility;
 
     protected $fillable = [
         'name',
@@ -31,11 +31,10 @@ class Category extends Model
     {
         parent::boot();
 
-        //static::addGlobalScope('country', function ($builder) {
-        //    $builder->where('country', Auth::user()->country);
-        //});
+        static::addGlobalScope('country', function ($builder) {
+            $builder->where('country', Auth::user()->country);
+        });
     }
-
 
     public function getSlotAttribute(){
         return $this->getFreeSlot($this);

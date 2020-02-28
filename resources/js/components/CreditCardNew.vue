@@ -3,7 +3,7 @@
     <div id="card-element"></div>
     <div id="card-errors" role="alert"></div>
     <template v-slot:footer>
-      <v-link :class="[{ 'disabled': disabled }, 'btn-lg btn-block']" type="primary" :loading="loading" :action="createSetupIntent">{{ checkoutMode ? 'Iscriviti' : 'Aggiungi carta' }}</v-link>
+      <v-link :class="[{ 'disabled': disabled }, 'btn-lg btn-block']" type="primary" :loading="loading" :action="(checkoutMode ? createPaymentMethod : createSetupIntent)">{{ checkoutMode ? 'Completa pagamento' : 'Aggiungi carta' }}</v-link>
     </template>
   </card>
 </template>
@@ -76,6 +76,23 @@
     },
 
     methods: {
+
+      // Create a new payment method (if in checkout mode)
+      createPaymentMethod () {
+        this.loading = true;
+        this.stripe.createPaymentMethod({
+          type: 'card',
+          card: this.cardInstance
+        }).then((result) => {
+          if (result.error) {
+            this.paymentMethodFailed()
+          } else {
+            this.addPaymentMethod(result.paymentMethod.id)
+          }
+        })
+      },
+
+      // Create a setup intent for future use and add the payment method
       createSetupIntent () {
         this.loading = true
         axios.get('/api/settings/setupintent').then((result) => {
@@ -90,26 +107,13 @@
               }
             ).then((result) => {
               if (result.error) {
-                Swal.fire({
-                  type: 'error',
-                  title: 'Errore',
-                  text: 'Per favore riprovare con un altro metodo di pagamento'
-                }).then(() => {
-                  this.loading = false
-                })
+                this.paymentMethodFailed()
               } else {
                 this.addPaymentMethod(result.setupIntent.payment_method)
               }
             })
           } catch (e) {
-            //console.log(e);
-            Swal.fire({
-              type: 'error',
-              title: 'Errore generico',
-              text: 'Si è verificato un errore, riprovare più tardi'
-            }).then(() => {
-              this.loading = false
-            })
+            this.genericError();
           }
         })
       },
@@ -117,23 +121,38 @@
       addPaymentMethod (paymentMethod) {
         this.$store.dispatch('stripe/addPaymentMethod', paymentMethod).then((result) => {
           if (result) {
-            Swal.fire({
-              type: 'success',
-              title: 'Fantastico',
-              text: 'Hai aggiunto un nuovo metodo di pagamento'
-            }).then(() => {
-              this.loading = false
-              this.$emit('payment-method-added')
-            })
+            this.$emit('payment-method-added')
           } else {
-            Swal.fire({
-              type: 'error',
-              title: 'Errore',
-              text: 'Per favore riprovare con un altro metodo di pagamento'
-            }).then(() => {
-              this.loading = false
-            })
+            this.genericError()
           }
+        })
+      },
+
+      paymentMethodAdded () {
+        Swal.fire({
+          type: 'success',
+          title: 'Fantastico',
+          text: 'Hai aggiunto un nuovo metodo di pagamento'
+        }).then(result => {
+          this.loading = false
+        })
+      },
+      paymentMethodFailed () {
+        Swal.fire({
+          type: 'error',
+          title: 'Errore',
+          text: 'Per favore riprovare con un altro metodo di pagamento'
+        }).then(result => {
+          this.loading = false
+        })
+      },
+      genericError () {
+        Swal.fire({
+          type: 'error',
+          title: 'Errore generico',
+          text: 'Si è verificato un errore, riprovare più tardi'
+        }).then(result => {
+          this.loading = false
         })
       }
     }

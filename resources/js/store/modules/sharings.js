@@ -3,11 +3,18 @@ import * as types from '../mutation-types'
 
 // state
 export const state = {
-  sharings: [],
+  sharings: {
+    data: [],
+    links: {},
+    meta: {}
+  },
   sharing: {},
-  chats: {},
-  credentials: [],
-  sharingRequests: []
+  chats: {
+    data: [],
+    links: {},
+    meta: {}
+  },
+  credentials: []
 }
 
 // getters
@@ -15,18 +22,22 @@ export const getters = {
   sharings: state => state.sharings,
   sharing: state => state.sharing,
   chats: state => state.chats,
-  credentials: state => state.credentials,
-  sharingRequests: state => state.sharingRequests
+  credentials: state => state.credentials
 }
 
 // mutations
 export const mutations = {
   [types.FETCH_SHARINGS_SUCCESS] (state, { sharings }) {
-    state.sharings = sharings
+    const obj = {
+      data: (sharings.meta.current_page === 1) ? sharings.data : state.sharings.data.concat(...sharings.data),
+      links: sharings.links,
+      meta: sharings.meta
+    }
+    state.sharings = Object.assign({}, obj)
   },
 
   [types.FETCH_SHARINGS_FAILURE] (state) {
-    state.sharings = []
+    state.sharings = {}
   },
 
   [types.FETCH_SHARING_SUCCESS] (state, { sharing }) {
@@ -52,19 +63,16 @@ export const mutations = {
   },
 
   [types.FETCH_CHATS_SUCCESS] (state, { chats }) {
-    state.chats = chats
+    const obj = {
+      data: (chats.meta.current_page === 1) ? chats.data : state.chats.data.concat(...chats.data),
+      links: chats.links,
+      meta: chats.meta
+    }
+    state.chats = Object.assign({}, obj)
   },
 
   [types.FETCH_CHATS_FAILURE] (state) {
     state.chats = {}
-  },
-
-  [types.FETCH_SHARING_REQUESTS_SUCCESS] (state, { sharingRequests }) {
-    state.sharingRequests = sharingRequests
-  },
-
-  [types.FETCH_SHARING_REQUESTS_FAILURE] (state) {
-    state.sharingRequests = []
   },
 
   [types.UPDATE_SHARING] (state, { sharing }) {
@@ -72,21 +80,22 @@ export const mutations = {
   },
 
   [types.SYNC_SHARINGS] (state, { sharing }) {
-    let data = sharing[0]
-    let indexOfData = state.sharings.map(e => e.id).indexOf(data.id)
-    let sharings = state.sharings.filter(item => item.id !== data.id)
-    sharings.splice(indexOfData, 0, data)
-    state.sharings = sharings
+    let indexOfData = state.sharings.data.map(e => e.id).indexOf(sharing.id)
+    let sharingsDataUpdated = state.sharings.data.filter(item => item.id !== sharing.id)
+    sharingsDataUpdated.splice(indexOfData, 0, sharing)
+
+    state.sharings.data = sharingsDataUpdated
+
+    // Re-assign the state with Object.assign because vuex state doesn't react at change in deph
+    state.sharings = Object.assign({}, state.sharings)
   }
 }
 
 // actions
 export const actions = {
-  async fetchSharings ({ commit }, type = '') {
+  async fetchSharings ({ commit }, params) {
     try {
-      let param = (type.length > 0) ? `?type=${type}` : '';
-      const { data } = await axios.get('/api/sharings' + param);
-
+      const data = await axios.get('/api/sharings' + params)
       commit(types.FETCH_SHARINGS_SUCCESS, { sharings: data.data })
     } catch (e) {
       commit(types.FETCH_SHARINGS_FAILURE)
@@ -104,29 +113,21 @@ export const actions = {
   async fetchSharing ({ commit }, id) {
     try {
       const { data } = await axios.get('/api/sharings/' + id)
+
       commit(types.FETCH_SHARING_SUCCESS, { sharing: data.data })
     } catch (e) {
       commit(types.FETCH_SHARING_FAILURE)
     }
   },
 
-  async fetchChats ({ commit }, { id, currentPage }) {
+  async fetchChats ({ commit }, { id, params }) {
     try {
-      const { data } = await axios.get(`/api/sharings/${id}/chats?page=${currentPage}`)
+      const { data } = await axios.get(`/api/sharings/${id}/chats` + params)
       commit(types.FETCH_CHATS_SUCCESS, { chats: data })
-      return true
+      return true // da cancellare
     } catch (e) {
       commit(types.FETCH_CHATS_FAILURE)
-      return false
-    }
-  },
-
-  async fetchSharingRequests ({ commit }) {
-    try {
-      const { data } = await axios.get('/api/sharing-requests/');
-      commit(types.FETCH_SHARING_REQUESTS_SUCCESS, { sharingRequests: data })
-    } catch (e) {
-      commit(types.FETCH_SHARING_REQUESTS_FAILURE)
+      return false // da cancellare
     }
   },
 

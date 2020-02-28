@@ -18,7 +18,6 @@ export default [
   { path: '/category/:category_id', name: 'category.show', component: page('categories/show.vue') },
   { path: '/category/:category_id/sharing/:sharing_id', name: 'sharing.show', component: page('sharings/show.vue') },
   { path: '/category/:category_id/sharing/:sharing_id/checkout', name: 'sharing.checkout', component: page('sharings/checkout.vue') },
-  { path: '/category/:category_id/sharing/:sharing_id/restore', name: 'sharing.restore', component: page('sharings/restore.vue') },
 
   { path: '/sharing/create', name: 'sharing.requests', component: page('sharings/create.vue') },
 
@@ -33,14 +32,7 @@ export default [
     ]
   },
 
-  { path: '/feed',
-    component: page('feed/index.vue'),
-    children: [
-      { path: '', name: 'feed', redirect: { name: 'feed.requests' } },
-      { path: 'requests', name: 'feed.requests', component: page('feed/requests.vue') },
-      { path: 'notifications', name: 'feed.notifications', component: page('feed/notifications.vue') }
-    ]
-  },
+  { path: '/notifications', name: 'notifications', component: page('notifications.vue') },
 
   { path: '/settings',
     component: page('settings/index.vue'),

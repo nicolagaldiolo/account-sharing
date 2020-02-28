@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Sharings;
 use App\Credential;
 use App\Enums\CredentialsStatus;
 use App\Http\Requests\CredentialRequest;
-use App\Http\Traits\UtilityTrait;
+use App\Http\Traits\Utility;
 use App\Mail\CredentialConfirmed;
 use App\Mail\CredentialUpdated;
 use App\Sharing;
@@ -21,7 +21,7 @@ use App\Http\Resources\Credential as CredentialResource;
 
 class CredentialController extends Controller
 {
-    use UtilityTrait;
+    use Utility;
 
     /**
      * Display a listing of the resource.

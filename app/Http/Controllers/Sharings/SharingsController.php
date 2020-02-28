@@ -5,29 +5,23 @@ namespace App\Http\Controllers\Sharings;
 use App\Category;
 use App\Enums\RenewalStatus;
 use App\Enums\SharingApprovationStatus;
-use App\Enums\SharingStatus;
-use App\Enums\SubscriptionStatus;
 use App\Events\SharingCreated;
 use App\Events\SharingStatusUpdated;
-use App\Events\SharingSubscription;
 use App\Http\Requests\CredentialRequest;
 use App\Http\Requests\SharingRequest;
-use App\Http\Resources\Member as MemberResource;
 use App\Http\Resources\Sharing as SharingResource;
 use App\Http\Resources\SharingCollection;
-use App\Http\Resources\Subscription as SubscriptionResource;
-use App\Http\Traits\SharingTrait;
+use App\Http\Traits\Utility;
+use App\MyClasses\Support\Facade\Stripe;
 use App\Sharing;
-use App\Subscription;
 use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class SharingsController extends Controller
 {
-    use SharingTrait;
+    use Utility;
 
     /**
      * Display a listing of the resource.
@@ -39,25 +33,28 @@ class SharingsController extends Controller
         $param = $request->input('type', '');
         switch ($param){
             case 'pending':
-                $sharings = SharingResource::collection(Auth::user()->sharings()->pending()->paginate(12));
+                $sharings = SharingResource::collection(Auth::user()->sharings()->with('owner')->pending()->paginate(config('custom.paginate')));
                 break;
             case 'approved':
-                $sharings = SharingResource::collection(Auth::user()->sharings()->approved()->paginate(12));
+                $sharings = SharingResource::collection(Auth::user()->sharings()->with('owner')->approved()->paginate(config('custom.paginate')));
                 break;
             case 'owner':
                 // manipolo i dati tornati raggruppando gli utenti per stato della relazione con sharing(es: pendind: utenti..., joined: utenti...)
-                $sharings = $this->getSharingOwners();
+                //$sharings = $this->getSharingOwners();
+
+                $sharings = SharingResource::collection(Auth::user()->sharingOwners()->with('users')->paginate(config('custom.paginate')));
                 break;
             case 'joined':
-                $sharings = SharingResource::collection(Auth::user()->sharings()->joined()->paginate(12));
+                $sharings = SharingResource::collection(Auth::user()->sharings()->with('owner')->joined()->paginate(config('custom.paginate')));
                 break;
             default:
 
                 //DISABILITO MOMENTANEAMENTE LA PAGINAZIONE PERCHè CREA PROBLEMI CON LA QUERY, DA SISTEMARE
                 // https://github.com/laravel/framework/issues/3105
 
-                //$sharings = SharingResource::collection(Sharing::with('owner')->public()->paginate(12));
-                $sharings = SharingResource::collection(Sharing::with('owner')->public()->get(), Auth::user());
+                //$sharings = SharingResource::collection(Sharing::with('owner')->public()->paginate(config('custom.paginate')));
+                //$sharings = SharingResource::collection(Sharing::with('owner')->public()->get(), Auth::user());
+                $sharings = SharingResource::collection(Sharing::with('owner')->paginate(config('custom.paginate')));
                 break;
         }
 
@@ -256,16 +253,37 @@ class SharingsController extends Controller
 
     }
 
+    public function subscribeRestore(Request $request, Sharing $sharing)
+    {
+        $user = Auth::user();
+        $userSharing = $user->sharings()->find($sharing->id)->sharing_status;
+        $stateMachine = \StateMachine::get($userSharing, 'sharing');
+
+        if($stateMachine->can('pay') || $user->can('restore', $userSharing)) {
+            // If an incomplete subscription exist, manage them, otherwise create newone
+            !$userSharing->subscription ? Stripe::createSubscription($sharing, $user) : Stripe::payInvoice($userSharing->subscription->id);
+
+            return new SharingResource($sharing->load(['members','owner']));
+        }else{
+            abort(403);
+        }
+
+    }
+
     public function transition(Request $request, Sharing $sharing, $transition = null)
     {
 
-        // Cerco la relazione tra utente e sharing, se non esiste la creo
+        // Find a relation between user and sharing, i not exist i create them
         $user = Auth::user();
         $userSharing = $user->sharings()->find($sharing->id);
 
         if(!$userSharing) {
             $user->sharings()->attach($sharing->id);
             $userSharing = $user->sharings()->find($sharing->id);
+
+            // Send Mail to owner and user
+            $sharing->owner->notify(new \App\Notifications\SharingUserNewRequest($sharing, $user, true));
+            $user->notify(new \App\Notifications\SharingUserNewRequest($sharing, $user));
         }
 
         $sharingStatus = $userSharing->sharing_status;
@@ -281,108 +299,6 @@ class SharingsController extends Controller
 
     }
 
-
-    public function restore(Request $request, Sharing $sharing)
-    {
-
-        $user = Auth::user();
-        $userSharing = $user->sharings()->find($sharing->id)->sharing_status;
-
-        $this->authorize('can-restore', $userSharing);
-
-        $stateMachine = \StateMachine::get($userSharing, 'sharing');
-
-        //if($stateMachine->can('pay')) {
-
-            $subscription = \Stripe\Subscription::retrieve($userSharing->subscription->id);
-
-            //logger($subscription);
-            //dd();
-
-            if($subscription->status === 'past_due') {
-                $invoice = \Stripe\Invoice::retrieve(['id' => $subscription->latest_invoice]);
-                try {
-                    $invoice->pay();
-                } catch (\Exception $e) {
-                }
-            }
-
-            $subscription = \Stripe\Subscription::retrieve([
-                'id' => $userSharing->subscription->id,
-                'expand' => [
-                    'latest_invoice.payment_intent'
-                ]
-            ]);
-
-            return $subscription;
-
-        //}else{
-        //    abort(500);
-        //}
-
-    }
-
-    public function subscribeConfirm(Request $request, Sharing $sharing)
-    {
-
-        $object = \Stripe\Subscription::retrieve($sharing->sharingUser->subscription->id)
-            ->toArray();
-
-        $subscription = $this->updateSubscription($object, 'pay');
-
-        //if ($subscription->status === SubscriptionStatus::active && $subscription->sharingUser->status === SharingStatus::Joined) {
-        //    event(New SharingSubscription($subscription->sharingUser));
-        //};
-
-        $member = $sharing->members()->where('user_id', Auth::id())->firstOrFail();
-
-        return new MemberResource($member);
-    }
-
-
-    public function subscribe(Request $request, Sharing $sharing)
-    {
-
-        $user = Auth::user();
-        $userSharing = $user->sharings()->find($sharing->id)->sharing_status;
-        $stateMachine = \StateMachine::get($userSharing, 'sharing');
-        $transition = 'pay';
-
-        if($stateMachine->can($transition)) {
-
-            // If an incomplete subscription exist, manage them, otherwise create newone
-            if($userSharing->subscription){
-                $stripeSubscription = $this->payInvoice($userSharing->subscription);
-                $subscription = Subscription::findOrFail($stripeSubscription->id);
-            }else{
-                $stripeSubscription = $this->createSubscription($user, $sharing, $transition);
-
-                $subscription = Subscription::findOrFail($stripeSubscription->id);
-
-                //if ($subscription->status === SubscriptionStatus::active && $subscription->sharingUser->status === SharingStatus::Joined) {
-                //    event(New SharingSubscription($subscription->sharingUser));
-                //};
-            }
-
-            return (new SubscriptionResource($subscription))->additional([
-                'meta' => [
-                    'latest_invoice' => [
-                        'payment_intent' => [
-                            'status' => $stripeSubscription->latest_invoice->payment_intent->status,
-                            'client_secret' => $stripeSubscription->latest_invoice->payment_intent->client_secret
-                        ]
-                    ]
-                ]
-            ]);
-
-        }else{
-
-            abort(403);
-
-        }
-
-    }
-
     public function transitionUser(Request $request, Sharing $sharing, User $user, $transition)
     {
         $sharing_status = $user->sharings()->findOrFail($sharing->id)->sharing_status;
@@ -392,7 +308,10 @@ class SharingsController extends Controller
             $stateMachine->apply($transition);
             $sharing_status->save();
         }
-        return $this->getSharingOwners($sharing->id);
+
+        $sharing->load('users');
+
+        return new SharingResource($sharing);
     }
 
     /**

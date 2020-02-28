@@ -4,14 +4,14 @@ namespace App\Http\Requests;
 
 use App\Category;
 use App\Enums\SharingVisibility;
-use App\Http\Traits\UtilityTrait;
+use App\Http\Traits\Utility;
 use BenSampo\Enum\Rules\EnumValue;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 
 class SharingRequest extends FormRequest
 {
-    use UtilityTrait;
+    use Utility;
 
     /**
      * Determine if the user is authorized to make this request.

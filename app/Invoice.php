@@ -2,13 +2,13 @@
 
 namespace App;
 
-use App\Http\Traits\UtilityTrait;
+use App\Http\Traits\Utility;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class Invoice extends Model
 {
-    use UtilityTrait;
+    use Utility;
 
     protected $fillable = [
         'stripe_id',

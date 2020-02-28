@@ -1,30 +1,24 @@
 <?php
 
-namespace App\Http\Controllers\Sharings;
+namespace App\Http\Controllers\Settings;
 
-use App\Chat;
-use App\Events\ChatMessageSent;
-use App\Http\Requests\ChatRequest;
-use App\Sharing;
+use App\Http\Resources\Notification;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Gate;
-use App\Http\Resources\Chat as ChatResource;
 
-class ChatsController extends Controller
+class NotificationsController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Sharing $sharing)
+    public function index()
     {
-        $this->authorize('manage-sharing', $sharing);
-
-        $collection = $sharing->chats()->with('user')->latest()->paginate(config('custom.paginate'));
-        return ChatResource::collection($collection);
+        $user = Auth::user();
+        return Notification::collection($user->unreadNotifications()->paginate(config('custom.paginate')));
     }
 
     /**
@@ -43,25 +37,9 @@ class ChatsController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(ChatRequest $request, Sharing $sharing)
+    public function store(Request $request)
     {
-        $this->authorize('manage-sharing', $sharing);
-
-        $this->validate($request, [
-            'message' => 'required'
-        ]);
-
-        $user = Auth::user();
-        $chat = new Chat;
-
-        $chat->message = $request->input('message');
-        $chat->sharing()->associate($sharing);
-        $chat->user()->associate($user);
-        $chat->save();
-
-        broadcast(new ChatMessageSent($user, $chat))->toOthers();
-
-        return new ChatResource($chat);
+        //
     }
 
     /**
@@ -93,9 +71,12 @@ class ChatsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, DatabaseNotification $notification)
     {
-        //
+        $this->authorize('read-notification', $notification);
+
+        $notification->markAsRead();
+        return new Notification($notification);
     }
 
     /**

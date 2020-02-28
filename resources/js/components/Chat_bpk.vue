@@ -5,6 +5,7 @@
       <div id="msg_container" class="msg_history">
 
         <infinite-loading direction="top" spinner="waveDots" @infinite="infiniteHandler"></infinite-loading>
+
         <div v-if="chatsFormatted && chatsFormatted.length">
           <div v-for="(chatGroup, index) in chatsFormatted" :key="index">
 
@@ -55,152 +56,138 @@
 </template>
 
 <script>
-import InfiniteLoading from 'vue-infinite-loading'
-import { helperMixin } from '~/mixins/helperMixin'
-import Form from 'vform'
-import { mapGetters } from 'vuex'
+    import InfiniteLoading from 'vue-infinite-loading'
+    import Form from 'vform'
 
-export default {
-  name: 'Chat',
-  middleware: 'auth',
-  components: {
-    InfiniteLoading
-  },
-  mixins: [ helperMixin ],
+    export default {
+        name: 'Chat',
+        middleware: 'auth',
+        components: {
+            InfiniteLoading
+        },
 
-  props: {
-    authUser: {
-      type: Object,
-      default: null
-    },
-    sharing: {
-      type: Object,
-      default: null
-    },
-    joined: {
-      type: Boolean,
-      default: false
-    },
-    owner: {
-      type: Boolean,
-      default: false
-    }
-  },
-
-  data () {
-    return {
-      chats_parsed: [],
-      scrollChatBox: false,
-      current_page: 1,
-      loading_state: {},
-      form: new Form({
-        message: ''
-      }),
-      formatDate: 'YYYY-MM-DD'
-    }
-  },
-
-  created () {
-    if (this.owner || this.joined) {
-      window.Echo.private(`chatSharing.${this.sharing.id}`)
-        .listen('ChatMessageSent', (e) => {
-          this.appendChatMessage(e.chat)
-        })
-    }
-  },
-
-  updated: function () {
-    if (this.scrollChatBox){
-      var container = document.getElementById('msg_container')
-      container.scrollTop = container.scrollHeight - container.clientHeight
-      this.scrollChatBox = false
-    }
-  },
-
-  computed: {
-    ...mapGetters({
-      chats: 'sharings/chats'
-    }),
-
-    emptyMessage: function () {
-        return this.form.message === ''
-    },
-
-    chatsFormatted: function () {
-      const chats = this.chats_parsed
-        return Object.keys(chats).map((date) => {
-            return {
-                date,
-                chats: chats[date].sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+        props: {
+            authUser: {
+                type: Object,
+                default: null
+            },
+            sharing: {
+                type: Object,
+                default: null
+            },
+            joined: {
+                type: Boolean,
+                default: false
+            },
+            owner: {
+                type: Boolean,
+                default: false
             }
-        }).sort((a, b) => new Date(a.date) - new Date(b.date))
+        },
+
+        data () {
+            return {
+                chats : {},
+                scrollChatBox: false,
+                current_page: 1,
+                form: new Form({
+                    message: ''
+                }),
+                formatDate : 'YYYY-MM-DD'
+            }
+        },
+
+        created () {
+            if(this.owner || this.joined) {
+                window.Echo.private(`chatSharing.${this.sharing.id}`)
+                    .listen('ChatMessageSent', (e) => {
+                      this.appendChatMessage(e.chat)
+                    })
+            }
+        },
+
+        updated: function () {
+            if(this.scrollChatBox){
+                var container = document.getElementById('msg_container');
+                container.scrollTop = container.scrollHeight - container.clientHeight;
+                this.scrollChatBox = false;
+            }
+        },
+
+        computed: {
+            emptyMessage: function () {
+                return this.form.message === ''
+            },
+
+            chatsFormatted: function () {
+              const chats = this.chats
+                return Object.keys(chats).map((date) => {
+                    return {
+                        date,
+                        chats: chats[date].sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+                    }
+
+                }).sort((a, b) => new Date(a.date) - new Date(b.date))
+            }
+
+        },
+
+        methods: {
+
+            async postChatMessage () {
+                const { data } = await this.form.post(`/api/sharings/${this.sharing.id}/chat`)
+                this.appendChatMessage(data.data, true)
+            },
+
+            async infiniteHandler ($state) {
+
+                    const id = this.$route.params.sharing_id
+                    const currentPage = this.current_page
+
+                    this.$store.dispatch('sharings/fetchChats', {id, currentPage}).then(response => {
+                        if (response) {
+                            const chatStore = this.$store.getters['sharings/chats']
+                            if (this.current_page <= chatStore.meta.last_page) {
+                                this.current_page += 1
+
+                                // devo clonare l'oggetto dello stato interno altrimenti il componente non si accorge dei cambiamenti e non scatena il redender
+                                const clone = Object.assign({}, this.chats);
+
+                                chatStore.data.reduce((obj, chat) => {
+                                    return this.addSingleItem(obj, chat);
+                                }, clone);
+
+                                this.chats = clone;
+
+                                $state.loaded()
+
+                            } else {
+                                $state.complete()
+                            }
+                        }
+                    })
+            },
+
+            addSingleItem: function(obj, message) {
+
+              const date = this.$moment(message.created_at).format(this.formatDate)
+              if (!obj[date]) obj[date] = []
+              obj[date].push(message)
+              return obj
+            },
+
+            appendChatMessage: function (message, cleanForm = false) {
+                // devo clonare l'oggetto dello stato interno altrimenti il componente non si accorge dei cambiamenti e non scatena il redender
+                const clone = Object.assign({}, this.chats);
+
+                this.chats = this.addSingleItem(clone, message);
+                this.scrollChatBox = true
+                if (cleanForm) {
+                    this.form.message = ''
+                }
+            }
+        }
     }
-
-  },
-
-  watch: {
-    chats (data) {
-
-      if (data.data && data.data.length) {
-
-        // devo clonare l'oggetto dello stato interno altrimenti il componente non si accorge dei cambiamenti e non scatena il redender
-        const clone = Object.assign({}, this.chats_parsed);
-        data.data.reduce((obj, chat) => {
-          return this.addSingleItem(obj, chat);
-        }, clone);
-        this.chats_parsed = clone
-
-        this.loading_state.loaded()
-      }
-
-      if (this.current_page < data.meta.last_page) {
-        this.current_page += 1
-      } else {
-        this.loading_state.complete()
-      }
-    }
-  },
-
-  methods: {
-
-    async postChatMessage () {
-      const { data } = await this.form.post(`/api/sharings/${this.sharing.id}/chat`)
-      this.appendChatMessage(data.data, true)
-    },
-
-    async infiniteHandler (state) {
-      this.loading_state = state
-
-      const obj = {
-        id: this.$route.params.sharing_id,
-        params: this.getQueryString({
-          page: this.current_page
-        })
-      }
-
-      this.$store.dispatch('sharings/fetchChats', obj)
-    },
-
-    addSingleItem: function(obj, message) {
-
-      const date = this.$moment(message.created_at).format(this.formatDate)
-      if (!obj[date]) obj[date] = []
-      obj[date].push(message)
-      return obj
-    },
-
-    appendChatMessage: function (message, cleanForm = false) {
-      // devo clonare l'oggetto dello stato interno altrimenti il componente non si accorge dei cambiamenti e non scatena il redender
-      const clone = Object.assign({}, this.chats);
-
-      this.chats = this.addSingleItem(clone, message);
-      this.scrollChatBox = true
-      if (cleanForm) {
-        this.form.message = ''
-      }
-    }
-  }
-}
 </script>
 
 <style scoped>

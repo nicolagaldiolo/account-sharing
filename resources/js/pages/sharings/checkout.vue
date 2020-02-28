@@ -3,7 +3,7 @@
     <div class="container">
       <div class="row">
         <div class="col-md-8">
-          <paymentmethods :checkout-mode="true"></paymentmethods>
+          <paymentmethods :checkout-mode="true" :sharing="sharing"></paymentmethods>
         </div>
         <div class="col-md-4">
           <card :title="sharing.name">

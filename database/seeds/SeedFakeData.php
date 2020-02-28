@@ -19,7 +19,7 @@ use Faker\Factory as Faker;
 class SeedFakeData extends Seeder
 {
 
-    use \App\Http\Traits\SharingTrait, \App\Http\Traits\UtilityTrait;
+    use \App\Http\Traits\Utility;
 
     /**
      * Run the database seeds.
@@ -132,7 +132,7 @@ class SeedFakeData extends Seeder
 
 
                 $sharing->approvedUsers()->get()->each(function($item) use($me, $sharing) {
-                    $this->createSubscription($item, $sharing, 'pay');
+                    \App\MyClasses\Support\Facade\Stripe::createSubscription($sharing, $item);
                 });
 
                 if(!is_null($sharing_random_value)){

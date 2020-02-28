@@ -15,7 +15,7 @@
         </div>
       </div>
       <template v-slot:footer>
-        <v-link v-if="checkoutMode && !showCardForm" :class="['btn-lg btn-block']" type="primary" :loading="loading" :action="subscribe">Iscriviti</v-link>
+        <v-link v-if="checkoutMode && !showCardForm" :class="['btn-lg btn-block']" type="primary" :loading="loading" :action="subscribe">Completa pagamento</v-link>
       </template>
     </card>
     <card v-else title="Credit Card">
@@ -54,10 +54,16 @@ export default {
     loading: false,
   }),
 
-    props: {
-        checkoutMode: { type: Boolean, default: false },
-        action: { type: String, default: 'subscribe' }
+  props: {
+    checkoutMode: {
+      type: Boolean,
+      default: false
     },
+    sharing: {
+      type: Object,
+      default: null
+    }
+  },
 
   computed: mapGetters({
     paymentmethods: 'stripe/paymentmethods',
@@ -66,13 +72,26 @@ export default {
   }),
 
   created () {
-    this.$store.dispatch('stripe/fetchPaymentMethods');
+    this.$store.dispatch('stripe/fetchPaymentMethods')
 
-    console.log('Eccomi')
-    window.Echo.private(`App.User.${this.authUser.id}`).notification(notifications => {
-      console.log('Ricevuto', notifications)
-    })
-
+    if (this.sharing && this.sharing.user_status) {
+      window.Echo.private(`sharingUser.${this.sharing.user_status.id}`).listen('SubscriptionChanged', ({ payload }) => {
+        if (payload.status === 1 && payload.latest_invoice.payment_intent.status === 'succeeded') {
+          // Outcome 1: Payment succeeds (Subscription active)
+          this.redirectToSharing()
+        } else if (payload.status === 2 && payload.latest_invoice.payment_intent.status === 'requires_payment_method') {
+          // Outcome 2: Payment fails (Subscription incomplete)
+          this.paymentFailed()
+        } else if ((payload.status === 2 || payload.status === 4) && payload.latest_invoice.payment_intent.status === 'requires_action') {
+          // Outcome 3: Subscription incomplete or past_due and action require
+          this.stripe.handleCardPayment(payload.latest_invoice.payment_intent.client_secret).then((result) => {
+            if (result.error) this.paymentFailed()
+          })
+        } else { // Outcome 4: other cases
+          this.genericError()
+        }
+      })
+    }
   },
 
   methods: {
@@ -83,42 +102,7 @@ export default {
     subscribe () {
       this.showCardForm = false
       this.loading = true
-
-      if (this.checkoutMode) {
-        const api = this.action === 'subscribe'
-          ? `/api/sharings/${this.$route.params.sharing_id}/subscribe`
-          : `/api/sharings/${this.$route.params.sharing_id}/restore`
-
-        axios.post(api).then((response) => {
-          if (response.data.data.status === 1 && response.data.meta.latest_invoice.payment_intent.status === 'succeeded') {
-            // Outcome 1: Payment succeeds (Subscription active)
-            //this.redirectToSharing()
-            console.log('redirectToSharing');
-          } else if (response.data.data.status === 2 && response.data.meta.latest_invoice.payment_intent.status === 'requires_payment_method') {
-            // Outcome 2: Payment fails (Subscription incomplete)
-            this.paymentFailed()
-          } else if ((response.data.data.status === 2 || response.data.data.status === 4) && response.data.meta.latest_invoice.payment_intent.status === 'requires_action') {
-            // Outcome 3: Subscription incomplete or past_due and action require
-            const paymentIntentSecret = response.data.meta.latest_invoice.payment_intent.client_secret;
-            this.stripe.handleCardPayment(paymentIntentSecret).then((result) => {
-              if (result.error) {
-                this.paymentFailed()
-              } else {
-                axios.post(`/api/sharings/${this.$route.params.sharing_id}/subscribe-confirm`).then((response) => {
-                  if (response.data.data.subscription && response.data.data.subscription.status === 1) {
-                    console.log('redirectToSharing');
-                  } else {
-                    this.genericError()
-                  }
-                })
-              }
-            })
-          } else {
-            // Outcome 4: other cases
-            this.genericError()
-          }
-        })
-      }
+      axios.post(`/api/sharings/${this.$route.params.sharing_id}/subscribeRestore`).then((response) => {})
     },
 
     redirectToSharing () {
@@ -136,9 +120,10 @@ export default {
         })
       })
     },
+
     paymentFailed () {
       Swal.fire({
-        type: 'Error',
+        type: 'error',
         title: 'Pagamento fallito',
         text: 'Siamo spiacenti, il pagamento non è andato a buon fine, si prega di utilizzare un\'altro metodo di pagamento'
       }).then(result => {

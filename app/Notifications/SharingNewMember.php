@@ -41,8 +41,7 @@ class SharingNewMember extends Notification implements ShouldQueue
     public function via($notifiable)
     {
         return [
-            'mail',
-            'broadcast'
+            'mail'
         ];
     }
 
@@ -57,7 +56,7 @@ class SharingNewMember extends Notification implements ShouldQueue
 
         $message = new MailMessage;
 
-        $sharing_url = url(config('app.url') . "/category/" . $this->sharing->category->id . "/sharing/" . $this->sharing->id);
+        $sharing_url = url(config('app.url') . "/category/" . $this->sharing->category_id . "/sharing/" . $this->sharing->id);
 
         if($this->forOwner){
             $message->subject(config('app.name') . ' - Nuovo membro nel tuo gruppo di condivisione ' . $this->sharing->name)
@@ -89,13 +88,5 @@ class SharingNewMember extends Notification implements ShouldQueue
         return [
             //
         ];
-    }
-
-    public function toBroadcast($notifiable)
-    {
-        logger("Entro qui nel toBroadcast");
-        return new BroadcastMessage([
-            'data' => "Ciao"
-        ]);
     }
 }

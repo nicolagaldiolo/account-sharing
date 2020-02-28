@@ -5,12 +5,13 @@ namespace App\Http\Traits;
 use App\Category;
 use App\Credential;
 use App\Enums\CredentialsStatus;
+use App\Enums\SharingStatus;
 use App\Sharing;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-trait UtilityTrait
+trait Utility
 {
     protected function calcNetPrice($price = 0)
     {
@@ -65,5 +66,23 @@ trait UtilityTrait
             'password' => $request->input('password'),
             'credential_updated_at' => Carbon::now()
         ]);
+    }
+
+    protected function getSharingOwners($id = null)
+    {
+        $sharings = Auth::user()->sharingOwners();
+
+        if($id) $sharings->findOrFail($id);
+
+        return $sharings->with('users')->get()->each(function($sharing){
+            $sharing['xx_sharing_by_status'] = collect(SharingStatus::getInstances())->each(function($sharingStatus) use($sharing){
+
+                $users = $sharing->users->where('sharing_status.status', $sharingStatus->value)->each(function($user) use($sharing){
+                    $sharing_obj = $user->sharings()->whereSharingId($sharing->id)->first()->sharing_status;
+                    $user->possible_transitions = \StateMachine::get($sharing_obj, 'sharing')->getPossibleTransitions();
+                });
+                $sharingStatus->users = $users->values();
+            });
+        });
     }
 }

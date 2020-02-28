@@ -10,6 +10,7 @@
 
 <script>
 import Loading from './Loading'
+import {mapGetters} from "vuex";
 
 // Load layout components dynamically.
 const requireContext = require.context('~/layouts', false, /.*\.vue$/)
@@ -41,6 +42,28 @@ export default {
     return {
       title: appName,
       titleTemplate: `%s · ${appName}`
+    }
+  },
+
+  computed: mapGetters({
+    user: 'auth/user',
+  }),
+
+  watch: {
+    user: function (user) {
+      if (user.id) {
+        window.Echo.private('App.User.' + user.id).notification((notification) => {
+          this.$toasted.show(notification.desc, {
+            action: {
+              text: 'Ok',
+              onClick: (e, toastObject) => {
+                this.$store.dispatch('settings/readNotification', notification.id)
+                toastObject.goAway(0)
+              }
+            }
+          }).goAway(5000)
+        })
+      }
     }
   },
 

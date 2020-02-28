@@ -2,23 +2,63 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="80fbe383-e517-4357-96d8-8ee0108f1222" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/app/Events/SubscriptionChanged.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Listeners/SharingTransitionSubscriber.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Category.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Category.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Events/SharingSubscription.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Settings/TransactionsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Settings/TransactionsController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Sharings/ChatsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Sharings/ChatsController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Sharings/CredentialController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Sharings/CredentialController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Sharings/SharingsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Sharings/SharingsController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Stripe/PaymentMethodsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Stripe/PaymentMethodsController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Stripe/WebhookController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Stripe/WebhookController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Requests/SharingRequest.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Requests/SharingRequest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Resources/Category.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Resources/Category.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Resources/Member.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Resources/Member.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Traits/SharingTrait.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Traits/SharingTrait.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Resources/Sharing.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Resources/Sharing.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Traits/SharingTrait.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Traits/UtilityTrait.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Traits/Utility.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Invoice.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Invoice.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Listeners/SharingSubscriber.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Listeners/SharingSubscriber.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Listeners/SharingTransitionListener.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/MyClasses/Stripe.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/MyClasses/Stripe.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Notifications/SharingNewMember.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Notifications/SharingNewMember.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Providers/AuthServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Providers/AuthServiceProvider.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/SharingUser.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/SharingUser.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/SchemaER.graphml" beforeDir="false" afterPath="$PROJECT_DIR$/database/SchemaER.graphml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Providers/EventServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Providers/EventServiceProvider.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Sharing.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Sharing.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/custom.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/custom.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/state-machine.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/state-machine.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/database/seeds/SeedFakeData.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeds/SeedFakeData.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/CreditCard.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/CreditCard.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/App.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/App.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/Chat.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Chat.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/Credentials.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Credentials.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/components/CreditCardNew.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/CreditCardNew.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/MemberItem.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/MemberItem.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/ManageSharingUser.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/ManageSharingUser.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/Navbar.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Navbar.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/Sharings.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Sharings.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/middleware/userCanPay.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/middleware/userCanPay.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/middleware/userCanRestore.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/pages/feed/index.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/pages/feed/notifications.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/notifications.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/pages/feed/requests.vue" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/pages/settings/paymentmethods.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/settings/paymentmethods.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/pages/sharings/checkout.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/sharings/checkout.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/pages/sharings/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/sharings/index.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/pages/sharings/owner.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/sharings/owner.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/pages/sharings/restore.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/pages/sharings/show.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/sharings/show.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/router/routes.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/router/routes.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/store/modules/settings.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/store/modules/settings.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/store/modules/sharings.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/store/modules/sharings.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/store/modules/stripe.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/store/modules/stripe.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/store/mutation-types.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/store/mutation-types.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/index.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/api.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/channels.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/channels.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -83,7 +123,7 @@
     <other-services-enabled>true</other-services-enabled>
     <auto-save>true</auto-save>
   </component>
-  <component name="PhpDebugGeneral" xdebug_debug_port="9002" listening_started="true" xdebug_force_break_when_no_path_mapping="false" xdebug_force_break_when_outside_project="false" />
+  <component name="PhpDebugGeneral" xdebug_debug_port="9002" xdebug_force_break_when_no_path_mapping="false" xdebug_force_break_when_outside_project="false" />
   <component name="PhpServers">
     <servers>
       <server id="cf81723a-9834-4957-be6e-e3491c72b774" use_path_mappings="true">
@@ -176,7 +216,12 @@
           <mapping local-root="$PROJECT_DIR$" remote-root="/Users/chloe/.composer/vendor/laravel/valet" />
         </path_mappings>
       </server>
-      <server host="" id="bc7abf1f-9beb-46a5-9b4e-ce09870e138c" use_path_mappings="true">
+      <server id="bc7abf1f-9beb-46a5-9b4e-ce09870e138c" use_path_mappings="true">
+        <path_mappings>
+          <mapping local-root="$PROJECT_DIR$" remote-root="/Users/chloe/.composer/vendor/laravel/valet" />
+        </path_mappings>
+      </server>
+      <server host="" id="211c731c-5899-4f71-950b-b72e8dc964af" use_path_mappings="true">
         <path_mappings>
           <mapping local-root="$PROJECT_DIR$" remote-root="/Users/chloe/.composer/vendor/laravel/valet" />
         </path_mappings>
@@ -321,11 +366,12 @@
   <component name="PropertiesComponent">
     <property name="Constants" value="false" />
     <property name="DatabaseDriversLRU" value="sqlserver&#10;mysql" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="PHP&#10;JSON" />
     <property name="database.console.LAST_STATE" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/js/middleware" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/js/components" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -341,18 +387,18 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/resources/js/components" />
       <recent name="$PROJECT_DIR$/resources/js/middleware" />
       <recent name="$PROJECT_DIR$/app/Listeners" />
-      <recent name="$PROJECT_DIR$/resources/js/components" />
       <recent name="C:\Zweb\xampp\htdocs\account-sharing\resources\js\pages\settings" />
       <recent name="$PROJECT_DIR$/resources/js/pages/settings" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/resources/js/pages" />
       <recent name="$PROJECT_DIR$/resources/js/components" />
       <recent name="$PROJECT_DIR$/storage" />
       <recent name="$PROJECT_DIR$/import_data" />
       <recent name="$PROJECT_DIR$/app/MyClasses/Support/Facade" />
-      <recent name="$PROJECT_DIR$/app/Http/Controllers/Sharings" />
     </key>
   </component>
   <component name="RunManager">
@@ -509,7 +555,10 @@
       <workItem from="1581149134474" duration="48926000" />
       <workItem from="1581399531307" duration="7504000" />
       <workItem from="1581441047921" duration="3704000" />
-      <workItem from="1581486005439" duration="26939000" />
+      <workItem from="1581486005439" duration="99307000" />
+      <workItem from="1582175373151" duration="5029000" />
+      <workItem from="1582181382613" duration="32353000" />
+      <workItem from="1582780337661" duration="14855000" />
     </task>
     <servers />
   </component>
@@ -538,19 +587,23 @@
     </state>
     <state x="592" y="344" key="#com.intellij.fileTypes.FileTypeChooser/0.23.1440.877/1440.-256.1440.877@0.23.1440.877" timestamp="1581184191810" />
     <state x="1052" y="542" key="#com.intellij.fileTypes.FileTypeChooser/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1580192962873" />
+    <state x="321" y="23" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1582386469266">
+      <screen x="0" y="23" width="1440" height="877" />
+    </state>
+    <state x="321" y="23" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.23.1440.877@0.23.1440.877" timestamp="1582386469266" />
     <state x="1018" y="485" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1580193449256">
       <screen x="0" y="23" width="2560" height="1417" />
     </state>
     <state x="1018" y="485" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1580193449256" />
-    <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1581749373903">
-      <screen x="0" y="23" width="1440" height="877" />
+    <state x="814" y="346" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1582786310206">
+      <screen x="0" y="23" width="2560" height="1417" />
     </state>
     <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1440.877/-552.-1417.2560.1417@0.23.1440.877" timestamp="1581540424495" />
     <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1440.877/1440.-256.1440.877@0.23.1440.877" timestamp="1580568010586" />
     <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1440.877/1440.-736.2560.1417@0.23.1440.877" timestamp="1576917394621" />
-    <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1440.877@0.23.1440.877" timestamp="1581749373903" />
+    <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1440.877@0.23.1440.877" timestamp="1582381482007" />
     <state x="814" y="346" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/2560.279.1440.877/-1440.448.1440.877/0.23.2560.1417@0.23.2560.1417" timestamp="1581239503735" />
-    <state x="814" y="346" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1581665436750" />
+    <state x="814" y="346" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1582786310206" />
     <state x="483" y="173" key="#xdebugger.evaluate" timestamp="1581097553132">
       <screen x="0" y="23" width="1440" height="877" />
     </state>
@@ -559,102 +612,114 @@
       <screen x="0" y="23" width="1440" height="877" />
     </state>
     <state x="465" y="315" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/0.23.1440.877@0.23.1440.877" timestamp="1577453181213" />
-    <state width="2518" height="717" key="GridCell.Tab.0.bottom" timestamp="1581493396232">
-      <screen x="0" y="23" width="2560" height="1417" />
+    <state width="1398" height="413" key="GridCell.Tab.0.bottom" timestamp="1582654092507">
+      <screen x="0" y="23" width="1440" height="877" />
     </state>
+    <state width="1398" height="413" key="GridCell.Tab.0.bottom/0.23.1440.877/-200.-1057.1920.1057@0.23.1440.877" timestamp="1582654092507" />
     <state width="2518" height="311" key="GridCell.Tab.0.bottom/0.23.1440.877/-552.-1417.2560.1417@0.23.1440.877" timestamp="1581426215612" />
     <state width="1398" height="173" key="GridCell.Tab.0.bottom/0.23.1440.877/1440.-256.1440.877@0.23.1440.877" timestamp="1581149854684" />
-    <state width="2518" height="311" key="GridCell.Tab.0.bottom/0.23.1440.877@0.23.1440.877" timestamp="1581367690757" />
+    <state width="1398" height="413" key="GridCell.Tab.0.bottom/0.23.1440.877@0.23.1440.877" timestamp="1582380360113" />
     <state width="2518" height="311" key="GridCell.Tab.0.bottom/2560.279.1440.877/-1440.448.1440.877/0.23.2560.1417@0.23.2560.1417" timestamp="1581240972898" />
-    <state width="2518" height="717" key="GridCell.Tab.0.bottom/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1581493396232" />
-    <state width="2518" height="717" key="GridCell.Tab.0.center" timestamp="1581493396231">
-      <screen x="0" y="23" width="2560" height="1417" />
+    <state width="1398" height="413" key="GridCell.Tab.0.bottom/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1582097421306" />
+    <state width="1398" height="413" key="GridCell.Tab.0.center" timestamp="1582654092506">
+      <screen x="0" y="23" width="1440" height="877" />
     </state>
+    <state width="1398" height="413" key="GridCell.Tab.0.center/0.23.1440.877/-200.-1057.1920.1057@0.23.1440.877" timestamp="1582654092506" />
     <state width="2518" height="311" key="GridCell.Tab.0.center/0.23.1440.877/-552.-1417.2560.1417@0.23.1440.877" timestamp="1581426215611" />
     <state width="1398" height="173" key="GridCell.Tab.0.center/0.23.1440.877/1440.-256.1440.877@0.23.1440.877" timestamp="1581149854683" />
-    <state width="2518" height="311" key="GridCell.Tab.0.center/0.23.1440.877@0.23.1440.877" timestamp="1581367690757" />
+    <state width="1398" height="413" key="GridCell.Tab.0.center/0.23.1440.877@0.23.1440.877" timestamp="1582380360113" />
     <state width="2518" height="311" key="GridCell.Tab.0.center/2560.279.1440.877/-1440.448.1440.877/0.23.2560.1417@0.23.2560.1417" timestamp="1581240972897" />
-    <state width="2518" height="717" key="GridCell.Tab.0.center/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1581493396231" />
-    <state width="2518" height="717" key="GridCell.Tab.0.left" timestamp="1581493396230">
-      <screen x="0" y="23" width="2560" height="1417" />
+    <state width="1398" height="413" key="GridCell.Tab.0.center/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1582097421304" />
+    <state width="1398" height="413" key="GridCell.Tab.0.left" timestamp="1582654092506">
+      <screen x="0" y="23" width="1440" height="877" />
     </state>
+    <state width="1398" height="413" key="GridCell.Tab.0.left/0.23.1440.877/-200.-1057.1920.1057@0.23.1440.877" timestamp="1582654092506" />
     <state width="2518" height="311" key="GridCell.Tab.0.left/0.23.1440.877/-552.-1417.2560.1417@0.23.1440.877" timestamp="1581426215609" />
     <state width="1398" height="173" key="GridCell.Tab.0.left/0.23.1440.877/1440.-256.1440.877@0.23.1440.877" timestamp="1581149854682" />
-    <state width="2518" height="311" key="GridCell.Tab.0.left/0.23.1440.877@0.23.1440.877" timestamp="1581367690756" />
+    <state width="1398" height="413" key="GridCell.Tab.0.left/0.23.1440.877@0.23.1440.877" timestamp="1582380360112" />
     <state width="2518" height="311" key="GridCell.Tab.0.left/2560.279.1440.877/-1440.448.1440.877/0.23.2560.1417@0.23.2560.1417" timestamp="1581240972897" />
-    <state width="2518" height="717" key="GridCell.Tab.0.left/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1581493396230" />
-    <state width="2518" height="717" key="GridCell.Tab.0.right" timestamp="1581493396231">
-      <screen x="0" y="23" width="2560" height="1417" />
+    <state width="1398" height="413" key="GridCell.Tab.0.left/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1582097421290" />
+    <state width="1398" height="413" key="GridCell.Tab.0.right" timestamp="1582654092507">
+      <screen x="0" y="23" width="1440" height="877" />
     </state>
+    <state width="1398" height="413" key="GridCell.Tab.0.right/0.23.1440.877/-200.-1057.1920.1057@0.23.1440.877" timestamp="1582654092507" />
     <state width="2518" height="311" key="GridCell.Tab.0.right/0.23.1440.877/-552.-1417.2560.1417@0.23.1440.877" timestamp="1581426215612" />
     <state width="1398" height="173" key="GridCell.Tab.0.right/0.23.1440.877/1440.-256.1440.877@0.23.1440.877" timestamp="1581149854683" />
-    <state width="2518" height="311" key="GridCell.Tab.0.right/0.23.1440.877@0.23.1440.877" timestamp="1581367690757" />
+    <state width="1398" height="413" key="GridCell.Tab.0.right/0.23.1440.877@0.23.1440.877" timestamp="1582380360113" />
     <state width="2518" height="311" key="GridCell.Tab.0.right/2560.279.1440.877/-1440.448.1440.877/0.23.2560.1417@0.23.2560.1417" timestamp="1581240972898" />
-    <state width="2518" height="717" key="GridCell.Tab.0.right/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1581493396231" />
-    <state width="2518" height="717" key="GridCell.Tab.1.bottom" timestamp="1581493396233">
-      <screen x="0" y="23" width="2560" height="1417" />
+    <state width="1398" height="413" key="GridCell.Tab.0.right/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1582097421305" />
+    <state width="1398" height="413" key="GridCell.Tab.1.bottom" timestamp="1582654092509">
+      <screen x="0" y="23" width="1440" height="877" />
     </state>
+    <state width="1398" height="413" key="GridCell.Tab.1.bottom/0.23.1440.877/-200.-1057.1920.1057@0.23.1440.877" timestamp="1582654092509" />
     <state width="2518" height="311" key="GridCell.Tab.1.bottom/0.23.1440.877/-552.-1417.2560.1417@0.23.1440.877" timestamp="1581426215614" />
     <state width="1398" height="173" key="GridCell.Tab.1.bottom/0.23.1440.877/1440.-256.1440.877@0.23.1440.877" timestamp="1581149854685" />
-    <state width="2518" height="311" key="GridCell.Tab.1.bottom/0.23.1440.877@0.23.1440.877" timestamp="1581367690760" />
+    <state width="1398" height="413" key="GridCell.Tab.1.bottom/0.23.1440.877@0.23.1440.877" timestamp="1582380360115" />
     <state width="2518" height="311" key="GridCell.Tab.1.bottom/2560.279.1440.877/-1440.448.1440.877/0.23.2560.1417@0.23.2560.1417" timestamp="1581240972900" />
-    <state width="2518" height="717" key="GridCell.Tab.1.bottom/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1581493396233" />
-    <state width="2518" height="717" key="GridCell.Tab.1.center" timestamp="1581493396232">
-      <screen x="0" y="23" width="2560" height="1417" />
+    <state width="1398" height="413" key="GridCell.Tab.1.bottom/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1582097421307" />
+    <state width="1398" height="413" key="GridCell.Tab.1.center" timestamp="1582654092508">
+      <screen x="0" y="23" width="1440" height="877" />
     </state>
+    <state width="1398" height="413" key="GridCell.Tab.1.center/0.23.1440.877/-200.-1057.1920.1057@0.23.1440.877" timestamp="1582654092508" />
     <state width="2518" height="311" key="GridCell.Tab.1.center/0.23.1440.877/-552.-1417.2560.1417@0.23.1440.877" timestamp="1581426215614" />
     <state width="1398" height="173" key="GridCell.Tab.1.center/0.23.1440.877/1440.-256.1440.877@0.23.1440.877" timestamp="1581149854685" />
-    <state width="2518" height="311" key="GridCell.Tab.1.center/0.23.1440.877@0.23.1440.877" timestamp="1581367690759" />
+    <state width="1398" height="413" key="GridCell.Tab.1.center/0.23.1440.877@0.23.1440.877" timestamp="1582380360114" />
     <state width="2518" height="311" key="GridCell.Tab.1.center/2560.279.1440.877/-1440.448.1440.877/0.23.2560.1417@0.23.2560.1417" timestamp="1581240972899" />
-    <state width="2518" height="717" key="GridCell.Tab.1.center/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1581493396232" />
-    <state width="2518" height="717" key="GridCell.Tab.1.left" timestamp="1581493396232">
-      <screen x="0" y="23" width="2560" height="1417" />
+    <state width="1398" height="413" key="GridCell.Tab.1.center/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1582097421306" />
+    <state width="1398" height="413" key="GridCell.Tab.1.left" timestamp="1582654092508">
+      <screen x="0" y="23" width="1440" height="877" />
     </state>
+    <state width="1398" height="413" key="GridCell.Tab.1.left/0.23.1440.877/-200.-1057.1920.1057@0.23.1440.877" timestamp="1582654092508" />
     <state width="2518" height="311" key="GridCell.Tab.1.left/0.23.1440.877/-552.-1417.2560.1417@0.23.1440.877" timestamp="1581426215613" />
     <state width="1398" height="173" key="GridCell.Tab.1.left/0.23.1440.877/1440.-256.1440.877@0.23.1440.877" timestamp="1581149854685" />
-    <state width="2518" height="311" key="GridCell.Tab.1.left/0.23.1440.877@0.23.1440.877" timestamp="1581367690759" />
+    <state width="1398" height="413" key="GridCell.Tab.1.left/0.23.1440.877@0.23.1440.877" timestamp="1582380360114" />
     <state width="2518" height="311" key="GridCell.Tab.1.left/2560.279.1440.877/-1440.448.1440.877/0.23.2560.1417@0.23.2560.1417" timestamp="1581240972899" />
-    <state width="2518" height="717" key="GridCell.Tab.1.left/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1581493396232" />
-    <state width="2518" height="717" key="GridCell.Tab.1.right" timestamp="1581493396233">
-      <screen x="0" y="23" width="2560" height="1417" />
+    <state width="1398" height="413" key="GridCell.Tab.1.left/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1582097421306" />
+    <state width="1398" height="413" key="GridCell.Tab.1.right" timestamp="1582654092508">
+      <screen x="0" y="23" width="1440" height="877" />
     </state>
+    <state width="1398" height="413" key="GridCell.Tab.1.right/0.23.1440.877/-200.-1057.1920.1057@0.23.1440.877" timestamp="1582654092508" />
     <state width="2518" height="311" key="GridCell.Tab.1.right/0.23.1440.877/-552.-1417.2560.1417@0.23.1440.877" timestamp="1581426215614" />
     <state width="1398" height="173" key="GridCell.Tab.1.right/0.23.1440.877/1440.-256.1440.877@0.23.1440.877" timestamp="1581149854685" />
-    <state width="2518" height="311" key="GridCell.Tab.1.right/0.23.1440.877@0.23.1440.877" timestamp="1581367690759" />
+    <state width="1398" height="413" key="GridCell.Tab.1.right/0.23.1440.877@0.23.1440.877" timestamp="1582380360114" />
     <state width="2518" height="311" key="GridCell.Tab.1.right/2560.279.1440.877/-1440.448.1440.877/0.23.2560.1417@0.23.2560.1417" timestamp="1581240972899" />
-    <state width="2518" height="717" key="GridCell.Tab.1.right/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1581493396233" />
-    <state width="2518" height="717" key="GridCell.Tab.2.bottom" timestamp="1581493396235">
-      <screen x="0" y="23" width="2560" height="1417" />
+    <state width="1398" height="413" key="GridCell.Tab.1.right/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1582097421307" />
+    <state width="1398" height="413" key="GridCell.Tab.2.bottom" timestamp="1582654092510">
+      <screen x="0" y="23" width="1440" height="877" />
     </state>
+    <state width="1398" height="413" key="GridCell.Tab.2.bottom/0.23.1440.877/-200.-1057.1920.1057@0.23.1440.877" timestamp="1582654092510" />
     <state width="2518" height="311" key="GridCell.Tab.2.bottom/0.23.1440.877/-552.-1417.2560.1417@0.23.1440.877" timestamp="1581426215615" />
     <state width="1398" height="173" key="GridCell.Tab.2.bottom/0.23.1440.877/1440.-256.1440.877@0.23.1440.877" timestamp="1581149854686" />
-    <state width="2518" height="311" key="GridCell.Tab.2.bottom/0.23.1440.877@0.23.1440.877" timestamp="1581367690761" />
+    <state width="1398" height="413" key="GridCell.Tab.2.bottom/0.23.1440.877@0.23.1440.877" timestamp="1582380360116" />
     <state width="2518" height="311" key="GridCell.Tab.2.bottom/2560.279.1440.877/-1440.448.1440.877/0.23.2560.1417@0.23.2560.1417" timestamp="1581240972901" />
-    <state width="2518" height="717" key="GridCell.Tab.2.bottom/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1581493396235" />
-    <state width="2518" height="717" key="GridCell.Tab.2.center" timestamp="1581493396234">
-      <screen x="0" y="23" width="2560" height="1417" />
+    <state width="1398" height="413" key="GridCell.Tab.2.bottom/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1582097421309" />
+    <state width="1398" height="413" key="GridCell.Tab.2.center" timestamp="1582654092509">
+      <screen x="0" y="23" width="1440" height="877" />
     </state>
+    <state width="1398" height="413" key="GridCell.Tab.2.center/0.23.1440.877/-200.-1057.1920.1057@0.23.1440.877" timestamp="1582654092509" />
     <state width="2518" height="311" key="GridCell.Tab.2.center/0.23.1440.877/-552.-1417.2560.1417@0.23.1440.877" timestamp="1581426215615" />
     <state width="1398" height="173" key="GridCell.Tab.2.center/0.23.1440.877/1440.-256.1440.877@0.23.1440.877" timestamp="1581149854686" />
-    <state width="2518" height="311" key="GridCell.Tab.2.center/0.23.1440.877@0.23.1440.877" timestamp="1581367690760" />
+    <state width="1398" height="413" key="GridCell.Tab.2.center/0.23.1440.877@0.23.1440.877" timestamp="1582380360115" />
     <state width="2518" height="311" key="GridCell.Tab.2.center/2560.279.1440.877/-1440.448.1440.877/0.23.2560.1417@0.23.2560.1417" timestamp="1581240972900" />
-    <state width="2518" height="717" key="GridCell.Tab.2.center/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1581493396234" />
-    <state width="2518" height="717" key="GridCell.Tab.2.left" timestamp="1581493396234">
-      <screen x="0" y="23" width="2560" height="1417" />
+    <state width="1398" height="413" key="GridCell.Tab.2.center/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1582097421308" />
+    <state width="1398" height="413" key="GridCell.Tab.2.left" timestamp="1582654092509">
+      <screen x="0" y="23" width="1440" height="877" />
     </state>
+    <state width="1398" height="413" key="GridCell.Tab.2.left/0.23.1440.877/-200.-1057.1920.1057@0.23.1440.877" timestamp="1582654092509" />
     <state width="2518" height="311" key="GridCell.Tab.2.left/0.23.1440.877/-552.-1417.2560.1417@0.23.1440.877" timestamp="1581426215615" />
     <state width="1398" height="173" key="GridCell.Tab.2.left/0.23.1440.877/1440.-256.1440.877@0.23.1440.877" timestamp="1581149854686" />
-    <state width="2518" height="311" key="GridCell.Tab.2.left/0.23.1440.877@0.23.1440.877" timestamp="1581367690760" />
+    <state width="1398" height="413" key="GridCell.Tab.2.left/0.23.1440.877@0.23.1440.877" timestamp="1582380360115" />
     <state width="2518" height="311" key="GridCell.Tab.2.left/2560.279.1440.877/-1440.448.1440.877/0.23.2560.1417@0.23.2560.1417" timestamp="1581240972900" />
-    <state width="2518" height="717" key="GridCell.Tab.2.left/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1581493396234" />
-    <state width="2518" height="717" key="GridCell.Tab.2.right" timestamp="1581493396234">
-      <screen x="0" y="23" width="2560" height="1417" />
+    <state width="1398" height="413" key="GridCell.Tab.2.left/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1582097421307" />
+    <state width="1398" height="413" key="GridCell.Tab.2.right" timestamp="1582654092509">
+      <screen x="0" y="23" width="1440" height="877" />
     </state>
+    <state width="1398" height="413" key="GridCell.Tab.2.right/0.23.1440.877/-200.-1057.1920.1057@0.23.1440.877" timestamp="1582654092509" />
     <state width="2518" height="311" key="GridCell.Tab.2.right/0.23.1440.877/-552.-1417.2560.1417@0.23.1440.877" timestamp="1581426215615" />
     <state width="1398" height="173" key="GridCell.Tab.2.right/0.23.1440.877/1440.-256.1440.877@0.23.1440.877" timestamp="1581149854686" />
-    <state width="2518" height="311" key="GridCell.Tab.2.right/0.23.1440.877@0.23.1440.877" timestamp="1581367690760" />
+    <state width="1398" height="413" key="GridCell.Tab.2.right/0.23.1440.877@0.23.1440.877" timestamp="1582380360115" />
     <state width="2518" height="311" key="GridCell.Tab.2.right/2560.279.1440.877/-1440.448.1440.877/0.23.2560.1417@0.23.2560.1417" timestamp="1581240972901" />
-    <state width="2518" height="717" key="GridCell.Tab.2.right/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1581493396234" />
+    <state width="1398" height="413" key="GridCell.Tab.2.right/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1582097421309" />
     <state x="393" y="147" key="SettingsEditor" timestamp="1581658795646">
       <screen x="0" y="23" width="2560" height="1417" />
     </state>
@@ -665,7 +730,7 @@
       <screen x="0" y="23" width="2560" height="1417" />
     </state>
     <state width="500" height="445" key="SwitcherDM/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1581663018191" />
-    <state x="973" y="563" key="com.intellij.ide.util.TipDialog" timestamp="1581486103269">
+    <state x="973" y="563" key="com.intellij.ide.util.TipDialog" timestamp="1582780338181">
       <screen x="0" y="23" width="2560" height="1417" />
     </state>
     <state x="547" y="357" key="com.intellij.ide.util.TipDialog/0.23.1440.877/-200.-1057.1920.1057@0.23.1440.877" timestamp="1580845122877" />
@@ -674,26 +739,26 @@
     <state x="547" y="357" key="com.intellij.ide.util.TipDialog/0.23.1440.877/1440.-256.1440.877@0.23.1440.877" timestamp="1581149138173" />
     <state x="547" y="357" key="com.intellij.ide.util.TipDialog/0.23.1440.877/1440.-736.2560.1417@0.23.1440.877" timestamp="1576914818414" />
     <state x="547" y="357" key="com.intellij.ide.util.TipDialog/0.23.1440.877@0.23.1440.877" timestamp="1580932783909" />
-    <state x="973" y="563" key="com.intellij.ide.util.TipDialog/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1581486103269" />
-    <state x="540" y="311" width="789" height="534" key="find.popup" timestamp="1581540123053">
-      <screen x="0" y="23" width="1440" height="877" />
+    <state x="973" y="563" key="com.intellij.ide.util.TipDialog/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1582780338181" />
+    <state x="846" y="452" width="1115" height="761" key="find.popup" timestamp="1582871950969">
+      <screen x="0" y="23" width="2560" height="1417" />
     </state>
     <state x="540" y="311" width="645" height="472" key="find.popup/0.23.1440.877/-200.-1057.1920.1057@0.23.1440.877" timestamp="1580843740096" />
     <state x="408" y="-952" width="1215" height="786" key="find.popup/0.23.1440.877/-552.-1417.2560.1417@-552.-1417.2560.1417" timestamp="1577120645150" />
     <state x="540" y="311" width="789" height="534" key="find.popup/0.23.1440.877/-552.-1417.2560.1417@0.23.1440.877" timestamp="1581540123053" />
     <state x="228" y="243" width="931" height="534" key="find.popup/0.23.1440.877/1440.-256.1440.877@0.23.1440.877" timestamp="1581180001961" />
     <state x="540" y="311" width="683" height="486" key="find.popup/0.23.1440.877/1440.-736.2560.1417@0.23.1440.877" timestamp="1576930160377" />
-    <state x="228" y="243" width="931" height="486" key="find.popup/0.23.1440.877@0.23.1440.877" timestamp="1580937462032" />
+    <state x="228" y="155" width="931" height="622" key="find.popup/0.23.1440.877@0.23.1440.877" timestamp="1582378469716" />
     <state x="405" y="378" width="1656" height="863" key="find.popup/2560.279.1440.877/-1440.448.1440.877/0.23.2560.1417@0.23.2560.1417" timestamp="1581232905883" />
-    <state x="960" y="488" width="758" height="534" key="find.popup/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1581404874139" />
+    <state x="846" y="452" width="1115" height="761" key="find.popup/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1582871950969" />
     <state x="517" y="381" width="1616" height="798" key="find.popup/2622.142.1858.1080/62.0.2498.1440@62.0.2498.1440" timestamp="1577718307895" />
-    <state x="946" y="348" width="1192" height="677" key="search.everywhere.popup" timestamp="1581237797226">
+    <state x="945" y="348" width="670" height="676" key="search.everywhere.popup" timestamp="1582003150186">
       <screen x="0" y="23" width="2560" height="1417" />
     </state>
     <state x="532" y="224" width="670" height="419" key="search.everywhere.popup/0.23.1440.877/1440.-256.1440.877@0.23.1440.877" timestamp="1581163192004" />
-    <state x="532" y="224" width="377" height="419" key="search.everywhere.popup/0.23.1440.877@0.23.1440.877" timestamp="1578153826784" />
+    <state x="532" y="224" width="670" height="419" key="search.everywhere.popup/0.23.1440.877@0.23.1440.877" timestamp="1581775422534" />
     <state x="946" y="348" width="1192" height="677" key="search.everywhere.popup/2560.279.1440.877/-1440.448.1440.877/0.23.2560.1417@0.23.2560.1417" timestamp="1581237797226" />
-    <state x="945" y="348" width="670" height="676" key="search.everywhere.popup/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1578465861805" />
+    <state x="945" y="348" width="670" height="676" key="search.everywhere.popup/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1582003150186" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
@@ -709,6 +774,9 @@
         <watch expression="$stripeSubscription-&gt;status" language="PHP" />
         <watch expression="$member" language="PHP" />
         <watch expression="$member-&gt;sharing_status" language="PHP" />
+        <watch expression="$event" language="PHP" />
+        <watch expression="$event-&gt;getConfig()['to']" language="PHP" />
+        <watch expression="$event-&gt;getState()" language="PHP" />
       </configuration>
     </watches-manager>
   </component>

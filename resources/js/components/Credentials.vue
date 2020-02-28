@@ -1,4 +1,3 @@
-import Swal from "sweetalert2";
 <template>
   <div>
     <modal name="credentialBox" width="80%" height="auto" :scrollable="true">
@@ -122,6 +121,11 @@ import Swal from "sweetalert2";
 
         this.$store.dispatch('sharings/fetchCredentials', this.$route.params.sharing_id)
 
+        /*
+        COMPLETAMENTE DA RIVEDERE, QUESTO EVENTO VIENE INVOCATO IN QUALSIASI SHARING (PER QUELL'UTENTE) E NON VA BENE
+
+
+
         window.Echo.private(`App.User.${this.authUser.id}`).notification( notifications => {
 
           this.$store.dispatch('sharings/updateSharing', { sharing: notifications.data.sharing })
@@ -162,6 +166,7 @@ import Swal from "sweetalert2";
               break
           }
         }),
+        */
 
         this.form.keys().forEach(key => {
           this.form[key] = this.sharing[key]

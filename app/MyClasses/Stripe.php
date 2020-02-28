@@ -190,9 +190,6 @@ class Stripe
             'product' => [
                 'name' => $sharing->name
             ],
-            'metadata' => [
-                'user_id' => $this->user->pl_account_id
-            ],
             'currency' => $this->user->currency
         ]);
 
@@ -258,5 +255,29 @@ class Stripe
                 'latest_invoice.payment_intent'
             ]
         ]);
+    }
+
+    public function payInvoice($id){
+
+        // Reattempt payment https://stripe.com/docs/billing/subscriptions/payment#failure-4
+
+        $stripeSubscription = \Stripe\Subscription::retrieve($id);
+
+        if($stripeSubscription->status === 'incomplete' || $stripeSubscription->status === 'past_due') {
+
+            $invoice = \Stripe\Invoice::retrieve([
+                'id' => $stripeSubscription->latest_invoice
+            ]);
+
+            try {
+                $invoice->pay([
+                    'expand' => [
+                        'payment_intent'
+                    ]
+                ]);
+            }catch (\Exception $e){
+                logger($e);
+            }
+        }
     }
 }

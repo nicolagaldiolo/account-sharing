@@ -10,8 +10,8 @@ return [
     |
     */
 
-    'day_refund_limit' => env('DAY_REFUND_LIMIT', '25'),
-    'limit_user_age' => env('LIMIT_USER_AGE', '18'),
+    'day_refund_limit' => env('DAY_REFUND_LIMIT', 25),
+    'limit_user_age' => env('LIMIT_USER_AGE', 18),
 
     'stripe' =>[
         'stripe_fee' => env('STRIPE_FEE', 100),
@@ -62,6 +62,8 @@ return [
                 'number' => '+4407036400109'
             ]
         ]
-    ]
+    ],
+
+    'paginate' => env('PAGINATE_ITEMS', 20)
 
 ];

@@ -4,7 +4,7 @@ namespace App\Providers;
 
 use App\Listeners\CredentialSubscriber;
 use App\Listeners\SharingSubscriber;
-use App\Listeners\SharingTransitionListener;
+use App\Listeners\SharingTransitionSubscriber;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -20,15 +20,13 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         Registered::class => [
             SendEmailVerificationNotification::class,
-        ],
-        'winzou.state_machine.*' => [
-            SharingTransitionListener::class
-        ],
+        ]
     ];
 
     protected $subscribe = [
         CredentialSubscriber::class,
-        SharingSubscriber::class
+        SharingSubscriber::class,
+        SharingTransitionSubscriber::class
     ];
 
     /**

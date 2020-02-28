@@ -10,6 +10,7 @@ $config = [
     'stripeFee' => config('custom.stripe.stripe_fee'),
     'platformFee' => config('custom.stripe.platform_fee'),
     'maxPaymentMethod' => config('custom.stripe.max_payment_method'),
+    'sharingUserStatus' => \App\Enums\SharingStatus::toSelectArray()
 ];
 @endphp
 <!DOCTYPE html>

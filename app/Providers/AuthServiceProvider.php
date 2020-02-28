@@ -12,6 +12,7 @@ use App\Sharing;
 use App\SharingUser;
 use App\User;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
@@ -35,14 +36,22 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
+        Gate::define('read-notification', function (User $user, DatabaseNotification $notification){
+            return $notification->notifiable_type === User::class && $user->id === $notification->notifiable_id;
+        });
+
         Gate::define('change-sharing-status', function (User $user, Sharing $sharing, $action){
             return $user->admin &&
                 $sharing->status === SharingApprovationStatus::Pending &&
                 in_array($action, SharingApprovationStatus::toArray());
         });
 
-        Gate::define('manage-own-sharing', function(User $user, $sharing){
+        Gate::define('manage-own-sharing', function(User $user, Sharing $sharing){
             return $user->id === $sharing->owner_id;
+        });
+
+        Gate::define('manage-own-sharingUser', function(User $user, SharingUser $sharingUser){
+            return $user->id === $sharingUser->sharing->owner_id;
         });
 
         Gate::define('can-add-payment-method', function($user, $paymentMethodTotal){
@@ -50,11 +59,11 @@ class AuthServiceProvider extends ServiceProvider
             return config('custom.stripe.max_payment_method') > $paymentMethodTotal;
         });
 
-        Gate::define('can-subscribe', function($user, $sharingUser){
-            return $user->id === $sharingUser->user_id && $sharingUser->status === SharingStatus::Approved;
+        Gate::define('can-pay', function(User $user, SharingUser $sharingUser){
+            return ($user->id === $sharingUser->user_id) && ($sharingUser->status === SharingStatus::Approved);
         });
 
-        Gate::define('can-restore', function($user, $sharingUser){
+        Gate::define('restore', function(User $user, SharingUser $sharingUser){
             return $user->id === $sharingUser->user_id && ($sharingUser->subscription && $sharingUser->subscription->status === SubscriptionStatus::getValue('past_due'));
         });
 

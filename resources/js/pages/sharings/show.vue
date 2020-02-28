@@ -64,11 +64,6 @@
                   </div>
                   <div v-else>
 
-                    <!--<div v-if="userSubscription === 4" class="alert alert-danger" role="alert">
-                      Attenzione ci sono problemi con i pagamenti.
-                      <router-link :to="{ name: 'sharing.restore' }" class="alert-link">Completa pagamento</router-link>
-                    </div>-->
-
                     <div v-if="sharing.user_status && !joined">
                       <div v-if="sharing.user_status.transitions.length">
                         <div v-for="(transition, index) in sharing.user_status.transitions" :key="index">
@@ -79,6 +74,13 @@
                         {{sharing.user_status.state.metadata.title}}
                       </div>
                     </div>
+                    <div v-else>
+                      <div v-if="userSubscription === 4" class="alert alert-danger" role="alert">
+                        Attenzione ci sono problemi con i pagamenti.
+                        <router-link :to="{ name: 'sharing.checkout' }" class="alert-link">Completa pagamento</router-link>
+                      </div>
+                    </div>
+
                   </div>
 
                   <a href="#" v-if="availability" class="mt-2 btn btn-outline-secondary btn-block">Invita i tuoi amici</a>
@@ -141,7 +143,6 @@
         }),
 
         created () {
-
           this.$store.dispatch('sharings/fetchSharing', this.$route.params.sharing_id).then(() => {
             if (!this.$store.getters['sharings/sharing'].id || this.$store.getters['sharings/sharing'].category_id !== +this.$route.params.category_id) {
               this.$router.push({ name: '404' })
@@ -175,17 +176,17 @@
             sharingRefused () {
                 return this.sharing.status === 2
             },
-            /*
             userSubscription () {
-                const user = this.sharing.active_users.filter(user => user.id === this.authUser.id)
-                return (user.length && user[0].sharing_status.subscription) ? user[0].sharing_status.subscription.status : {}
+                const user = this.sharing.members.find(user => user.id === this.authUser.id);
+                return (user) ? user.subscription.status : {}
             }
-
-             */
         },
 
         watch: {
             sharing (value) {
+
+              //console.log(value);
+
                 this.globalMembers = [value.owner];
                 if(value.members) this.globalMembers.push(...value.members);
             }

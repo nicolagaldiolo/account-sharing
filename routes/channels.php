@@ -21,6 +21,10 @@ Broadcast::channel('App.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });
 
+Broadcast::channel('sharingUser.{sharingUser}', function($user, \App\SharingUser $sharingUser) {
+    return $user->id === $sharingUser->user_id;
+});
+
 Broadcast::channel('chatSharing.{sharing}', function(User $user, Sharing $sharing){
     return Gate::allows('manage-sharing', $sharing);
 });

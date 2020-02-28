@@ -18,52 +18,52 @@
         </ul>
 
         <ul class="navbar-nav ml-auto">
-
-          <li v-if="user" class="nav-item">
-            <router-link :to="{ name: 'sharing.requests' }" class="nav-link">
-              Crea Condivisione
-            </router-link>
-          </li>
-
-          <li v-if="user" class="nav-item">
-            <router-link :to="{ name: 'home' }" class="nav-link">
-              Naviga
-            </router-link>
-          </li>
-
-          <li v-if="user" class="nav-item">
-            <router-link :to="{ name: 'sharings' }" class="nav-link">
-              Miei Gruppi
-            </router-link>
-          </li>
-
-          <li v-if="user" class="nav-item">
-            <router-link :to="{ name: 'feed' }" class="nav-link">
-              Richieste
-            </router-link>
-          </li>
-
-          <!-- Authenticated -->
-          <li v-if="user" class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle text-dark"
-               href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-            >
-              <img :src="user.photo_url" class="rounded-circle profile-photo mr-1">
-              {{ user.name }}
-            </a>
-            <div class="dropdown-menu">
-              <router-link :to="{ name: 'settings.profile' }" class="dropdown-item pl-3">
-                <fa icon="cog" fixed-width />
-                {{ $t('settings') }}
+          <template v-if="user">
+            <li class="nav-item">
+              <router-link :to="{ name: 'sharing.requests' }" class="nav-link">
+                Crea Condivisione
               </router-link>
+            </li>
 
-              <div class="dropdown-divider" />
-              <a href="#" class="dropdown-item pl-3" @click.prevent="logout">
-                <fa icon="sign-out-alt" fixed-width />
-                {{ $t('logout') }}
+            <li class="nav-item">
+              <router-link :to="{ name: 'home' }" class="nav-link">
+                Naviga
+              </router-link>
+            </li>
+
+            <li class="nav-item">
+              <router-link :to="{ name: 'sharings' }" class="nav-link">
+                Miei Gruppi
+              </router-link>
+            </li>
+
+            <li class="nav-item">
+              <router-link :to="{ name: 'notifications' }" class="nav-link">
+                Notifiche
+              </router-link>
+            </li>
+
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle text-dark"
+                 href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+              >
+                <img :src="user.photo_url" class="rounded-circle profile-photo mr-1">
+                {{ user.name }}
               </a>
-            </div>
-          </li>
+              <div class="dropdown-menu">
+                <router-link :to="{ name: 'settings.profile' }" class="dropdown-item pl-3">
+                  <fa icon="cog" fixed-width />
+                  {{ $t('settings') }}
+                </router-link>
+
+                <div class="dropdown-divider" />
+                <a href="#" class="dropdown-item pl-3" @click.prevent="logout">
+                  <fa icon="sign-out-alt" fixed-width />
+                  {{ $t('logout') }}
+                </a>
+              </div>
+            </li>
+          </template>
           <!-- Guest -->
           <template v-else>
             <li class="nav-item">

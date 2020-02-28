@@ -2,13 +2,13 @@
 
 namespace App\Http\Resources;
 
-use App\Http\Traits\UtilityTrait;
+use App\Http\Traits\Utility;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
 
 class Category extends JsonResource
 {
-    use UtilityTrait;
+    use Utility;
 
     /**
      * Transform the resource into an array.

@@ -6,6 +6,7 @@ import App from '~/components/App'
 import Clipboard from 'v-clipboard'
 import VueCurrencyInput from 'vue-currency-input'
 import VModal from 'vue-js-modal'
+import Toasted from 'vue-toasted'
 
 import Echo from 'laravel-echo'
 import '~/plugins'
@@ -16,6 +17,7 @@ Vue.use(require('vue-moment')) // Use inside component as this.$moment() or as {
 Vue.use(Clipboard)
 Vue.use(VueCurrencyInput)
 Vue.use(VModal)
+Vue.use(Toasted)
 window.Pusher = require('pusher-js');
 
 window.Echo = new Echo({

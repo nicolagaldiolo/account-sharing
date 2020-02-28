@@ -3,11 +3,13 @@
     <div class="media align-items-center">
       <img src="https://lorempixel.com/40/40/?28787" class="mr-3 rounded-circle" alt="">
       <div class="media-body align-items-centeri">
-        <h6 class="mt-0">{{user.name}}<small class="pl-2 text-muted">Last updated 3 mins ago</small></h6>
+        <h6 class="mt-0">{{user.username}}<br>
+          <small class="text-muted">{{ sharingUserStatus }}</small>
+        </h6>
       </div>
     </div>
-    <div v-if="buttons">
-      <a v-for="(item, index) in user.possible_transitions" :key="index" @click.prevent="transition(item)" href="#" class="btn btn-primary btn-sm">{{item}}</a>
+    <div>
+      <a v-for="(item, index) in user.transitions" :key="index" @click.prevent="transition(item)" href="#" class="btn btn-primary btn-sm">{{item}}</a>
     </div>
   </div>
 </template>
@@ -25,17 +27,18 @@
       user: {
         type: Object,
         default: null
-      },
-      buttons: {
-        type: Boolean,
-        default: false
+      }
+    },
+    computed: {
+      sharingUserStatus: function () {
+        return window.config.sharingUserStatus[this.user.user_status]
       }
     },
 
     methods: {
-      transition : function(transition) {
+      transition: function (transition) {
         axios.patch(`/api/sharings/${this.sharing.id}/user/${this.user.id}/transition-user/${transition}`).then((response) => {
-          this.$store.dispatch('sharings/syncSharings', { sharing: response.data })
+          this.$store.dispatch('sharings/syncSharings', { sharing: response.data.data })
         });
       }
     }

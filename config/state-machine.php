@@ -89,19 +89,19 @@ return [
                     // call the callback on a specific transition
                     'on' => 'approve',
                     // will check the ability on the gate or the class policy
-                    'can' => 'manage-own-sharing',
+                    'can' => 'manage-own-sharingUser',
                 ],
                 'guard_on_refusing' => [
                     // call the callback on a specific transition
                     'on' => 'refuses',
                     // will check the ability on the gate or the class policy
-                    'can' => 'manage-own-sharing',
+                    'can' => 'manage-own-sharingUser',
                 ],
                 'guard_on_payment' => [
                     // call the callback on a specific transition
                     'on' => 'pay',
                     // will check the ability on the gate or the class policy
-                    'can' => 'can-subscribe',
+                    'can' => 'can-pay',
                 ],
                 'guard_on_left' => [
                     'on' => 'left',
@@ -124,9 +124,6 @@ return [
                 ],
                 */
             ],
-
-            // will be called before applying a transition
-            'before' => [],
 
             // will be called after applying a transition
             'after' => [

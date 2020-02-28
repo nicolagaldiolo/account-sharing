@@ -65,6 +65,7 @@ export const actions = {
   },
 
   async addPaymentMethod ({ commit }, paymentMethod) {
+
     try {
       const { data } = await axios.post('/api/settings/paymentmethods', {
         payment_method: paymentMethod

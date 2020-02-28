@@ -15,7 +15,7 @@ class Sharing extends JsonResource
         // Ensure you call the parent constructor
         parent::__construct($resource);
         $this->resource = $resource;
-        $this->user = $user;
+        $this->user = ($user instanceof \App\User) ? $user : null;
     }
 
     /**
@@ -29,25 +29,24 @@ class Sharing extends JsonResource
     {
         $userStatus = null;
 
-        if($request->is('api/sharings/*')){
-            // If user provided get the sharingUser for that user otherwise use the logged user
-            $sharingUser = is_null($this->user) ? $this->sharingUser : $this->sharingUser($this->user)->first();
+        // If user provided get the sharingUser for that user otherwise use the logged user
+        $sharingUser = is_null($this->user) ? $this->sharingUser : $this->sharingUser($this->user)->first();
 
-            if(!is_null($sharingUser)){
-                $stateMachine = $sharingUser->stateMachine();
-                $userStatus = [
-                    'state' => [
-                        'value' => $stateMachine->getState(),
-                        'metadata' => $stateMachine->metadata('state'),
-                    ],
-                    'transitions' => collect($stateMachine->getPossibleTransitions())->map(function ($value) use ($stateMachine) {
-                        return [
-                            'value' => $value,
-                            'metadata' => $stateMachine->metadata()->transition($value)
-                        ];
-                    })->all()
-                ];
-            }
+        if(!is_null($sharingUser)){
+            $stateMachine = $sharingUser->stateMachine();
+            $userStatus = [
+                'id' => $sharingUser->id,
+                'state' => [
+                    'value' => $stateMachine->getState(),
+                    'metadata' => $stateMachine->metadata('state'),
+                ],
+                'transitions' => collect($stateMachine->getPossibleTransitions())->map(function ($value) use ($stateMachine) {
+                    return [
+                        'value' => $value,
+                        'metadata' => $stateMachine->metadata()->transition($value)
+                    ];
+                })->all()
+            ];
         }
 
         return [
@@ -67,7 +66,9 @@ class Sharing extends JsonResource
             'created_at' => $this->created_at,
             'owner' => new MemberResource($this->whenLoaded('owner')),
             'renewal_frequency' => $this->renewalFrequency->frequency,
-            $this->mergeWhen($request->is('api/sharings/*'), [
+            'users' => MemberResource::collection($this->whenLoaded('users')),
+
+            //$this->mergeWhen($request->is('api/sharings/*'), [
                 $this->mergeWhen(Auth::user()->can('manage-sharing', $this), [
                     'members' => MemberResource::collection($this->whenLoaded('members')),
                 ]),
@@ -75,7 +76,7 @@ class Sharing extends JsonResource
                 $this->mergeWhen($userStatus, [
                     'user_status' => $userStatus
                 ]),
-            ]),
+            //])
 
         ];
 

@@ -33,10 +33,11 @@ class PaymentMethodsController extends Controller
             'type' => 'card',
         ]);
 
-        return (new PaymentMethodCollection(collect($paymentMethods->data)))->additional(
-            ['meta' => [
+        return (new PaymentMethodCollection(collect($paymentMethods->data)))->additional([
+            'meta' => [
                 'defaultPaymentMethod' => $stripeCustomer->invoice_settings->default_payment_method,
-            ]]);
+            ]
+        ]);
     }
 
     /**
@@ -78,9 +79,11 @@ class PaymentMethodsController extends Controller
             ]
         );
 
-        return (new PaymentMethod(PaymentMethod::make(json_decode($payment_method->toJSON(), true))->resolve()))->additional(['meta' => [
-            'defaultPaymentMethod' => $newPaymentMethod,
-        ]]);
+        return (new PaymentMethod(PaymentMethod::make(json_decode($payment_method->toJSON(), true))->resolve()))->additional([
+            'meta' => [
+                'defaultPaymentMethod' => $newPaymentMethod,
+            ]
+        ]);
     }
 
     /**

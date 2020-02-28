@@ -4,14 +4,14 @@ namespace App;
 
 use App\Enums\SharingStatus;
 use App\Enums\SharingVisibility;
-use App\Http\Traits\UtilityTrait;
+use App\Http\Traits\Utility;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 
 class Sharing extends Model
 {
-    use SoftDeletes, UtilityTrait;
+    use SoftDeletes, Utility;
 
     protected $fillable = [
         'name',
@@ -26,19 +26,6 @@ class Sharing extends Model
         'renewal_frequency_id',
         'category_id'
     ];
-
-    //protected $with = [
-    //    'category'
-    //];
-
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::addGlobalScope('country', function ($builder) {
-            $builder->has('category');
-        });
-    }
 
     public function setSlotAttribute($value){
         $this->attributes['slot'] = $value;
@@ -139,12 +126,12 @@ class Sharing extends Model
 
     public function scopePending($query)
     {
-        return $query->whereStatus(SharingStatus::Pending);
+        return $query->where('sharing_user.status', SharingStatus::Pending);
     }
 
     public function scopeApproved($query)
     {
-        return $query->whereStatus(SharingStatus::Approved);
+        return $query->where('sharing_user.status', SharingStatus::Approved);
     }
 
     public function scopePublic($query)
@@ -153,14 +140,13 @@ class Sharing extends Model
         //return $query->whereVisibility(SharingVisibility::Public);
     }
 
+    public function scopeJoined($query)
+    {
+        return $query->where('sharing_user.status', SharingStatus::Joined);
+    }
 
 /*$posts = App\Post::withCount(['votes', 'comments' => function (Builder $query) {
     $query->where('content', 'like', 'foo%');
 }])->get();*/
 
-
-    public function scopeJoined($query)
-    {
-        return $query->whereStatus(SharingStatus::Joined);
-    }
 }
