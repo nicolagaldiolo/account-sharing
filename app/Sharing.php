@@ -8,6 +8,7 @@ use App\Http\Traits\Utility;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class Sharing extends Model
 {
@@ -56,6 +57,15 @@ class Sharing extends Model
     public function getPriceWithFeeAttribute(){
         return ($this->price / $this->capacity) + (floatval(config('custom.stripe.stripe_fee')) / 100) + (floatval(config('custom.stripe.platform_fee')) / 100);
     }
+
+    public function setImageAttribute($image){
+        $this->attributes['image'] = $image->store('sharings');
+    }
+
+    public function getImageAttribute($image){
+        return Storage::url($image ? $image : config('custom.default_image'));
+    }
+
 
     public function category(){
         return $this->belongsTo(Category::class);

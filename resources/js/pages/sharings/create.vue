@@ -1,17 +1,14 @@
-import Swal from "sweetalert2";
 <template>
   <div>
     <section class="jumbotron text-center">
       <div class="container">
         <h1 class="jumbotron-heading">Crea condivisione</h1>
         <p class="lead text-muted">Something short and leading about the collection below—its contents, the creator, etc. Make it short and sweet, but not too short so folks don’t simply skip over it entirely.</p>
-
         <alert-error :form="form" :message="form.message"></alert-error>
       </div>
     </section>
     <div class="container">
       <div v-if="!Object.keys(category).length" class="list-group text-center">
-
         <div v-for="category in categories" :key="category.id">
           <a v-if="!category.forbidden" href="#" @click.prevent="setCategory($event, category)" class="list-group-item list-group-item-action">{{ category.name }}</a>
           <a v-else href="#" class="list-group-item list-group-item-action disabled">{{ category.name }}</a>
@@ -19,10 +16,18 @@ import Swal from "sweetalert2";
       </div>
 
       <div v-if="Object.keys(category).length">
-
         <neededinfo v-if="user.additional_data_needed"></neededinfo>
         <card v-else :title="`Nuovo ${category.name}`">
           <form @submit.prevent="create" @keydown="form.onKeydown($event)">
+
+            <!-- Cover image -->
+            <div class="form-group row">
+              <label class="col-md-3 col-form-label text-md-right">{{ $t('load_image') }}</label>
+              <div class="col-md-7">
+                <input type="file" :class="{ 'is-invalid': form.errors.has('image') }" class="form-control" name="image" ref="image">
+                <has-error :form="form" field="image" />
+              </div>
+            </div>
 
             <!-- Renewal frequency -->
             <div class="form-group row">
@@ -130,6 +135,8 @@ import Swal from "sweetalert2";
   import MoneyFormat from 'vue-money-format'
   import Swal from 'sweetalert2'
 
+  const objectToFormData = window.objectToFormData;
+
   export default {
     components: {
       Neededinfo,
@@ -140,6 +147,7 @@ import Swal from "sweetalert2";
     data: () => ({
       category: {},
       form: new Form({
+        image: null,
         name: '',
         description: '',
         price: 0,
@@ -162,7 +170,20 @@ import Swal from "sweetalert2";
       },
       async create () {
 
-        const { data } = await this.form.post('/api/sharings')
+        this.form.image = this.$refs.image.files[0]
+
+        const { data } = await this.form.submit('post', '/api/sharings', {
+          // Transform form data to FormData
+          transformRequest: [function (data, headers) {
+            return objectToFormData(data)
+          }],
+          onUploadProgress: e => {
+            // Do whatever you want with the progress event
+            //console.log(e)
+          }
+        });
+
+        console.log(this.form);
 
         // Redirect to sharing.
         this.$router.push( { name: 'sharing.show', params: { category_id: data.data.category_id, sharing_id: data.data.id }})

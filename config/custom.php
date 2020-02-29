@@ -10,6 +10,7 @@ return [
     |
     */
 
+    'default_image' => env('DEFAULT_IMAGE', 'default.png'),
     'day_refund_limit' => env('DAY_REFUND_LIMIT', 25),
     'limit_user_age' => env('LIMIT_USER_AGE', 18),
 

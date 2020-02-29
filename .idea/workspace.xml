@@ -5,16 +5,11 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Category.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Category.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Sharings/SharingsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Sharings/SharingsController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Traits/Utility.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Traits/Utility.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Requests/SharingRequest.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Requests/SharingRequest.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Sharing.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Sharing.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/Sharings.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Sharings.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/pages/home.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/home.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/pages/notifications.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/notifications.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/pages/sharings/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/sharings/index.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/pages/sharings/owner.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/sharings/owner.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/pages/sharings/show.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/sharings/show.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/store/modules/categories.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/store/modules/categories.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/store/modules/sharings.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/store/modules/sharings.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/custom.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/custom.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/lang/en.json" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/lang/en.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/pages/sharings/create.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/sharings/create.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -342,19 +337,19 @@
     <property name="ts.external.directory.path" value="$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external" />
   </component>
   <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/storage/app/public" />
+      <recent name="$PROJECT_DIR$/resources/js/pages" />
+      <recent name="$PROJECT_DIR$/resources/js/components" />
+      <recent name="$PROJECT_DIR$/storage" />
+      <recent name="$PROJECT_DIR$/import_data" />
+    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/resources/js/components" />
       <recent name="$PROJECT_DIR$/resources/js/middleware" />
       <recent name="$PROJECT_DIR$/app/Listeners" />
       <recent name="C:\Zweb\xampp\htdocs\account-sharing\resources\js\pages\settings" />
       <recent name="$PROJECT_DIR$/resources/js/pages/settings" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/resources/js/pages" />
-      <recent name="$PROJECT_DIR$/resources/js/components" />
-      <recent name="$PROJECT_DIR$/storage" />
-      <recent name="$PROJECT_DIR$/import_data" />
-      <recent name="$PROJECT_DIR$/app/MyClasses/Support/Facade" />
     </key>
   </component>
   <component name="RunManager">
@@ -515,7 +510,7 @@
       <workItem from="1582175373151" duration="5029000" />
       <workItem from="1582181382613" duration="32353000" />
       <workItem from="1582780337661" duration="17709000" />
-      <workItem from="1582961725395" duration="23343000" />
+      <workItem from="1582961725395" duration="31651000" />
     </task>
     <servers />
   </component>
@@ -552,15 +547,15 @@
       <screen x="0" y="23" width="2560" height="1417" />
     </state>
     <state x="1018" y="485" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1580193449256" />
-    <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1582985681420">
-      <screen x="0" y="23" width="1440" height="877" />
+    <state x="814" y="346" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1582999873648">
+      <screen x="0" y="23" width="2560" height="1417" />
     </state>
     <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1440.877/-552.-1417.2560.1417@0.23.1440.877" timestamp="1581540424495" />
     <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1440.877/1440.-256.1440.877@0.23.1440.877" timestamp="1580568010586" />
     <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1440.877/1440.-736.2560.1417@0.23.1440.877" timestamp="1582985681420" />
     <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1440.877@0.23.1440.877" timestamp="1582381482007" />
     <state x="814" y="346" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/2560.279.1440.877/-1440.448.1440.877/0.23.2560.1417@0.23.2560.1417" timestamp="1581239503735" />
-    <state x="814" y="346" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1582786310206" />
+    <state x="814" y="346" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1582999873648" />
     <state x="483" y="173" key="#xdebugger.evaluate" timestamp="1581097553132">
       <screen x="0" y="23" width="1440" height="877" />
     </state>

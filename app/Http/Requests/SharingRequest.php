@@ -35,6 +35,7 @@ class SharingRequest extends FormRequest
         $max_price = ($category->price > 0) ? '|max:' . $category->price : '';
 
         return [
+            'image'                 => 'required|image|mimes:jpeg,bmp,png',
             'name'                  => 'required|max:255',
             'description'           => 'required|max:750',
             'visibility'            => ['required', new EnumValue(SharingVisibility::class, false)],
@@ -44,7 +45,7 @@ class SharingRequest extends FormRequest
             'renewal_frequency_id'  => 'required|exists:renewal_frequencies,id',
             'username'              => 'sometimes',
             'password'              => 'sometimes',
-            'service_igree'         => 'required|in:1',
+            //'service_igree'         => 'required|in:1',
         ];
     }
 }

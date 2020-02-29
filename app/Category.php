@@ -6,6 +6,7 @@ use App\Http\Traits\Utility;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class Category extends Model
 {
@@ -36,8 +37,12 @@ class Category extends Model
         });
     }
 
-    public function getImageAttribute(){
-        return 'https://img-dotcom-media.s3.us-east-2.amazonaws.com/assets/87831560-7b80-11e6-a932-0df35c00d3f8.jpg?v=31';
+    public function setImageAttribute($image){
+        $this->attributes['image'] = $image->store('categories');
+    }
+
+    public function getImageAttribute($image){
+        return Storage::url($image ? $image : config('custom.default_image'));
     }
 
     public function getSlotAttribute(){
