@@ -36,6 +36,10 @@ class Category extends Model
         });
     }
 
+    public function getImageAttribute(){
+        return 'https://img-dotcom-media.s3.us-east-2.amazonaws.com/assets/87831560-7b80-11e6-a932-0df35c00d3f8.jpg?v=31';
+    }
+
     public function getSlotAttribute(){
         return $this->getFreeSlot($this);
     }

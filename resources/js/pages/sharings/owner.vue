@@ -1,8 +1,8 @@
 <template>
   <div>
-    <div v-for="sharing in sharings.data" :key="sharing.id">
+    <div v-for="sharing in items" :key="sharing.id">
       <div class="row no-gutters">
-        <div class="col-md-2" :style="{'background-image': `url(${sharing.image})`}"></div>
+        <div class="col-md-2 sharing_image_bg" :style="{'background-image': `url(${sharing.image})`}"></div>
         <div class="col-md-10">
           <div class="card-body">
             <h5 class="card-title">{{sharing.name}} <small>{{sharing.availability}}/{{sharing.capacity}} disponibili</small></h5>
@@ -53,6 +53,7 @@ export default {
 
   data () {
     return {
+      items: [],
       current_page: 1,
       loading_state: {}
     }
@@ -61,6 +62,7 @@ export default {
   watch: {
     sharings (data) {
       if (data.data && data.data.length) {
+        this.items = data.data
         this.loading_state.loaded()
       }
       if (this.current_page < data.meta.last_page) {
@@ -84,6 +86,10 @@ export default {
 }
 </script>
 <style scoped>
+  .sharing_image_bg{
+    background-repeat: no-repeat;
+    background-size: 100%;
+  }
   .category-item{
     position: relative;
   }

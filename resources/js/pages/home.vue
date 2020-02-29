@@ -12,7 +12,7 @@
         </div>
       </div>
 
-      <sharings title="Condivisioni"></sharings>
+      <sharings />
 
     </div>
 
@@ -20,17 +20,26 @@
 </template>
 
 <script>
-  import Sharings from "~/components/Sharings";
+import { mapGetters } from 'vuex'
+import Sharings from '~/components/Sharings'
 
-  export default {
-    components: {
-      Sharings
-    },
-    middleware: [
-      'auth',
-      'registrationCompleted'
-    ]
+export default {
+  components: {
+    Sharings
+  },
+  middleware: [
+    'auth',
+    'registrationCompleted'
+  ],
+
+  computed: mapGetters({
+    categories: 'categories/categories',
+  }),
+
+  created () {
+    this.$store.dispatch('categories/fetchCategories')
   }
+}
 </script>
 
 <style scoped>

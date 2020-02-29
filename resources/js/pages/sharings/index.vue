@@ -1,5 +1,4 @@
 <template>
-
   <div>
     <div class="bg-white">
       <div class="container">

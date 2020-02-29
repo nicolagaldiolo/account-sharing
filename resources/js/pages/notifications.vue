@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="container">
-      <div v-for="(notification, key) in notifications.data" :key="key" class="card mb-3">
+      <div v-for="(notification, key) in items" :key="key" class="card mb-3">
         <div class="card-body">
           <div class="d-flex align-items-center justify-content-between">
             <img :src="notification.data.icon" width="40" class="rounded-circle" alt="">
@@ -43,6 +43,7 @@ export default {
 
   data () {
     return {
+      items: [],
       current_page: 1,
       loading_state: {}
     }
@@ -51,7 +52,10 @@ export default {
   watch: {
     notifications (data) {
 
-      if (data.data.length) this.loading_state.loaded()
+      if (data.data.length) {
+        this.items = data.data
+        this.loading_state.loaded()
+      }
 
       if (this.current_page < data.meta.last_page) {
         this.current_page += 1

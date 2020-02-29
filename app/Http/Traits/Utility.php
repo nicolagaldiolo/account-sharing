@@ -67,22 +67,4 @@ trait Utility
             'credential_updated_at' => Carbon::now()
         ]);
     }
-
-    protected function getSharingOwners($id = null)
-    {
-        $sharings = Auth::user()->sharingOwners();
-
-        if($id) $sharings->findOrFail($id);
-
-        return $sharings->with('users')->get()->each(function($sharing){
-            $sharing['xx_sharing_by_status'] = collect(SharingStatus::getInstances())->each(function($sharingStatus) use($sharing){
-
-                $users = $sharing->users->where('sharing_status.status', $sharingStatus->value)->each(function($user) use($sharing){
-                    $sharing_obj = $user->sharings()->whereSharingId($sharing->id)->first()->sharing_status;
-                    $user->possible_transitions = \StateMachine::get($sharing_obj, 'sharing')->getPossibleTransitions();
-                });
-                $sharingStatus->users = $users->values();
-            });
-        });
-    }
 }

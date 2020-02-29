@@ -35,7 +35,7 @@
                   <h5 class="card-title">{{sharing.name}}<br><small>{{sharing.description}}</small></h5>
                   <div class="text-right">
                     <h5 class="mb-0"><strong>{{sharing.availability}}/{{sharing.capacity}}</strong></h5>
-                    Posti liberi
+                    Posti disponibili
                   </div>
                 </div>
                 <ul class="list-group">

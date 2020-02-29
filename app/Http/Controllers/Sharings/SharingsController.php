@@ -18,6 +18,7 @@ use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\URL;
 
 class SharingsController extends Controller
 {
@@ -33,15 +34,12 @@ class SharingsController extends Controller
         $param = $request->input('type', '');
         switch ($param){
             case 'pending':
-                $sharings = SharingResource::collection(Auth::user()->sharings()->with('owner')->pending()->paginate(config('custom.paginate')));
+                $sharings = SharingResource::collection(Auth::user()->sharings()->with(['owner'])->pending()->paginate(config('custom.paginate')));
                 break;
             case 'approved':
                 $sharings = SharingResource::collection(Auth::user()->sharings()->with('owner')->approved()->paginate(config('custom.paginate')));
                 break;
             case 'owner':
-                // manipolo i dati tornati raggruppando gli utenti per stato della relazione con sharing(es: pendind: utenti..., joined: utenti...)
-                //$sharings = $this->getSharingOwners();
-
                 $sharings = SharingResource::collection(Auth::user()->sharingOwners()->with('users')->paginate(config('custom.paginate')));
                 break;
             case 'joined':
@@ -49,12 +47,20 @@ class SharingsController extends Controller
                 break;
             default:
 
-                //DISABILITO MOMENTANEAMENTE LA PAGINAZIONE PERCHè CREA PROBLEMI CON LA QUERY, DA SISTEMARE
-                // https://github.com/laravel/framework/issues/3105
+                // Create a custom pagination (https://github.com/laravel/framework/issues/3105)
 
-                //$sharings = SharingResource::collection(Sharing::with('owner')->public()->paginate(config('custom.paginate')));
-                //$sharings = SharingResource::collection(Sharing::with('owner')->public()->get(), Auth::user());
-                $sharings = SharingResource::collection(Sharing::with('owner')->paginate(config('custom.paginate')));
+                $perPage = config('custom.paginate');
+                $currentPage = $request->input('page', 1);
+                $path_url = URL::to("/{$request->route()->getPrefix()}/sharings");
+                $paginationOption = ['path' => $path_url];
+
+                $sharings = Sharing::with('owner')->public()->get();
+
+                $totalElements = $sharings->count();
+                $sharings_paginate = $sharings->slice(($currentPage - 1) * $perPage, $perPage);
+
+                $lengthAwarePaginator = new \Illuminate\Pagination\LengthAwarePaginator($sharings_paginate, $totalElements, $perPage, $currentPage, $paginationOption);
+                $sharings = SharingResource::collection($lengthAwarePaginator);
                 break;
         }
 

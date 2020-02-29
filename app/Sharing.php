@@ -27,6 +27,19 @@ class Sharing extends Model
         'category_id'
     ];
 
+    /**
+     * The "booting" method of the model.
+     *
+     * @return void
+     */
+    protected static function boot()
+    {
+        parent::boot();
+        static::addGlobalScope('country', function ($builder) {
+            $builder->whereHas('category');
+        });
+    }
+
     public function setSlotAttribute($value){
         $this->attributes['slot'] = $value;
         $this->attributes['capacity'] = $this->calcCapacity($value);
@@ -137,16 +150,11 @@ class Sharing extends Model
     public function scopePublic($query)
     {
         return $query->withCount('members')->havingRaw('`members_count` < `sharings`.`slot`')->whereVisibility(SharingVisibility::Public);
-        //return $query->whereVisibility(SharingVisibility::Public);
     }
 
     public function scopeJoined($query)
     {
         return $query->where('sharing_user.status', SharingStatus::Joined);
     }
-
-/*$posts = App\Post::withCount(['votes', 'comments' => function (Builder $query) {
-    $query->where('content', 'like', 'foo%');
-}])->get();*/
 
 }

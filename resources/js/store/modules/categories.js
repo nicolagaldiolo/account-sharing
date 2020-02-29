@@ -3,26 +3,26 @@ import * as types from '../mutation-types'
 
 // state
 export const state = {
-  data: {},
+  categories: {},
   category: {}
 }
 
 // getters
 export const getters = {
   category: state => state.category,
-  categories: state => state.data.categories,
-  renewal_frequencies: state => state.data.renewal_frequencies,
-  sharings_visibility: state => state.data.sharings_visibility,
+  categories: state => state.categories.categories,
+  renewal_frequencies: state => state.categories.renewal_frequencies,
+  sharings_visibility: state => state.categories.sharings_visibility,
 }
 
 // mutations
 export const mutations = {
-  [types.FETCH_CATEGORIES_SUCCESS] (state, { data }) {
-    state.data = data
+  [types.FETCH_CATEGORIES_SUCCESS] (state, { categories }) {
+    state.categories = categories
   },
 
   [types.FETCH_CATEGORIES_FAILURE] (state) {
-    state.data = {}
+    state.categories = {}
   },
 
   [types.FETCH_CATEGORY_SUCCESS] (state, { category }) {
@@ -41,7 +41,7 @@ export const actions = {
     try {
       let params = (embed.length > 0) ? `?embed=${embed.join(',')}` : '';
       const { data } = await axios.get('/api/categories' + params);
-      commit(types.FETCH_CATEGORIES_SUCCESS, { data: data.data })
+      commit(types.FETCH_CATEGORIES_SUCCESS, { categories: data.data })
     } catch (e) {
       commit(types.FETCH_CATEGORIES_FAILURE)
     }
