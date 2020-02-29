@@ -65,28 +65,23 @@ class CredentialUpdated extends Notification implements ShouldQueue
     public function toArray($notifiable)
     {
         return [
-            //
+            'icon' => $this->sharing->image,
+            'desc' => $this->sharing->owner->username . ' ha aggiornato le credenziali per la condivisione ' . $this->sharing->name,
+            'data' => [
+                'sharing' => new SharingResource($this->sharing, $notifiable),
+                'recipient' => $this->recipient
+            ]
         ];
     }
 
-    public function toBroadcast($notifiable)
-    {
-        return new BroadcastMessage([
-            'data' => [
-                'sharing' => new SharingResource($this->sharing, $notifiable),
-                'user' => $this->sharing->owner->username,
-                'recipient' => $this->recipient
-            ]
-        ]);
-    }
-
-
     protected function getChannels($notifiable)
     {
-        $channels = ['broadcast'];
+        $channels = [
+            'broadcast',
+        ];
 
         if(!$this->recipient || $this->recipient && $notifiable->id === $this->recipient->id){
-            array_push($channels, 'mail');
+            array_push($channels, 'mail', 'database');
         }
 
         return $channels;

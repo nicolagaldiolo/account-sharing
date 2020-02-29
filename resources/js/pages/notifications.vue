@@ -9,7 +9,7 @@
               <h6 class="card-title pb-0 mb-0">{{ notification.data.desc }}</h6>
               <p class="card-text"><small class="text-muted">{{ notification.created_at | moment("D MMMM YYYY") }}</small></p>
             </div>
-            <a href="#" @click.prevent="read" :data-id="notification.id">Ok</a>
+            <a href="#" @click.prevent="read" :data-id="notification.id">Chiudi</a>
           </div>
         </div>
       </div>

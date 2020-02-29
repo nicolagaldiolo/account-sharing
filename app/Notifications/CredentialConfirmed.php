@@ -23,12 +23,21 @@ class CredentialConfirmed extends Notification implements ShouldQueue
     public $user;
     public $sharing;
     public $action;
+    public $actionDesc;
 
     public function __construct($user, $sharing, $action)
     {
         $this->user = $user;
         $this->sharing = $sharing;
         $this->action = $action;
+
+        if($this->action === CredentialsStatus::Confirmed){
+            $this->actionDesc = $this->user->name . ' ha appena confermato che le credenziali di ' . $this->sharing->name . ' che hai salvato sono valide.';
+        }else if ($this->action === CredentialsStatus::Wrong) {
+            $this->actionDesc = $this->user->name . ' ha appena confermato che le credenziali di ' . $this->sharing->name . ' che hai salvato sono errate.';
+        }else{
+            $this->actionDesc = '';
+        }
     }
 
     /**
@@ -54,13 +63,13 @@ class CredentialConfirmed extends Notification implements ShouldQueue
             return (new MailMessage)
                 ->subject(config('app.name') . ': ' . $this->sharing->name . ' - Credenziali confermate')
                 ->greeting('Ciao ' . $notifiable->name)
-                ->line($this->user->name . ' ha appena confermato che le credenziali di ' . $this->sharing->name . ' che hai salvato sono valide.')
+                ->line($this->actionDesc)
                 ->line('Ora tutti gli utenti di ' . config('app.name') . ' sapranno che sei un admin affidabile.');
         }else if ($this->action === CredentialsStatus::Wrong) {
             return (new MailMessage)
                 ->subject(config('app.name') . ': ' . $this->sharing->name . ' - Credenziali errate')
                 ->greeting('Ciao ' . $notifiable->name)
-                ->line($this->user->name . ' ha appena confermato che le credenziali di ' . $this->sharing->name . ' che hai salvato sono errate.')
+                ->line($this->actionDesc)
                 ->line('Ti preghiamo di fornire delle credenziali corrette.');
         }
     }
@@ -74,27 +83,23 @@ class CredentialConfirmed extends Notification implements ShouldQueue
     public function toArray($notifiable)
     {
         return [
-            //
-        ];
-    }
-
-    public function toBroadcast($notifiable)
-    {
-        return new BroadcastMessage([
+            'icon' => $this->sharing->image,
+            'desc' => $this->actionDesc,
             'data' => [
                 'sharing' => new SharingResource($this->sharing, $notifiable),
-                'user' => $this->user->username,
                 'action' => $this->action
             ]
-        ]);
+        ];
     }
 
     protected function getChannels($notifiable)
     {
-        $channels = ['broadcast'];
+        $channels = [
+            'broadcast'
+        ];
 
         if($notifiable->id === $this->sharing->owner->id || !$this->sharing->members->pluck('id')->contains($this->user->id)){
-            array_push($channels, 'mail');
+            array_push($channels, 'mail', 'database');
         }
 
         return $channels;

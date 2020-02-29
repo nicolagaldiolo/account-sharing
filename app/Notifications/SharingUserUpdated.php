@@ -36,7 +36,9 @@ class SharingUserUpdated extends Notification implements ShouldQueue
     public function via($notifiable)
     {
         return [
-            'mail'
+            'mail',
+            'database',
+            'broadcast'
         ];
     }
 
@@ -63,10 +65,12 @@ class SharingUserUpdated extends Notification implements ShouldQueue
      * @param  mixed  $notifiable
      * @return array
      */
+    // The default method for Database e Broadcast channel, otherwise must create the toDatabase() and toBroadcast() methods
     public function toArray($notifiable)
     {
         return [
-            //
+            'icon' => $this->sharing->image,
+            'desc' => 'La tua richiesta di partecipazione al gruppo di condivisione ' . $this->sharing->name . ' è in stato ' . $this->status
         ];
     }
 }

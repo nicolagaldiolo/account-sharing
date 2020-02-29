@@ -34,6 +34,20 @@ export const helperMixin = {
           break
       }
       return status
+    },
+
+    showNotificationToast (message = 'notification_title', id) {
+      const options = {
+        action: {
+          text: 'Chiudi',
+          onClick: (e, toastObject) => {
+            if (id) this.$store.dispatch('settings/readNotification', id)
+            toastObject.goAway(0)
+          }
+        },
+        duration: 6000
+      }
+      this.$toasted.show(message, options)
     }
   }
 }

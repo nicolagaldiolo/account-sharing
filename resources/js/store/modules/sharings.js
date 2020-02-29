@@ -94,6 +94,7 @@ export const mutations = {
 // actions
 export const actions = {
   async fetchSharings ({ commit }, params) {
+
     try {
       const data = await axios.get('/api/sharings' + params)
       commit(types.FETCH_SHARINGS_SUCCESS, { sharings: data.data })
@@ -113,7 +114,6 @@ export const actions = {
   async fetchSharing ({ commit }, id) {
     try {
       const { data } = await axios.get('/api/sharings/' + id)
-
       commit(types.FETCH_SHARING_SUCCESS, { sharing: data.data })
     } catch (e) {
       commit(types.FETCH_SHARING_FAILURE)
