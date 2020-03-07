@@ -13,8 +13,12 @@
 
 Route::get('/prova', 'Sharings\SharingsController@prova');
 
+
 Route::any('stripe', 'Stripe\WebhookController@handleWebhook');
 
 Route::get('{path}', function () {
     return view('index');
-})->where('path', '(.*)');
+})->where('path', '^(?!storage).*$');
+
+
+//Route::get('{path}')->where('any', '^(?!nova).*$');

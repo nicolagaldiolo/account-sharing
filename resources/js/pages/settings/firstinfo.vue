@@ -40,7 +40,6 @@
 <script>
 import Form from 'vform'
 import { mapGetters } from 'vuex'
-import { Card, createToken } from 'vue-stripe-elements-plus'
 
 export default {
   scrollToTop: false,

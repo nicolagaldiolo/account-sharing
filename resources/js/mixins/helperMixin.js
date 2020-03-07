@@ -48,6 +48,19 @@ export const helperMixin = {
         duration: 6000
       }
       this.$toasted.show(message, options)
+    },
+
+    showSimpleToast (message) {
+      const options = {
+        action: {
+          text: 'Chiudi',
+          onClick: (e, toastObject) => {
+            toastObject.goAway(0)
+          }
+        },
+        duration: 6000
+      }
+      this.$toasted.show(message, options)
     }
   }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\Member as MemberResource;
+use App\Http\Resources\Category as CategoryResource;
 
 class Sharing extends JsonResource
 {
@@ -62,12 +63,13 @@ class Sharing extends JsonResource
             'price_no_fee' => round($this->priceNoFee, 2),
             'multiaccount' => $this->multiaccount,
             'credential_status' => $this->credentialStatus,
-            'image' => $this->image,
+            'image' => $this->publicImage,
             'created_at' => $this->created_at,
             'owner' => new MemberResource($this->whenLoaded('owner')),
             'renewal_frequency' => $this->renewalFrequency->frequency,
             'users' => MemberResource::collection($this->whenLoaded('users')),
-
+            'visibility' => $this->visibility,
+            'category' => new CategoryResource($this->whenLoaded('category')),
             //$this->mergeWhen($request->is('api/sharings/*'), [
                 $this->mergeWhen(Auth::user()->can('manage-sharing', $this), [
                     'members' => MemberResource::collection($this->whenLoaded('members')),

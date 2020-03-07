@@ -17,8 +17,11 @@ use App\Sharing;
 use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
 
 class SharingsController extends Controller
 {
@@ -80,7 +83,23 @@ class SharingsController extends Controller
     public function prova(Request $request)
     {
 
-        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+
+
+        //dd($uploaded_file);
+        $url = 'https://pay.google.com/about/static/images/social/og_image.jpg';
+        $info = pathinfo($url);
+        $contents = file_get_contents($url);
+        $file = '/tmp/' . $info['basename'];
+        file_put_contents($file, $contents);
+        $uploaded_file = new UploadedFile($file, $info['basename']);
+        //$url = "http://www.google.co.in/intl/en_com/images/srpr/logo1w.png";
+        //$contents = file_get_contents($url);
+        //$filename = uniqid() . '.' . pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION);
+
+        //Storage::put('sharings/' . $filename, $contents);
+
+
+        /*\Stripe\Stripe::setApiKey(config('services.stripe.secret'));
         \Stripe\Stripe::setApiVersion("2019-10-08");
 
         $customers = collect(\Stripe\Subscription::all(['limit' => 99])->data);
@@ -88,7 +107,7 @@ class SharingsController extends Controller
             $customers->each(function($item){
                 $item->delete();
             });
-        }
+        }*/
 
         /*
         $user = Auth::login(User::find(1));
@@ -176,12 +195,12 @@ class SharingsController extends Controller
      */
     public function store(SharingRequest $request)
     {
-
         $category = Category::findOrFail($request->get('category_id'));
         $this->authorize('create-sharing', $category);
 
         $dataValidated = $request->validated();
         $dataValidated['status'] = ($category->custom) ? SharingApprovationStatus::Pending: SharingApprovationStatus::Approved;
+        $dataValidated['image'] = $this->processSharingImage($request);
 
         // Create the sharing
         $user = Auth::user();
@@ -219,7 +238,7 @@ class SharingsController extends Controller
      */
     public function show(Sharing $sharing)
     {
-        $sharing->load(['members','owner']);
+        $sharing->load(['members','owner','category']);
 
         return new SharingResource($sharing);
     }
@@ -242,7 +261,7 @@ class SharingsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Sharing $sharing, User $user)
+    public function renewalUpdate(Request $request, Sharing $sharing, User $user)
     {
         $this->authorize('update-sharing', [$sharing, $user]);
 
@@ -258,6 +277,20 @@ class SharingsController extends Controller
 
         return new SharingResource($sharing);
 
+    }
+
+    public function update(SharingRequest $request, Sharing $sharing)
+    {
+        $this->authorize('manage-own-sharing', $sharing);
+
+        $dataValidated = $request->validated();
+        $dataValidated['image'] = $this->processSharingImage($request);
+
+        $sharing->update($dataValidated);
+
+        $sharing->load(['members','owner','category']);
+
+        return new SharingResource($sharing);
     }
 
     public function subscribeRestore(Request $request, Sharing $sharing)

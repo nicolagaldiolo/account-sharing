@@ -20,6 +20,7 @@ Vue.use(VModal)
 Vue.use(toasted)
 window.Pusher = require('pusher-js');
 
+
 window.Echo = new Echo({
   authEndpoint: '/api/broadcasting/auth',
   broadcaster: 'pusher',

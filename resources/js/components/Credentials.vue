@@ -161,11 +161,7 @@ export default {
   }
 }
 </script>
-<style>
-  .v--modal{
-    padding: 20px;
-  }
-
+<style scoped>
   .c-green{
     color: #1c7430;
   }

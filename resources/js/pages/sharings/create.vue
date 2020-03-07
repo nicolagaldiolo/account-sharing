@@ -1,5 +1,6 @@
 <template>
   <div>
+
     <section class="jumbotron text-center">
       <div class="container">
         <h1 class="jumbotron-heading">Crea condivisione</h1>
@@ -18,15 +19,15 @@
       <div v-if="Object.keys(category).length">
         <neededinfo v-if="user.additional_data_needed"></neededinfo>
         <card v-else :title="`Nuovo ${category.name}`">
+
+
           <form @submit.prevent="create" @keydown="form.onKeydown($event)">
 
             <!-- Cover image -->
-            <div class="form-group row">
-              <label class="col-md-3 col-form-label text-md-right">{{ $t('load_image') }}</label>
-              <div class="col-md-7">
-                <input type="file" :class="{ 'is-invalid': form.errors.has('image') }" class="form-control" name="image" ref="image">
-                <has-error :form="form" field="image" />
-              </div>
+            <div class="mb-4">
+              <ImageSelector :category="category" @finished="finished"/>
+              <div :class="{ 'is-invalid': form.errors.has('img_file') }" class="form-control d-none"></div>
+              <has-error :form="form" field="img_file" />
             </div>
 
             <!-- Renewal frequency -->
@@ -86,7 +87,7 @@
               <div class="col-md-7">
                 <select v-model="form.visibility" :class="{ 'is-invalid': form.errors.has('visibility') }" class="form-control" name="visibility">
                   <option value="">Scegli la visibilità</option>
-                  <option v-for="(visibility, index) in sharings_visibility" :key="index" :value="index">{{visibility}}</option>
+                  <option v-for="(visibility, index) in sharingsVisibility" :key="index" :value="index">{{visibility}}</option>
                 </select>
                 <has-error :form="form" field="visibility" />
               </div>
@@ -134,11 +135,13 @@
   import Neededinfo from '../settings/neededinfo'
   import MoneyFormat from 'vue-money-format'
   import Swal from 'sweetalert2'
+  import ImageSelector from '../../components/ImageSelector'
 
-  const objectToFormData = window.objectToFormData;
+  const objectToFormData = window.objectToFormData
 
   export default {
     components: {
+      ImageSelector,
       Neededinfo,
       MoneyFormat
     },
@@ -147,8 +150,9 @@
     data: () => ({
       category: {},
       form: new Form({
-        image: null,
         name: '',
+        img_file: null,
+        img_string: '',
         description: '',
         price: 0,
         slot: 0,
@@ -160,6 +164,17 @@
     }),
 
     methods: {
+
+      async finished (e) {
+
+        if (typeof e === 'string' || e instanceof String) {
+          this.form.img_string = e
+        } else {
+          const file = e.target.files[0]
+          this.form.img_file = file
+        }
+      },
+
       setCategory (event, category) {
         this.category = category;
 
@@ -169,8 +184,6 @@
         this.form.category_id = this.category.id
       },
       async create () {
-
-        this.form.image = this.$refs.image.files[0]
 
         const { data } = await this.form.submit('post', '/api/sharings', {
           // Transform form data to FormData
@@ -183,7 +196,7 @@
           }
         });
 
-        console.log(this.form);
+
 
         // Redirect to sharing.
         this.$router.push( { name: 'sharing.show', params: { category_id: data.data.category_id, sharing_id: data.data.id }})
@@ -207,11 +220,36 @@
       this.$store.dispatch('categories/fetchCategories', ['renewal_frequencies', 'sharings_visibility']);
     },
 
-    computed: mapGetters({
-      user: 'auth/user',
-      categories: 'categories/categories',
-      renewal_frequencies: 'categories/renewal_frequencies',
-      sharings_visibility: 'categories/sharings_visibility'
-    }),
+    computed: {
+      ...mapGetters({
+         user: 'auth/user',
+         categories: 'categories/categories',
+         renewal_frequencies: 'categories/renewal_frequencies',
+        sharingsVisibility: 'config/sharingsVisibility'
+       })
+    },
   }
 </script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style>
+  h1,
+  h2 {
+    font-weight: normal;
+  }
+  ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  li {
+    display: inline-block;
+    margin: 0 10px;
+  }
+  a {
+    color: #42b983;
+  }
+  .my-8 {
+    margin-top: 4rem;
+    margin-bottom: 4rem;
+  }
+</style>

@@ -111,8 +111,6 @@
           this.$store.dispatch('sharings/saveCredentials', data.data).then(
             this.$store.dispatch('sharings/fetchSharing', this.sharing.id)
           )
-
-          this.$modal.hide('credentialBox')
         }
       },
       async confirmCredentials (event) {
@@ -142,8 +140,6 @@
               text: `${this.sharing.owner.username} provvederà a fornire delle credenziali corrette`
             })
           }
-
-          this.$modal.hide('credentialBox')
 
         })
       }

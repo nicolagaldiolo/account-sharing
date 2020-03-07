@@ -7,6 +7,7 @@ use App\Enums\SharingVisibility;
 use App\Http\Traits\Utility;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
@@ -59,13 +60,18 @@ class Sharing extends Model
     }
 
     public function setImageAttribute($image){
-        $this->attributes['image'] = $image->store('sharings');
+        if($image) {
+            if (Storage::exists($this->image)){
+                Storage::delete($this->image);
+            }
+            $this->attributes['image'] = $image->store('sharings');
+        }
     }
 
-    public function getImageAttribute($image){
-        return Storage::url($image ? $image : config('custom.default_image'));
+    public function getPublicImageAttribute(){
+        $image = ($this->image && Storage::exists($this->image)) ? $this->image : config('custom.default_image');
+        return Storage::url($image);
     }
-
 
     public function category(){
         return $this->belongsTo(Category::class);

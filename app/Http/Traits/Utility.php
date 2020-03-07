@@ -9,7 +9,10 @@ use App\Enums\SharingStatus;
 use App\Sharing;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
 
 trait Utility
 {
@@ -66,5 +69,23 @@ trait Utility
             'password' => $request->input('password'),
             'credential_updated_at' => Carbon::now()
         ]);
+    }
+
+    protected function processSharingImage($request)
+    {
+        $image_file = '';
+
+        if(!empty($request->file('img_file'))){
+            $image_file = $request->file('img_file');
+        }else if(!empty($request->input('img_string'))){
+            $file_path = Str::replaceFirst(URL::to('/'), '', $request->input('img_string'));
+            $internal_path = public_path() . $file_path;
+            $info = pathinfo($internal_path);
+            if (file_exists($internal_path)) {
+                $finfo = new \finfo(FILEINFO_MIME_TYPE);
+                $image_file = new UploadedFile($internal_path, $info['basename'], $finfo->file($internal_path));
+            }
+        }
+        return $image_file;
     }
 }

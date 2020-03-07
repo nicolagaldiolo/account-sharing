@@ -24,9 +24,6 @@ class CategoryCollection extends ResourceCollection
             'categories' => $this->collection,
             $this->mergeWhen(in_array('renewal_frequencies', $embed), [
                 'renewal_frequencies' => RenewalFrequency::all(),
-            ]),
-            $this->mergeWhen(in_array('sharings_visibility', $embed), [
-                'sharings_visibility' => SharingVisibility::toSelectArray()
             ])
         ];
     }

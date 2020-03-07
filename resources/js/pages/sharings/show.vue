@@ -25,6 +25,8 @@
                 <img class="rounded-circle" width="80" :src="sharing.owner.photo_url">
                 <h4>{{sharing.owner.username}}</h4>
                 <span>Attivo dal {{ sharing.owner.created_at | moment("D MMMM YYYY") }}</span>
+                <update-sharing-form :sharing="sharing"/>
+
               </div>
             </div>
           </div>
@@ -120,134 +122,138 @@
   </div>
 </template>
 <script>
-    import { mapGetters } from 'vuex'
-    import axios from 'axios'
-    import Swal from 'sweetalert2'
-    import MemberItem from '~/components/MemberItem'
-    import Chat from '~/components/Chat'
-    import Credentials from '~/components/Credentials'
-    import MoneyFormat from 'vue-money-format'
+import { helperMixin } from '~/mixins/helperMixin'
+import { mapGetters } from 'vuex'
+import axios from 'axios'
+import Swal from 'sweetalert2'
+import MemberItem from '~/components/MemberItem'
+import Chat from '~/components/Chat'
+import Credentials from '~/components/Credentials'
+import MoneyFormat from 'vue-money-format'
+import Form from 'vform'
+import UpdateSharingForm from '../../components/updatesharingform'
 
-    export default {
-        components: {
-          Credentials,
-          MemberItem,
-          Chat,
-          MoneyFormat
-        },
+const objectToFormData = window.objectToFormData
 
-        data: () => ({
-          globalMembers: [],
-          confirmStatus: false,
-          refusedStatus: false
-        }),
+export default {
+  components: {
+    UpdateSharingForm,
+    Credentials,
+    MemberItem,
+    Chat,
+    MoneyFormat
+  },
 
-        created () {
-          this.$store.dispatch('sharings/fetchSharing', this.$route.params.sharing_id).then(() => {
-            if (!this.$store.getters['sharings/sharing'].id || this.$store.getters['sharings/sharing'].category_id !== +this.$route.params.category_id) {
-              this.$router.push({ name: '404' })
-            }
-          })
-        },
+  mixins: [ helperMixin ],
 
-        computed: {
-            ...mapGetters({
-                sharing: 'sharings/sharing',
-                authUser: 'auth/user'
-            }),
-            availability () {
-                return this.sharing.availability > 0
-            },
-            owner () {
-              return this.sharing.owner && this.authUser.id === this.sharing.owner.id
-            },
-            foreign () {
-                return !this.sharing.user_status && !this.owner
-            },
-            joined () {
-                return this.sharing.user_status && this.sharing.user_status.state.value === 3
-            },
-            sharingPending () {
-              return this.sharing.status === 0
-            },
-            sharingApproved () {
-              return this.sharing.status === 1
-            },
-            sharingRefused () {
-                return this.sharing.status === 2
-            },
-            userSubscription () {
-                const user = this.sharing.members.find(user => user.id === this.authUser.id);
-                return (user) ? user.subscription.status : {}
-            }
-        },
+  data: () => ({
+    globalMembers: [],
+    confirmStatus: false,
+    refusedStatus: false
+  }),
 
-        watch: {
-            sharing (value) {
+  created () {
+    this.$store.dispatch('sharings/fetchSharing', this.$route.params.sharing_id).then(() => {
+      if (!this.$store.getters['sharings/sharing'].id || this.$store.getters['sharings/sharing'].category_id !== +this.$route.params.category_id) {
+        this.$router.push({ name: '404' })
+      }
+    })
+  },
 
-              //console.log(value);
-
-                this.globalMembers = [value.owner];
-                if(value.members) this.globalMembers.push(...value.members);
-            }
-        },
-
-
-        methods: {
-
-            async changeStatus (event) {
-              const action = parseInt(event.target.getAttribute('data-action'))
-
-              if (action === 1) {
-                this.confirmStatus = true
-              } else if (action === 2) {
-                this.refusedStatus = true
-              }
-
-              axios.patch(`/api/sharings/${this.sharing.id}/status/${action}`).then(response => {
-                this.$store.dispatch('sharings/updateSharing', { sharing: response.data.data })
-
-                if (action === 1) {
-                  this.confirmStatus = false
-                  Swal.fire({
-                    type: 'success',
-                    title: 'Gruppo confermato',
-                    text: 'Il gruppo è stato confermato'
-                  })
-                } else if (action === 2) {
-                  this.refusedStatus = false
-                  Swal.fire({
-                    type: 'success',
-                    title: 'Gruppo rifiutato',
-                    text: 'Il gruppo è stato rifiutato'
-                  }).then(result => {
-                    if (result.value) this.$router.push({ name: 'home' })
-                  })
-                }
-
-              })
-            },
-
-            doTransition (event) {
-
-              const action = event.target.getAttribute('data-action');
-
-              if(action === 'pay') {
-                  const category = this.$route.params.category_id
-                  const sharing = this.$route.params.sharing_id
-                  this.$router.push({ name: 'sharing.checkout', params: { category, sharing } })
-              } else {
-                  let api = (action)
-                      ? `/api/sharings/${this.sharing.id}/transitions/${action}`
-                      : `/api/sharings/${this.sharing.id}/transitions`
-                  axios.patch(api).then((response) => {
-                    this.$store.dispatch('sharings/updateSharing', { sharing: response.data.data })
-                  })
-              }
-            }
-
-        }
+  computed: {
+    ...mapGetters({
+      sharing: 'sharings/sharing',
+      authUser: 'auth/user'
+    }),
+    availability () {
+      return this.sharing.availability > 0
+    },
+    owner () {
+      return this.sharing.owner && this.authUser.id === this.sharing.owner.id
+    },
+    foreign () {
+        return !this.sharing.user_status && !this.owner
+    },
+    joined () {
+        return this.sharing.user_status && this.sharing.user_status.state.value === 3
+    },
+    sharingPending () {
+      return this.sharing.status === 0
+    },
+    sharingApproved () {
+      return this.sharing.status === 1
+    },
+    sharingRefused () {
+        return this.sharing.status === 2
+    },
+    userSubscription () {
+        const user = this.sharing.members.find(user => user.id === this.authUser.id);
+        return (user) ? user.subscription.status : {}
     }
+  },
+
+  watch: {
+    sharing (obj) {
+      this.globalMembers = [obj.owner]
+      if (obj.members) this.globalMembers.push(...obj.members)
+    }
+  },
+
+  methods: {
+
+    async changeStatus (event) {
+      const action = parseInt(event.target.getAttribute('data-action'))
+
+      if (action === 1) {
+        this.confirmStatus = true
+      } else if (action === 2) {
+        this.refusedStatus = true
+      }
+
+      axios.patch(`/api/sharings/${this.sharing.id}/status/${action}`).then(response => {
+        this.$store.dispatch('sharings/updateSharing', { sharing: response.data.data })
+
+        if (action === 1) {
+          this.confirmStatus = false
+          Swal.fire({
+            type: 'success',
+            title: 'Gruppo confermato',
+            text: 'Il gruppo è stato confermato'
+          })
+        } else if (action === 2) {
+          this.refusedStatus = false
+          Swal.fire({
+            type: 'success',
+            title: 'Gruppo rifiutato',
+            text: 'Il gruppo è stato rifiutato'
+          }).then(result => {
+            if (result.value) this.$router.push({ name: 'home' })
+          })
+        }
+
+      })
+    },
+
+    doTransition (event) {
+
+      const action = event.target.getAttribute('data-action');
+
+      if (action === 'pay') {
+        const category = this.$route.params.category_id
+        const sharing = this.$route.params.sharing_id
+        this.$router.push({ name: 'sharing.checkout', params: { category, sharing } })
+      } else {
+        let api = (action)
+          ? `/api/sharings/${this.sharing.id}/transitions/${action}`
+          : `/api/sharings/${this.sharing.id}/transitions`
+        axios.patch(api).then((response) => {
+          this.$store.dispatch('sharings/updateSharing', { sharing: response.data.data })
+        })
+      }
+    }
+
+  }
+}
 </script>
 
 <style scoped>

@@ -75,7 +75,7 @@ export default {
 
   methods: {
     renewalAction (action) {
-      axios.patch(`/api/sharings/${this.sharingId}/user/${this.member.id}/update`).then(response => {
+      axios.patch(`/api/sharings/${this.sharingId}/user/${this.member.id}/renewal_update`).then(response => {
         this.$store.dispatch('sharings/updateSharing', { sharing: response.data.data })
       })
     },
