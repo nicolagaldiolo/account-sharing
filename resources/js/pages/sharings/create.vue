@@ -74,7 +74,7 @@
               <label class="col-md-3 col-form-label text-md-right">Posti disponibili</label>
               <div class="col-md-7">
                 <select v-model="form.slot" :class="{ 'is-invalid': form.errors.has('slot') }" class="form-control" name="slot">
-                  <option value="">Seleziona i posti liberi</option>
+                  <option value="">Seleziona i posti disponibili</option>
                   <option v-for="index in category.slot" :key="index" :value="index">{{ index }}</option>
                 </select>
                 <has-error :form="form" field="slot" />

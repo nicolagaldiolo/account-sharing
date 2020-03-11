@@ -36,7 +36,7 @@
                 <div class="d-flex justify-content-between">
                   <h5 class="card-title">{{sharing.name}}<br><small>{{sharing.description}}</small></h5>
                   <div class="text-right">
-                    <h5 class="mb-0"><strong>{{sharing.availability}}/{{sharing.capacity}}</strong></h5>
+                    <h5 class="mb-0"><strong>{{sharing.availability}}/{{sharing.max_slot_available}}</strong></h5>
                     Posti disponibili
                   </div>
                 </div>
@@ -131,7 +131,7 @@ import Chat from '~/components/Chat'
 import Credentials from '~/components/Credentials'
 import MoneyFormat from 'vue-money-format'
 import Form from 'vform'
-import UpdateSharingForm from '../../components/updatesharingform'
+import UpdateSharingForm from '../../components/Updatesharingform'
 
 const objectToFormData = window.objectToFormData
 

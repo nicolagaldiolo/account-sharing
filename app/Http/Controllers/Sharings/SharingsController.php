@@ -196,6 +196,7 @@ class SharingsController extends Controller
     public function store(SharingRequest $request)
     {
         $category = Category::findOrFail($request->get('category_id'));
+
         $this->authorize('create-sharing', $category);
 
         $dataValidated = $request->validated();

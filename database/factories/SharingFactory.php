@@ -13,7 +13,7 @@ $factory->define(Sharing::class, function (Faker $faker) {
         'description' => $faker->sentence,
         'visibility' => array_rand(SharingVisibility::getValues()),
         'status' => \App\Enums\SharingApprovationStatus::Approved,
-        'slot' => ($faker->numberBetween(2,6)) - 1,
+        'slot' => $faker->numberBetween(2,6) - 1,
         'price' => $faker->randomFloat(2, 0, 20),
         'multiaccount' => 0,
         'image' => $faker->imageUrl(),

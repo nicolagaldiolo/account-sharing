@@ -26,7 +26,7 @@
             </div>
             <div class="card-footer d-flex justify-content-between">
               <small class="text-muted">
-                <strong>{{sharing.availability}}/{{sharing.capacity}} Posti disponibili</strong>
+                <strong>{{sharing.availability}}/{{sharing.max_slot_available}} Posti disponibili</strong>
               </small>
               <fa :class="calcCredentialStatus(sharing ? sharing.credential_status : 0).class" icon="key" fixed-width />
             </div>

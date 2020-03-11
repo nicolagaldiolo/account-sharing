@@ -40,7 +40,6 @@ class SharingRequest extends FormRequest
             case 'POST':
 
                 $category = Category::findOrFail($this->input('category_id'));
-                $max_price = ($category->price > 0) ? '|max:' . $category->price : '';
 
                 $request_data = [
                     'img_file'              => 'required_without:img_string|image|mimes:jpeg,bmp,png',
@@ -48,24 +47,30 @@ class SharingRequest extends FormRequest
                     'name'                  => 'required|max:255',
                     'description'           => 'required|max:750',
                     'visibility'            => ['required', new EnumValue(SharingVisibility::class, false)],
-                    'slot'                  => 'required|numeric|max:' . ($this->getFreeSlot($category)),
-                    'price'                 => 'required|numeric|min:1' . $max_price,
+                    'slot'                  => 'required|numeric|max:' . ($category->freeSlot),
+                    'price'                 => 'required|numeric|min:1' . ($category->price > 0) ? '|max:' . $category->price : '',
                     'category_id'           => 'required|exists:categories,id',
                     'renewal_frequency_id'  => 'required|exists:renewal_frequencies,id',
                     'username'              => 'sometimes',
                     'password'              => 'sometimes',
-                    //'service_igree'         => 'required|in:1',
+                    'service_igree'         => 'required|in:1,true',
                 ];
                 break;
 
             case 'PATCH':
 
+                $sharing = $this->route('sharing');
+
                 $request_data = [
                     'img_file'              => 'sometimes|image|mimes:jpeg,bmp,png',
                     'img_string'            => 'sometimes|url',
-                    'visibility'            => ['required', new EnumValue(SharingVisibility::class, false)],
-                    //'slot'                  => 'required|numeric|max:' . ($this->getFreeSlot($category)),
+                    'visibility'            => ['required', new EnumValue(SharingVisibility::class, false)]
                 ];
+
+                if(!$sharing->category->custom){
+                    $request_data['slot'] = 'required|numeric|max:' . $sharing->max_slot_capacity;
+                }
+
                 break;
         }
 

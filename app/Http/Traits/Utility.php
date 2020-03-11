@@ -21,11 +21,6 @@ trait Utility
         return (intval($price) > 0) ? (intval($price) - intval(config('custom.stripe.stripe_fee')) - intval(config('custom.stripe.platform_fee'))) : 0;
     }
 
-    protected function getFreeSlot(Category $category)
-    {
-        return ($category->capacity) - 1;
-    }
-
     protected function calcCapacity($slot)
     {
         return $slot + 1;

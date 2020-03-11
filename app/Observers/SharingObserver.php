@@ -15,7 +15,9 @@ class SharingObserver
      */
     public function created(Sharing $sharing)
     {
-        //
+        $category = $sharing->category;
+        $sharing->capacity = ($category->custom) ? $sharing->slot + 1 : $category->capacity;
+        $sharing->save();
     }
 
     /**

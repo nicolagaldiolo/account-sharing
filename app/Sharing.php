@@ -42,13 +42,24 @@ class Sharing extends Model
         });
     }
 
-    public function setSlotAttribute($value){
-        $this->attributes['slot'] = $value;
-        $this->attributes['capacity'] = $this->calcCapacity($value);
+    public function getPriceAttribute($price){
+        return $price;
     }
 
     public function getAvailabilityAttribute(){
         return $this->slot - $this->members()->count();
+    }
+
+    public function getMaxSlotAvailableAttribute(){
+        return $this->slot + 1;
+    }
+
+    public function getMaxSlotCapacityAttribute(){
+        return $this->capacity - 1;
+    }
+
+    public function getMinSlotAvailableAttribute(){
+        return $this->members()->count();
     }
 
     public function getPriceNoFeeAttribute(){

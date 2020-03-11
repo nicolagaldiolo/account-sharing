@@ -107,7 +107,7 @@ class SeedFakeData extends Seeder
                     'renewal_frequency_id' => $renewalFrequencies->random(1)->pluck('id')->first(),
                     'category_id' => $category->id,
                     'owner_id' => $me->id,
-                    'slot' => $this->getFreeSlot($category),
+                    'slot' => $category->freeSlot,
                 ]);
 
                 $stripeObj->createPlan($sharing);

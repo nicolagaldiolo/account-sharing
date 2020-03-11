@@ -45,8 +45,8 @@ class Category extends Model
         return Storage::url($image ? $image : config('custom.default_image'));
     }
 
-    public function getSlotAttribute(){
-        return $this->getFreeSlot($this);
+    public function getFreeSlotAttribute(){
+        return $this->capacity -1;
     }
 
     public function sharings()

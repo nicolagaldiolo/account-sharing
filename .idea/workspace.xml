@@ -3,33 +3,21 @@
   <component name="ChangeListManager">
     <list default="true" id="80fbe383-e517-4357-96d8-8ee0108f1222" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Category.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Category.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Sharings/SharingsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Sharings/SharingsController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Requests/SharingRequest.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Requests/SharingRequest.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Resources/Category.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Resources/Category.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Resources/CategoryCollection.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Resources/CategoryCollection.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Resources/Sharing.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Resources/Sharing.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Traits/Utility.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Traits/Utility.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Imports/ServiceDataImport.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Imports/ServiceDataImport.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Observers/SharingObserver.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Observers/SharingObserver.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Sharing.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Sharing.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/migrations/2019_07_17_191311_create_categories_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2019_07_17_191311_create_categories_table.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/CredentialForm.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/CredentialForm.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/Credentials.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Credentials.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/MemberItem.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/MemberItem.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/lang/en.json" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/lang/en.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/lang/es.json" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/lang/es.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/mixins/helperMixin.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/mixins/helperMixin.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/pages/settings/firstinfo.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/settings/firstinfo.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/pages/settings/profile.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/settings/profile.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/factories/SharingFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/factories/SharingFactory.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2019_07_17_191346_create_sharings_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2019_07_17_191346_create_sharings_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/seeds/SeedFakeData.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeds/SeedFakeData.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/Sharings.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Sharings.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/updatesharingform.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/updatesharingform.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/pages/sharings/create.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/sharings/create.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/pages/sharings/owner.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/sharings/owner.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/pages/sharings/show.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/sharings/show.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/sass/app.scss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/sass/app.scss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/index.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/api.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/import_data/service_data.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/storage/import_data/service_data.xlsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -534,7 +522,11 @@
       <workItem from="1583213336407" duration="6020000" />
       <workItem from="1583341758944" duration="12807000" />
       <workItem from="1583432857797" duration="6660000" />
-      <workItem from="1583479397856" duration="38388000" />
+      <workItem from="1583479397856" duration="38668000" />
+      <workItem from="1583644168650" duration="105000" />
+      <workItem from="1583644359404" duration="122000" />
+      <workItem from="1583644491467" duration="9436000" />
+      <workItem from="1583905137223" duration="6798000" />
     </task>
     <servers />
   </component>
@@ -696,18 +688,18 @@
     <state width="1398" height="413" key="GridCell.Tab.2.right/0.23.1440.877@0.23.1440.877" timestamp="1582380360115" />
     <state width="2518" height="311" key="GridCell.Tab.2.right/2560.279.1440.877/-1440.448.1440.877/0.23.2560.1417@0.23.2560.1417" timestamp="1581240972901" />
     <state width="1398" height="413" key="GridCell.Tab.2.right/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1582097421309" />
-    <state x="393" y="147" key="SettingsEditor" timestamp="1581658795646">
+    <state x="393" y="147" width="1576" height="1125" key="SettingsEditor" timestamp="1583645311534">
       <screen x="0" y="23" width="2560" height="1417" />
     </state>
     <state x="221" y="100" key="SettingsEditor/0.23.1440.877/-552.-1417.2560.1417@0.23.1440.877" timestamp="1581530165307" />
     <state x="221" y="100" key="SettingsEditor/0.23.1440.877@0.23.1440.877" timestamp="1578209286674" />
-    <state x="393" y="147" key="SettingsEditor/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1581658795646" />
+    <state x="393" y="147" width="1576" height="1125" key="SettingsEditor/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1583645311534" />
     <state width="500" height="445" key="SwitcherDM" timestamp="1581663018191">
       <screen x="0" y="23" width="2560" height="1417" />
     </state>
     <state width="500" height="445" key="SwitcherDM/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1581663018191" />
-    <state x="547" y="357" key="com.intellij.ide.util.TipDialog" timestamp="1583479398678">
-      <screen x="0" y="23" width="1440" height="877" />
+    <state x="973" y="563" key="com.intellij.ide.util.TipDialog" timestamp="1583905431271">
+      <screen x="0" y="23" width="2560" height="1417" />
     </state>
     <state x="547" y="357" key="com.intellij.ide.util.TipDialog/0.23.1440.877/-200.-1057.1920.1057@0.23.1440.877" timestamp="1580845122877" />
     <state x="547" y="357" key="com.intellij.ide.util.TipDialog/0.23.1440.877/-259.-1057.1920.1057@0.23.1440.877" timestamp="1579717267049" />
@@ -715,24 +707,25 @@
     <state x="547" y="357" key="com.intellij.ide.util.TipDialog/0.23.1440.877/1440.-256.1440.877@0.23.1440.877" timestamp="1581149138173" />
     <state x="547" y="357" key="com.intellij.ide.util.TipDialog/0.23.1440.877/1440.-736.2560.1417@0.23.1440.877" timestamp="1582961726011" />
     <state x="547" y="357" key="com.intellij.ide.util.TipDialog/0.23.1440.877@0.23.1440.877" timestamp="1583479398678" />
-    <state x="973" y="563" key="com.intellij.ide.util.TipDialog/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1583432857900" />
-    <state x="846" y="452" width="1115" height="761" key="find.popup" timestamp="1583607702899">
-      <screen x="0" y="23" width="2560" height="1417" />
+    <state x="973" y="563" key="com.intellij.ide.util.TipDialog/2560.235.1440.877/-2560.23.2560.1417/0.23.2560.1417@0.23.2560.1417" timestamp="1583905431271" />
+    <state x="973" y="563" key="com.intellij.ide.util.TipDialog/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1583644492713" />
+    <state x="228" y="155" width="931" height="622" key="find.popup" timestamp="1583910604015">
+      <screen x="0" y="23" width="1440" height="877" />
     </state>
     <state x="540" y="311" width="645" height="472" key="find.popup/0.23.1440.877/-200.-1057.1920.1057@0.23.1440.877" timestamp="1580843740096" />
     <state x="408" y="-952" width="1215" height="786" key="find.popup/0.23.1440.877/-552.-1417.2560.1417@-552.-1417.2560.1417" timestamp="1577120645150" />
     <state x="540" y="311" width="789" height="534" key="find.popup/0.23.1440.877/-552.-1417.2560.1417@0.23.1440.877" timestamp="1583345414195" />
     <state x="228" y="243" width="931" height="534" key="find.popup/0.23.1440.877/1440.-256.1440.877@0.23.1440.877" timestamp="1583584837332" />
     <state x="540" y="311" width="683" height="486" key="find.popup/0.23.1440.877/1440.-736.2560.1417@0.23.1440.877" timestamp="1582981352585" />
-    <state x="228" y="155" width="931" height="622" key="find.popup/0.23.1440.877@0.23.1440.877" timestamp="1583214373505" />
+    <state x="228" y="155" width="931" height="622" key="find.popup/0.23.1440.877@0.23.1440.877" timestamp="1583910604015" />
     <state x="405" y="378" width="1656" height="863" key="find.popup/2560.279.1440.877/-1440.448.1440.877/0.23.2560.1417@0.23.2560.1417" timestamp="1581232905883" />
-    <state x="846" y="452" width="1115" height="761" key="find.popup/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1583607702899" />
+    <state x="481" y="400" width="1115" height="761" key="find.popup/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1583646750433" />
     <state x="517" y="381" width="1616" height="798" key="find.popup/2622.142.1858.1080/62.0.2498.1440@62.0.2498.1440" timestamp="1577718307895" />
-    <state x="945" y="348" width="670" height="676" key="search.everywhere.popup" timestamp="1582003150186">
-      <screen x="0" y="23" width="2560" height="1417" />
+    <state x="532" y="224" width="670" height="419" key="search.everywhere.popup" timestamp="1583907251216">
+      <screen x="0" y="23" width="1440" height="877" />
     </state>
     <state x="532" y="224" width="670" height="419" key="search.everywhere.popup/0.23.1440.877/1440.-256.1440.877@0.23.1440.877" timestamp="1581163192004" />
-    <state x="532" y="224" width="670" height="419" key="search.everywhere.popup/0.23.1440.877@0.23.1440.877" timestamp="1581775422534" />
+    <state x="532" y="224" width="670" height="419" key="search.everywhere.popup/0.23.1440.877@0.23.1440.877" timestamp="1583907251216" />
     <state x="946" y="348" width="1192" height="677" key="search.everywhere.popup/2560.279.1440.877/-1440.448.1440.877/0.23.2560.1417@0.23.2560.1417" timestamp="1581237797226" />
     <state x="945" y="348" width="670" height="676" key="search.everywhere.popup/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1582003150186" />
   </component>

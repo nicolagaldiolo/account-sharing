@@ -12,12 +12,11 @@
         </div>
 
         <!-- Slot -->
-        <div class="form-group row">
+        <div v-if="!sharing.category.custom" class="form-group row">
           <label class="col-md-3 col-form-label text-md-right">Posti disponibili</label>
           <div class="col-md-7">
             <select v-model="form.slot" :class="{ 'is-invalid': form.errors.has('slot') }" class="form-control" name="slot">
-              <option value="">Seleziona i posti liberi</option>
-              <option v-for="index in sharing.slot" :key="index" :value="index">{{ index }}</option>
+              <option v-for="slot in slotsAvailable">{{ slot }}</option>
             </select>
             <has-error :form="form" field="slot" />
           </div>
@@ -69,24 +68,32 @@ export default {
   },
 
   data: () => ({
-    form: new Form({
-      slot: 0,
-      visibility: 0
-    })
+
   }),
+
+  created() {
+    this.form.keys().forEach(key => {
+      this.form[key] = this.sharing[key]
+    })
+  },
 
   computed: {
     ...mapGetters({
       authUser: 'auth/user',
       sharingsVisibility: 'config/sharingsVisibility'
     }),
-  },
 
-  watch: {
-    sharing (obj) {
-      this.form.keys().forEach(key => {
-        this.form[key] = obj[key]
-      })
+    form () {
+      const form = {}
+      form.visibility = 0
+      if (!this.sharing.category.custom) form.slot = 0
+      return new Form(form)
+    },
+
+    slotsAvailable () {
+      const start = this.sharing.min_slot_available
+      const end = this.sharing.max_slot_capacity
+      return Array(end - start + 1).fill().map((_, idx) => start + idx).reverse()
     }
   },
 
