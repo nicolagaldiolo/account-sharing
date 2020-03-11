@@ -36,7 +36,7 @@ class Category extends JsonResource
             'custom' => $this->custom,
             'price' => $this->price,
             //'capacity' => $this->capacity,
-            'slot' => $this->slot,
+            'slot' => $this->freeSlot,
             'forbidden' => $this->whenLoaded('categoryForbidden', $this->custom ? false : true),
             'images_archive' => $images_archive
         ];

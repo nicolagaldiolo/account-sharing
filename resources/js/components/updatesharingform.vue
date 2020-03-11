@@ -16,7 +16,7 @@
           <label class="col-md-3 col-form-label text-md-right">Posti disponibili</label>
           <div class="col-md-7">
             <select v-model="form.slot" :class="{ 'is-invalid': form.errors.has('slot') }" class="form-control" name="slot">
-              <option v-for="slot in slotsAvailable">{{ slot }}</option>
+              <option v-for="slot in slotOptions">{{ slot }}</option>
             </select>
             <has-error :form="form" field="slot" />
           </div>
@@ -68,14 +68,11 @@ export default {
   },
 
   data: () => ({
-
-  }),
-
-  created() {
-    this.form.keys().forEach(key => {
-      this.form[key] = this.sharing[key]
+    form: new Form({
+      slot: 0,
+      visibility: 0
     })
-  },
+  }),
 
   computed: {
     ...mapGetters({
@@ -83,18 +80,19 @@ export default {
       sharingsVisibility: 'config/sharingsVisibility'
     }),
 
-    form () {
-      const form = {}
-      form.visibility = 0
-      if (!this.sharing.category.custom) form.slot = 0
-      return new Form(form)
-    },
+    slotOptions() {
 
-    slotsAvailable () {
       const start = this.sharing.min_slot_available
       const end = this.sharing.max_slot_capacity
       return Array(end - start + 1).fill().map((_, idx) => start + idx).reverse()
     }
+
+  },
+
+  created() {
+    this.form.keys().forEach(key => {
+      this.form[key] = this.sharing[key]
+    })
   },
 
   methods: {
@@ -108,6 +106,10 @@ export default {
 
     async updateSharing () {
       this.form._method = 'PATCH';
+
+      // remove the slot key if custom sharing
+      if (this.sharing.category.custom) delete this.form.slot
+
       const { data } = await this.form.submit('post', `/api/sharings/${this.sharing.id}/update`, {
         // Transform form data to FormData
         transformRequest: [function (data, headers) {
@@ -122,8 +124,7 @@ export default {
       this.$store.dispatch('sharings/updateSharing', { sharing: data.data })
       this.$modal.hide('editSharing')
       this.showSimpleToast('Condivisione aggiornata con successo')
-    }
-
+    },
   }
 }
 </script>
