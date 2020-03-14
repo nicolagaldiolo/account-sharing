@@ -3,8 +3,16 @@
   <component name="ChangeListManager">
     <list default="true" id="80fbe383-e517-4357-96d8-8ee0108f1222" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Categories/CategoriesController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Categories/CategoriesController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Requests/SharingRequest.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Requests/SharingRequest.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Resources/Category.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Resources/Category.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/updatesharingform.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/updatesharingform.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Resources/CategoryCollection.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Sharing.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Sharing.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/Navbar.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Navbar.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/pages/errors/404.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/errors/404.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/pages/sharings/create.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/sharings/create.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/router/routes.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/router/routes.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/store/modules/categories.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/store/modules/categories.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -332,19 +340,19 @@
     <property name="ts.external.directory.path" value="$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/resources/js/pages/sharings" />
-      <recent name="$PROJECT_DIR$/resources/js/components" />
-      <recent name="$PROJECT_DIR$/resources/js/middleware" />
-      <recent name="$PROJECT_DIR$/app/Listeners" />
-      <recent name="C:\Zweb\xampp\htdocs\account-sharing\resources\js\pages\settings" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/resources/js/components" />
       <recent name="$PROJECT_DIR$/storage/app/public" />
       <recent name="$PROJECT_DIR$/resources/js/pages" />
       <recent name="$PROJECT_DIR$/storage" />
       <recent name="$PROJECT_DIR$/import_data" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/resources/js/pages/sharings" />
+      <recent name="$PROJECT_DIR$/resources/js/components" />
+      <recent name="$PROJECT_DIR$/resources/js/middleware" />
+      <recent name="$PROJECT_DIR$/app/Listeners" />
+      <recent name="C:\Zweb\xampp\htdocs\account-sharing\resources\js\pages\settings" />
     </key>
   </component>
   <component name="RunManager">
@@ -514,7 +522,8 @@
       <workItem from="1583644359404" duration="122000" />
       <workItem from="1583644491467" duration="9436000" />
       <workItem from="1583905137223" duration="7094000" />
-      <workItem from="1583928597061" duration="2580000" />
+      <workItem from="1583928597061" duration="2689000" />
+      <workItem from="1584079237718" duration="11035000" />
     </task>
     <servers />
   </component>
@@ -551,13 +560,15 @@
       <screen x="0" y="23" width="2560" height="1417" />
     </state>
     <state x="1018" y="485" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1580193449256" />
-    <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1583593568364">
+    <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1584104345990">
       <screen x="0" y="23" width="1440" height="877" />
     </state>
     <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1440.877/-552.-1417.2560.1417@0.23.1440.877" timestamp="1583343225377" />
+    <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1440.877/-644.-1417.2560.1417@0.23.1440.877" timestamp="1584104345990" />
     <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1440.877/1440.-256.1440.877@0.23.1440.877" timestamp="1583593568364" />
     <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1440.877/1440.-736.2560.1417@0.23.1440.877" timestamp="1582985681420" />
     <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1440.877@0.23.1440.877" timestamp="1583385286464" />
+    <state x="814" y="346" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/2560.205.1440.877/0.23.2560.1417@0.23.2560.1417" timestamp="1584086718834" />
     <state x="814" y="346" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/2560.279.1440.877/-1440.448.1440.877/0.23.2560.1417@0.23.2560.1417" timestamp="1581239503735" />
     <state x="814" y="346" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1583473123947" />
     <state x="483" y="173" key="#xdebugger.evaluate" timestamp="1581097553132">
@@ -686,7 +697,7 @@
       <screen x="0" y="23" width="2560" height="1417" />
     </state>
     <state width="500" height="445" key="SwitcherDM/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1581663018191" />
-    <state x="973" y="563" key="com.intellij.ide.util.TipDialog" timestamp="1583928601012">
+    <state x="973" y="563" key="com.intellij.ide.util.TipDialog" timestamp="1584079238420">
       <screen x="0" y="23" width="2560" height="1417" />
     </state>
     <state x="547" y="357" key="com.intellij.ide.util.TipDialog/0.23.1440.877/-200.-1057.1920.1057@0.23.1440.877" timestamp="1580845122877" />
@@ -695,17 +706,20 @@
     <state x="547" y="357" key="com.intellij.ide.util.TipDialog/0.23.1440.877/1440.-256.1440.877@0.23.1440.877" timestamp="1581149138173" />
     <state x="547" y="357" key="com.intellij.ide.util.TipDialog/0.23.1440.877/1440.-736.2560.1417@0.23.1440.877" timestamp="1582961726011" />
     <state x="547" y="357" key="com.intellij.ide.util.TipDialog/0.23.1440.877@0.23.1440.877" timestamp="1583479398678" />
+    <state x="973" y="563" key="com.intellij.ide.util.TipDialog/2560.205.1440.877/0.23.2560.1417@0.23.2560.1417" timestamp="1584079238420" />
     <state x="973" y="563" key="com.intellij.ide.util.TipDialog/2560.235.1440.877/-2560.23.2560.1417/0.23.2560.1417@0.23.2560.1417" timestamp="1583928601012" />
     <state x="973" y="563" key="com.intellij.ide.util.TipDialog/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1583644492713" />
-    <state x="228" y="155" width="931" height="622" key="find.popup" timestamp="1583910604015">
+    <state x="228" y="155" width="932" height="623" key="find.popup" timestamp="1584174049882">
       <screen x="0" y="23" width="1440" height="877" />
     </state>
     <state x="540" y="311" width="645" height="472" key="find.popup/0.23.1440.877/-200.-1057.1920.1057@0.23.1440.877" timestamp="1580843740096" />
     <state x="408" y="-952" width="1215" height="786" key="find.popup/0.23.1440.877/-552.-1417.2560.1417@-552.-1417.2560.1417" timestamp="1577120645150" />
     <state x="540" y="311" width="789" height="534" key="find.popup/0.23.1440.877/-552.-1417.2560.1417@0.23.1440.877" timestamp="1583345414195" />
+    <state x="228" y="155" width="932" height="623" key="find.popup/0.23.1440.877/-571.-1417.2560.1417@0.23.1440.877" timestamp="1584174049882" />
     <state x="228" y="243" width="931" height="534" key="find.popup/0.23.1440.877/1440.-256.1440.877@0.23.1440.877" timestamp="1583584837332" />
     <state x="540" y="311" width="683" height="486" key="find.popup/0.23.1440.877/1440.-736.2560.1417@0.23.1440.877" timestamp="1582981352585" />
     <state x="228" y="155" width="931" height="622" key="find.popup/0.23.1440.877@0.23.1440.877" timestamp="1583910604015" />
+    <state x="405" y="236" width="1656" height="1005" key="find.popup/2560.205.1440.877/0.23.2560.1417@0.23.2560.1417" timestamp="1584085402629" />
     <state x="405" y="378" width="1656" height="863" key="find.popup/2560.279.1440.877/-1440.448.1440.877/0.23.2560.1417@0.23.2560.1417" timestamp="1581232905883" />
     <state x="481" y="400" width="1115" height="761" key="find.popup/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1583646750433" />
     <state x="517" y="381" width="1616" height="798" key="find.popup/2622.142.1858.1080/62.0.2498.1440@62.0.2498.1440" timestamp="1577718307895" />

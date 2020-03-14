@@ -20,7 +20,7 @@
         <ul class="navbar-nav ml-auto">
           <template v-if="user">
             <li class="nav-item">
-              <router-link :to="{ name: 'sharing.requests' }" class="nav-link">
+              <router-link :to="{ name: 'sharing.create' }" class="nav-link">
                 Crea Condivisione
               </router-link>
             </li>

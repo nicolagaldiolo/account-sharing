@@ -19,7 +19,8 @@ export default [
   { path: '/category/:category_id/sharing/:sharing_id', name: 'sharing.show', component: page('sharings/show.vue') },
   { path: '/category/:category_id/sharing/:sharing_id/checkout', name: 'sharing.checkout', component: page('sharings/checkout.vue') },
 
-  { path: '/sharing/create', name: 'sharing.requests', component: page('sharings/create.vue') },
+  { path: '/sharing/create', name: 'sharing.create', component: page('sharings/create.vue') },
+  { path: '/sharing/create/:category_id', name: 'sharing.create.category', component: page('sharings/createForm.vue') },
 
   { path: '/sharings',
     component: page('sharings/index.vue'),

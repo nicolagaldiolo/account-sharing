@@ -67,7 +67,7 @@ class Sharing extends Model
     }
 
     public function getPriceWithFeeAttribute(){
-        return ($this->price / $this->capacity) + (floatval(config('custom.stripe.stripe_fee')) / 100) + (floatval(config('custom.stripe.platform_fee')) / 100);
+        return $this->priceNoFee + (floatval(config('custom.stripe.stripe_fee')) / 100) + (floatval(config('custom.stripe.platform_fee')) / 100);
     }
 
     public function setImageAttribute($image){

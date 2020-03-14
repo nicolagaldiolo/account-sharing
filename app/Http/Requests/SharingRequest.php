@@ -48,13 +48,14 @@ class SharingRequest extends FormRequest
                     'description'           => 'required|max:750',
                     'visibility'            => ['required', new EnumValue(SharingVisibility::class, false)],
                     'slot'                  => 'required|numeric|max:' . ($category->freeSlot),
-                    'price'                 => 'required|numeric|min:1' . ($category->price > 0) ? '|max:' . $category->price : '',
+                    'price'                 => 'required|numeric|' . (($category->custom) ? ('min:1') : ('min:' . $category->price . '|max:' . $category->price)),
                     'category_id'           => 'required|exists:categories,id',
                     'renewal_frequency_id'  => 'required|exists:renewal_frequencies,id',
                     'username'              => 'sometimes',
                     'password'              => 'sometimes',
                     'service_igree'         => 'required|in:1,true',
                 ];
+
                 break;
 
             case 'PATCH':

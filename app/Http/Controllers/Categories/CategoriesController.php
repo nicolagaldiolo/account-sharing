@@ -21,7 +21,7 @@ class CategoriesController extends Controller
      */
     public function index(Request $request)
     {
-        return new CategoryCollection(Category::with('categoryForbidden')->get());
+        return \App\Http\Resources\Category::collection(Category::with('categoryForbidden')->get());
     }
 
     /**
@@ -53,7 +53,7 @@ class CategoriesController extends Controller
      */
     public function show(Category $category)
     {
-        return $category->load('sharings.owner');
+        return new \App\Http\Resources\Category($category->load('sharings.owner'));
     }
 
     /**
