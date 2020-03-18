@@ -1,4 +1,3 @@
-import Swal from "sweetalert2";
 <template>
   <div id="app">
     <loading ref="loading" />

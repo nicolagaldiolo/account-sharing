@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Http\Resources\RenewalFrequency as RenewalFrequencyResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\Member as MemberResource;
@@ -69,7 +70,7 @@ class Sharing extends JsonResource
             'image' => $this->publicImage,
             'created_at' => $this->created_at,
             'owner' => new MemberResource($this->whenLoaded('owner')),
-            'renewal_frequency' => $this->renewalFrequency->frequency,
+            'renewal_frequency' => new RenewalFrequencyResource($this->whenLoaded('renewalFrequency')),
             'users' => MemberResource::collection($this->whenLoaded('users')),
             'visibility' => $this->visibility,
             'category' => new CategoryResource($this->whenLoaded('category')),

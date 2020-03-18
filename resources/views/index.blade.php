@@ -11,7 +11,8 @@ $config = [
     'platformFee' => config('custom.stripe.platform_fee'),
     'maxPaymentMethod' => config('custom.stripe.max_payment_method'),
     'sharingUserStatus' => \App\Enums\SharingStatus::toSelectArray(),
-    'sharingsVisibility' => \App\Enums\SharingVisibility::toSelectArray()
+    'sharingsVisibility' => \App\Enums\SharingVisibility::toSelectArray(),
+    'renewalFrequency' => \App\Http\Resources\RenewalFrequency::collection(\App\RenewalFrequency::all())
 ];
 @endphp
 <!DOCTYPE html>

@@ -53,7 +53,7 @@ class CategoriesController extends Controller
      */
     public function show(Category $category)
     {
-        return new \App\Http\Resources\Category($category->load('sharings.owner'));
+        return new \App\Http\Resources\Category($category);
     }
 
     /**

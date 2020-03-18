@@ -8,7 +8,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use function foo\func;
+use App\Http\Resources\Sharing as SharingResource;
 
 class Category extends JsonResource
 {
@@ -23,7 +23,7 @@ class Category extends JsonResource
     public function toArray($request)
     {
 
-        $embed = ($request->has('embed') ? explode(',', $request->input('embed')) : []);
+        //$embed = ($request->has('embed') ? explode(',', $request->input('embed')) : []);
 
         $images_archive = collect(Storage::files('archive/' . $this->str_id))->filter(function($file){
             return !Str::endsWith($file, '.DS_Store');
@@ -35,15 +35,12 @@ class Category extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'description' => $this->description,
-            'image' => $this->image,
+            'image' => $this->publicImage,
             'custom' => $this->custom,
             'price' => $this->price,
             'slot' => $this->freeSlot,
             'forbidden' => $this->whenLoaded('categoryForbidden', $this->custom ? false : true),
-            'images_archive' => $images_archive,
-            $this->mergeWhen(in_array('renewal_frequencies', $embed), [
-                'renewal_frequencies' => RenewalFrequency::all(),
-            ])
+            'images_archive' => $images_archive
         ];
     }
 }

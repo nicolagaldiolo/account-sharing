@@ -27,7 +27,7 @@
                 <div class="col-md-7">
                   <select v-model="form.renewal_frequency_id" :class="{ 'is-invalid': form.errors.has('renewal_frequency_id') }" class="form-control" name="renewal_frequency_id">
                     <option value="">Scegli una frequenza di rinnovo</option>
-                    <option v-for="renewal_frequency in category.renewal_frequencies" :key="renewal_frequency.id" :value="renewal_frequency.id">{{renewal_frequency.frequency}}</option>
+                    <option v-for="frequency in renewalFrequency" :key="frequency.id" :value="frequency.id">{{frequency.frequency}}</option>
                   </select>
                   <has-error :form="form" field="renewal_frequency_id" />
                 </div>
@@ -186,12 +186,12 @@ export default {
   },
 
   created () {
-    const obj = {
-      id: this.$route.params.category_id,
-      params: ['renewal_frequencies']
-    }
+    //const obj = {
+    //  id: this.$route.params.category_id,
+    //  params: ['renewal_frequencies']
+    //}
 
-    this.$store.dispatch('categories/fetchCategory', obj).then(() => {
+    this.$store.dispatch('categories/fetchCategory', this.$route.params.category_id).then(() => {
       if (!this.$store.getters['categories/category'].id) {
         this.$router.push({ name: '404' })
       } else {
@@ -207,7 +207,8 @@ export default {
     ...mapGetters({
       user: 'auth/user',
       sharingsVisibility: 'config/sharingsVisibility',
-      category: 'categories/category'
+      category: 'categories/category',
+      renewalFrequency: 'config/renewalFrequency'
     })
   }
 }

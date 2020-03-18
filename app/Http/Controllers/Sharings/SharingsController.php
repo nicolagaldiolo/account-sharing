@@ -35,39 +35,48 @@ class SharingsController extends Controller
     public function index(Request $request)
     {
         $param = $request->input('type', '');
+
+        $category = (!empty($request->input('category', ''))) ?
+            Category::findOrFail($request->input('category', '')) : '';
+
+        $sharings = (!empty($category)) ? $category->sharings() : Auth::user()->sharings();
+
         switch ($param){
             case 'pending':
-                $sharings = SharingResource::collection(Auth::user()->sharings()->with(['owner'])->pending()->paginate(config('custom.paginate')));
+                $data = SharingResource::collection($sharings->with(['owner','renewalFrequency'])->pending()->paginate(config('custom.paginate')));
                 break;
             case 'approved':
-                $sharings = SharingResource::collection(Auth::user()->sharings()->with('owner')->approved()->paginate(config('custom.paginate')));
+                $data = SharingResource::collection($sharings->with(['owner','renewalFrequency'])->approved()->paginate(config('custom.paginate')));
                 break;
             case 'owner':
-                $sharings = SharingResource::collection(Auth::user()->sharingOwners()->with('users')->paginate(config('custom.paginate')));
+                $sharings = (!empty($category)) ? $category->sharings() : Auth::user()->sharingOwners();
+                $data = SharingResource::collection($sharings->with(['users','renewalFrequency'])->paginate(config('custom.paginate')));
                 break;
             case 'joined':
-                $sharings = SharingResource::collection(Auth::user()->sharings()->with('owner')->joined()->paginate(config('custom.paginate')));
+                $data = SharingResource::collection($sharings->with(['owner','renewalFrequency'])->joined()->paginate(config('custom.paginate')));
                 break;
             default:
 
                 // Create a custom pagination (https://github.com/laravel/framework/issues/3105)
-
                 $perPage = config('custom.paginate');
                 $currentPage = $request->input('page', 1);
                 $path_url = URL::to("/{$request->route()->getPrefix()}/sharings");
                 $paginationOption = ['path' => $path_url];
 
-                $sharings = Sharing::with('owner')->public()->get();
+                $sharings = ((!empty($category)) ?
+                    $category->sharings() :
+                    Sharing::query()
+                )->with(['owner','renewalFrequency'])->public()->latest()->get();
 
                 $totalElements = $sharings->count();
                 $sharings_paginate = $sharings->slice(($currentPage - 1) * $perPage, $perPage);
 
                 $lengthAwarePaginator = new \Illuminate\Pagination\LengthAwarePaginator($sharings_paginate, $totalElements, $perPage, $currentPage, $paginationOption);
-                $sharings = SharingResource::collection($lengthAwarePaginator);
+                $data = SharingResource::collection($lengthAwarePaginator);
                 break;
         }
 
-        return $sharings;
+        return $data;
     }
 
     /**
@@ -239,7 +248,7 @@ class SharingsController extends Controller
      */
     public function show(Sharing $sharing)
     {
-        $sharing->load(['members','owner','category']);
+        $sharing->load(['members','owner','category', 'renewalFrequency']);
 
         return new SharingResource($sharing);
     }

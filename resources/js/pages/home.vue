@@ -2,17 +2,20 @@
   <div>
     <div class="container mt-4">
 
-      <h2>Categorie</h2>
       <div class="row">
-        <div class="col" v-for="category in categories" :key="category.id">
-          <router-link :to="{ name: 'category.show', params: { category_id: category.id } }" class="category-item">
-            <span>{{ category.name }}</span>
-            <img :src="category.image" width="150">
-          </router-link>
+        <div class="col-3" v-for="category in categories" :key="category.id">
+          <div v-if="category.custom === 0">
+            <router-link :to="{ name: 'category.show', params: { category_id: category.id } }" class="category-item">
+              <span>{{ category.name }}</span>
+              <img class="img-fluid" :src="category.image">
+            </router-link>
+          </div>
         </div>
       </div>
 
-      <sharings />
+      <div class="mt-5">
+        <sharings />
+      </div>
 
     </div>
 

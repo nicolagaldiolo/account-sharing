@@ -38,11 +38,15 @@ class Category extends Model
     }
 
     public function setImageAttribute($image){
-        $this->attributes['image'] = $image->store('categories');
+        if($image) {
+            if (Storage::exists($this->image)) Storage::delete($this->image);
+            $this->attributes['image'] = $image->store('uploads/categories');
+        }
     }
 
-    public function getImageAttribute($image){
-        return Storage::url($image ? $image : config('custom.default_image'));
+    public function getPublicImageAttribute(){
+        $image = ($this->image && Storage::exists($this->image)) ? $this->image : config('custom.default_image');
+        return Storage::url($image);
     }
 
     public function getFreeSlotAttribute(){

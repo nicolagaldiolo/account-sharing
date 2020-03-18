@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use App\Enums\SharingStatus;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use Faker\Factory as Faker;
 
@@ -28,6 +29,8 @@ class SeedFakeData extends Seeder
      */
     public function run()
     {
+
+        Storage::deleteDirectory('uploads');
 
         $faker = Faker::create();
 
@@ -89,7 +92,10 @@ class SeedFakeData extends Seeder
         Excel::import(new ServiceDataImport, storage_path('import_data/service_data.xlsx'));
         $categories = Category::withoutGlobalScope('country')->get();
 
+
         $users->each(function($me) use($categories, $renewalFrequencies, $users, $stripeObj, $faker){
+
+            Auth::login($me);
 
             $user_random_value = $faker->optional(0.6)->randomDigit;
 
@@ -100,9 +106,12 @@ class SeedFakeData extends Seeder
 
                 $sharing_random_value = $faker->optional(0.5)->randomDigit;
 
+                $images_archive = $this->getRandomImageFromArchive('/archive/' . $category->str_id);
+
                 $sharing = factory(Sharing::class)->create([
                     'name' => $category->name,
                     'price' => ($category->price <= 0) ? 20.00 : $category->price, // force price for custom group
+                    'image' => $this->generateUploadedFile($images_archive),
                     'multiaccount' => $category->multiaccount,
                     'renewal_frequency_id' => $renewalFrequencies->random(1)->pluck('id')->first(),
                     'category_id' => $category->id,
@@ -129,7 +138,6 @@ class SeedFakeData extends Seeder
                 });
 
                 $sharing->users()->sync($usersToAttach);
-
 
                 $sharing->approvedUsers()->get()->each(function($item) use($me, $sharing) {
                     \App\MyClasses\Support\Facade\Stripe::createSubscription($sharing, $item);
@@ -172,14 +180,12 @@ class SeedFakeData extends Seeder
                     }
                 });
 
-                /*
-                $me->payouts()->create([
-                    'stripe_id' => 'xxxxxxxx',
-                    'amount' => number_format((float)$sharing->price * 100., 0, '.', ''),
-                    'currency' => 'eur',
-                    'ccnumber' => '8745'
-                ])->transactions()->create();
-                */
+                //$me->payouts()->create([
+                //    'stripe_id' => 'xxxxxxxx',
+                //    'amount' => number_format((float)$sharing->price * 100., 0, '.', ''),
+                //    'currency' => 'eur',
+                //    'ccnumber' => '8745'
+                //])->transactions()->create();
 
             });
         });

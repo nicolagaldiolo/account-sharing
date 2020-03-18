@@ -45,10 +45,11 @@ export const actions = {
     }
   },
 
-  async fetchCategory ({ commit }, obj) {
+  async fetchCategory ({ commit }, id) {
     try {
-      const params = (obj.params.length > 0) ? `?embed=${obj.params.join(',')}` : ''
-      const { data } = await axios.get('/api/categories/' + obj.id + params)
+      //const params = (obj.params && obj.params.length > 0) ? `?embed=${obj.params.join(',')}` : ''
+      //const { data } = await axios.get('/api/categories/' + obj.id + params)
+      const { data } = await axios.get('/api/categories/' + id)
       commit(types.FETCH_CATEGORY_SUCCESS, { category: data.data })
     } catch (e) {
       commit(types.FETCH_CATEGORIES_FAILURE)

@@ -63,19 +63,17 @@ class Sharing extends Model
     }
 
     public function getPriceNoFeeAttribute(){
-        return $this->price / $this->capacity;
+        return $this->getPrice($this->price, $this->capacity, $this->renewalFrequency)['netPrice'];
     }
 
     public function getPriceWithFeeAttribute(){
-        return $this->priceNoFee + (floatval(config('custom.stripe.stripe_fee')) / 100) + (floatval(config('custom.stripe.platform_fee')) / 100);
+        return $this->getPrice($this->price, $this->capacity, $this->renewalFrequency)['totalPrice'];
     }
 
     public function setImageAttribute($image){
         if($image) {
-            if (Storage::exists($this->image)){
-                Storage::delete($this->image);
-            }
-            $this->attributes['image'] = $image->store('sharings');
+            if (Storage::exists($this->image)) Storage::delete($this->image);
+            $this->attributes['image'] = $image->store('uploads/sharings');
         }
     }
 

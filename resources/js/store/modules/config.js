@@ -1,11 +1,13 @@
-const { sharingsVisibility } = window.config
+const { sharingsVisibility, renewalFrequency } = window.config
 
 // state
 export const state = {
-  sharingsVisibility
+  sharingsVisibility,
+  renewalFrequency
 }
 
 // getters
 export const getters = {
-  sharingsVisibility: state => state.sharingsVisibility
+  sharingsVisibility: state => state.sharingsVisibility,
+  renewalFrequency: state => state.renewalFrequency
 }

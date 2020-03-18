@@ -1,5 +1,5 @@
 <template>
-  <div v-if="sharing.id">
+  <div v-if="loaded">
     <div v-if="authUser.admin && sharingPending" class="pt-2 pb-2 mb-4 text-white bg-danger">
       <div class="container">
         <div class="d-flex align-items-center">
@@ -43,7 +43,7 @@
                 <ul class="list-group">
                   <li class="list-group-item d-flex justify-content-between align-items-center">
                     Ricorrenza pagamento
-                    <strong>{{ sharing.renewal_frequency }}</strong>
+                    <strong>{{ sharing.renewal_frequency.frequency }}</strong>
                   </li>
                   <li class="list-group-item d-flex justify-content-between align-items-center">
                     Data di creazione
@@ -147,6 +147,7 @@ export default {
   mixins: [ helperMixin ],
 
   data: () => ({
+    loaded: false,
     globalMembers: [],
     confirmStatus: false,
     refusedStatus: false
@@ -194,6 +195,7 @@ export default {
 
   watch: {
     sharing (obj) {
+      this.loaded = true;
       this.globalMembers = [obj.owner]
       if (obj.members) this.globalMembers.push(...obj.members)
     }

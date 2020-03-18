@@ -10,35 +10,33 @@
         </p>
       </div>
     </section>
-    <div class="container">
-      <div class="row">
-        <div class="col-md-3 mb-4" v-for="sharing in category.sharings" :key="sharing.id">
-          <sharing-card :sharing="sharing" />
-        </div>
+    <div v-if="category" class="container">
+      <div class="mt-5">
+        <sharings/>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
-  import SharingCard from "../../components/SharingCard";
+import { mapGetters } from 'vuex'
+import Sharings from '../../components/Sharings'
 
-  export default {
-    components: {
-      SharingCard
-    },
+export default {
+  components: {
+    Sharings
+  },
 
-    created () {
-      this.$store.dispatch('categories/fetchCategory', this.$route.params.category_id).then(() => {
-        if (!this.$store.getters['categories/category'].id) this.$router.push({ name: '404' })
-      });
-    },
-
-    computed: mapGetters({
-      category: 'categories/category',
-    })
-  }
+  created () {
+    this.$store.dispatch('categories/fetchCategory', this.$route.params.category_id).then(() => {
+      if (!this.$store.getters['categories/category'].id) this.$router.push({ name: '404' })
+    });
+  },
+  computed: mapGetters({
+    category: 'categories/category',
+    authUser: 'auth/user'
+  })
+}
 </script>
 
 <style scoped>

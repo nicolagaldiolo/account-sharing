@@ -33,6 +33,7 @@ export const mutations = {
       links: sharings.links,
       meta: sharings.meta
     }
+
     state.sharings = Object.assign({}, obj)
   },
 
