@@ -27,6 +27,7 @@ export default router
  *
  * @return {Router}
  */
+
 function createRouter () {
   const router = new Router({
     scrollBehavior,
@@ -72,7 +73,25 @@ async function beforeEach (to, from, next) {
   }
 
   // Get the middleware for all the matched components.
-  const middleware = getMiddleware(components)
+  let middleware = getMiddleware(components)
+
+  // Add Parent router meta middleware to middleware array
+  if (to.matched) {
+    to.matched.filter(item => item.parent).forEach(i => {
+      if (i.parent.meta.middleware) {
+        Array.isArray(i.parent.meta.middleware)
+          ? middleware.push(...i.parent.meta.middleware)
+          : middleware.push(i.parent.meta.middleware)
+      }
+    })
+  }
+
+  // Add router meta middleware to middleware array
+  if (to.meta.middleware) {
+    Array.isArray(to.meta.middleware)
+      ? middleware.push(...to.meta.middleware)
+      : middleware.push(to.meta.middleware)
+  }
 
   // Call each middleware.
   callMiddleware(middleware, to, from, (...args) => {
@@ -107,7 +126,8 @@ async function afterEach (to, from, next) {
  * @param {Function} next
  */
 function callMiddleware (middleware, to, from, next) {
-  const stack = middleware.reverse()
+  // Reorder the middleware array and remove duplicates
+  const stack = [...new Set(middleware)].reverse()
 
   const _next = (...args) => {
     // Stop if "_next" was called with an argument or the stack is empty.
@@ -139,6 +159,7 @@ function callMiddleware (middleware, to, from, next) {
  * @param  {Array} components
  * @return {Array}
  */
+
 function resolveComponents (components) {
   return Promise.all(components.map(component => {
     return typeof component === 'function' ? component() : component

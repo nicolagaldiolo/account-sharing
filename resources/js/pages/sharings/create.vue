@@ -19,20 +19,18 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex'
 
-  export default {
-    middleware: 'auth',
+export default {
+  created () {
+    this.$store.dispatch('categories/fetchCategories')
+  },
 
-    created () {
-      this.$store.dispatch('categories/fetchCategories');
-    },
-
-    computed: {
-      ...mapGetters({
-         user: 'auth/user',
-         categories: 'categories/categories'
-       })
-    },
-  }
+  computed: {
+    ...mapGetters({
+      user: 'auth/user',
+      categories: 'categories/categories'
+    })
+  },
+}
 </script>

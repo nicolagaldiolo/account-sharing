@@ -62,7 +62,6 @@ import { mapGetters } from 'vuex'
 
 export default {
   name: 'Chat',
-  middleware: 'auth',
   components: {
     InfiniteLoading
   },

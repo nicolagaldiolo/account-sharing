@@ -6,21 +6,20 @@
 import Sharings from '~/components/Sharings'
 
 export default {
-    components: {
-      Sharings
-    },
-    middleware: 'auth',
+  components: {
+    Sharings
+  },
 
-    props: {
-        type: {
-            type: String,
-            default: ''
-        },
-        title: {
-          type: String,
-          default: ''
-        }
+  props: {
+    type: {
+      type: String,
+      default: ''
+    },
+    title: {
+      type: String,
+      default: ''
     }
+  }
 
 }
 </script>

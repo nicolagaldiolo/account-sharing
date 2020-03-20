@@ -3,31 +3,26 @@
   <component name="ChangeListManager">
     <list default="true" id="80fbe383-e517-4357-96d8-8ee0108f1222" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Category.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Category.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Enums/RenewalFrequencies.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Enums/RenewalFrequencies.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Categories/CategoriesController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Categories/CategoriesController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Sharings/SharingsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Sharings/SharingsController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Resources/Category.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Resources/Category.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Resources/Sharing.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Resources/Sharing.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Traits/Utility.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Traits/Utility.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Imports/ServiceDataImport.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Imports/ServiceDataImport.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/RenewalFrequency.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/RenewalFrequency.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Sharing.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Sharing.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/seeds/SeedFakeData.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeds/SeedFakeData.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/App.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/App.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/SharingCard.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/SharingCard.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/Chat.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Chat.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/components/Sharings.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Sharings.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/pages/categories/show.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/categories/show.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/pages/auth/login.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/auth/login.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/pages/auth/password/email.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/auth/password/email.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/pages/auth/password/reset.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/auth/password/reset.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/pages/auth/register.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/auth/register.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/pages/auth/verification/resend.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/auth/verification/resend.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/pages/auth/verification/verify.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/auth/verification/verify.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/pages/home.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/home.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/pages/notifications.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/notifications.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/pages/settings/firstinfo.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/settings/firstinfo.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/pages/settings/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/settings/index.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/pages/sharings/checkout.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/sharings/checkout.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/pages/sharings/create.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/sharings/create.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/pages/sharings/createForm.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/sharings/createForm.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/pages/sharings/show.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/sharings/show.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/store/modules/categories.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/store/modules/categories.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/store/modules/config.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/store/modules/config.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/store/modules/sharings.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/store/modules/sharings.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/index.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/import_data/images/custom/account_sharing_1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/import_data/images/custom/account_sharing_2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/import_data/images/custom/account_sharing_3.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/pages/sharings/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/sharings/index.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/pages/sharings/lists.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/sharings/lists.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/pages/sharings/owner.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/sharings/owner.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/router/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/router/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/router/routes.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/router/routes.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -544,7 +539,9 @@
       <workItem from="1583905137223" duration="7094000" />
       <workItem from="1583928597061" duration="2689000" />
       <workItem from="1584079237718" duration="38523000" />
-      <workItem from="1584512674336" duration="2778000" />
+      <workItem from="1584512674336" duration="5268000" />
+      <workItem from="1584597323516" duration="8218000" />
+      <workItem from="1584684418363" duration="1813000" />
     </task>
     <servers />
   </component>
@@ -731,8 +728,8 @@
       <screen x="0" y="23" width="2560" height="1417" />
     </state>
     <state width="500" height="445" key="SwitcherDM/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1581663018191" />
-    <state x="547" y="357" key="com.intellij.ide.util.TipDialog" timestamp="1584512678833">
-      <screen x="0" y="23" width="1440" height="877" />
+    <state x="972" y="563" key="com.intellij.ide.util.TipDialog" timestamp="1584684419065">
+      <screen x="0" y="23" width="2560" height="1417" />
     </state>
     <state x="547" y="357" key="com.intellij.ide.util.TipDialog/0.23.1440.877/-200.-1057.1920.1057@0.23.1440.877" timestamp="1580845122877" />
     <state x="547" y="357" key="com.intellij.ide.util.TipDialog/0.23.1440.877/-259.-1057.1920.1057@0.23.1440.877" timestamp="1579717267049" />
@@ -744,13 +741,18 @@
     <state x="973" y="563" key="com.intellij.ide.util.TipDialog/2560.205.1440.877/0.23.2560.1417@0.23.2560.1417" timestamp="1584079238420" />
     <state x="973" y="563" key="com.intellij.ide.util.TipDialog/2560.235.1440.877/-2560.23.2560.1417/0.23.2560.1417@0.23.2560.1417" timestamp="1583928601012" />
     <state x="973" y="563" key="com.intellij.ide.util.TipDialog/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1583644492713" />
-    <state x="106" y="114" width="1195" height="699" key="find.popup" timestamp="1584209479217">
-      <screen x="0" y="23" width="1440" height="877" />
+    <state x="972" y="563" key="com.intellij.ide.util.TipDialog/548.1463.1440.877/-2560.23.2560.1417/0.23.2560.1417@0.23.2560.1417" timestamp="1584684419065" />
+    <state x="548" y="1463" width="1383" height="877" maximized="true" key="dock-window-1" timestamp="1584684613063">
+      <screen x="548" y="1463" width="1440" height="877" />
+    </state>
+    <state x="548" y="1463" width="1383" height="877" maximized="true" key="dock-window-1/548.1463.1440.877/-2560.23.2560.1417/0.23.2560.1417@0.23.2560.1417" timestamp="1584684613063" />
+    <state x="-1910" y="304" width="1195" height="699" key="find.popup" timestamp="1584684538643">
+      <screen x="-2560" y="23" width="2560" height="1417" />
     </state>
     <state x="540" y="311" width="645" height="472" key="find.popup/0.23.1440.877/-200.-1057.1920.1057@0.23.1440.877" timestamp="1580843740096" />
     <state x="408" y="-952" width="1215" height="786" key="find.popup/0.23.1440.877/-552.-1417.2560.1417@-552.-1417.2560.1417" timestamp="1577120645150" />
     <state x="540" y="311" width="789" height="534" key="find.popup/0.23.1440.877/-552.-1417.2560.1417@0.23.1440.877" timestamp="1583345414195" />
-    <state x="106" y="114" width="1195" height="699" key="find.popup/0.23.1440.877/-571.-1417.2560.1417@0.23.1440.877" timestamp="1584209479217" />
+    <state x="106" y="114" width="1195" height="699" key="find.popup/0.23.1440.877/-571.-1417.2560.1417@0.23.1440.877" timestamp="1584599327625" />
     <state x="228" y="243" width="931" height="534" key="find.popup/0.23.1440.877/1440.-256.1440.877@0.23.1440.877" timestamp="1583584837332" />
     <state x="540" y="311" width="683" height="486" key="find.popup/0.23.1440.877/1440.-736.2560.1417@0.23.1440.877" timestamp="1582981352585" />
     <state x="228" y="155" width="931" height="622" key="find.popup/0.23.1440.877@0.23.1440.877" timestamp="1583910604015" />
@@ -758,6 +760,7 @@
     <state x="405" y="378" width="1656" height="863" key="find.popup/2560.279.1440.877/-1440.448.1440.877/0.23.2560.1417@0.23.2560.1417" timestamp="1581232905883" />
     <state x="481" y="400" width="1115" height="761" key="find.popup/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1583646750433" />
     <state x="517" y="381" width="1616" height="798" key="find.popup/2622.142.1858.1080/62.0.2498.1440@62.0.2498.1440" timestamp="1577718307895" />
+    <state x="-1910" y="304" width="1195" height="699" key="find.popup/548.1463.1440.877/-2560.23.2560.1417/0.23.2560.1417@548.1463.1440.877" timestamp="1584684538643" />
     <state x="532" y="224" width="670" height="419" key="search.everywhere.popup" timestamp="1583907251216">
       <screen x="0" y="23" width="1440" height="877" />
     </state>

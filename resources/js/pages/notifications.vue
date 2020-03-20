@@ -31,10 +31,6 @@ export default {
     InfiniteLoading
   },
 
-  middleware: [
-    'auth',
-  ],
-
   mixins: [ helperMixin ],
 
   computed: mapGetters({

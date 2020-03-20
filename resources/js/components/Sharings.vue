@@ -23,10 +23,6 @@ export default {
   },
 
   mixins: [ helperMixin ],
-  middleware: [
-    'auth',
-    'registrationCompleted'
-  ],
 
   props: {
     title: {

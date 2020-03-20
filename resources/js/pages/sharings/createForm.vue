@@ -128,7 +128,6 @@ export default {
     ImageSelector,
     Neededinfo
   },
-  middleware: 'auth',
 
   data: () => ({
     form: new Form({

@@ -46,9 +46,6 @@ import paymentmethods from '../settings/paymentmethods';
 import MoneyFormat from 'vue-money-format'
 
 export default {
-  middleware: [
-    'userCanPay'
-  ],
   components: {
     paymentmethods,
     MoneyFormat

@@ -12,7 +12,7 @@
           </div>
         </div>
       </div>
-
+      <hr>
       <div class="mt-5">
         <sharings />
       </div>
@@ -30,11 +30,6 @@ export default {
   components: {
     Sharings
   },
-  middleware: [
-    'auth',
-    'registrationCompleted'
-  ],
-
   computed: mapGetters({
     categories: 'categories/categories',
   }),

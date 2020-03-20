@@ -38,8 +38,6 @@ export default {
     ManageSharingUser
   },
   mixins: [ helperMixin ],
-  middleware: 'auth',
-
   props: {
     type: {
       type: String,
