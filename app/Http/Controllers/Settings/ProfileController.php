@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Settings;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class ProfileController extends Controller
 {
@@ -16,7 +17,7 @@ class ProfileController extends Controller
      */
     public function update(Request $request)
     {
-        $user = $request->user();
+        $user = Auth::user();
 
         $this->validate($request, [
             'name' => 'sometimes',
@@ -29,8 +30,7 @@ class ProfileController extends Controller
 
     public function completeRegistration(Request $request)
     {
-
-        $user = $request->user();
+        $user = Auth::user();
 
         $this->validate($request, [
             'country' => 'required',
@@ -44,7 +44,7 @@ class ProfileController extends Controller
 
     public function neededInfo(Request $request)
     {
-        $user = $request->user();
+        $user = Auth::user();
 
         $this->validate($request, [
             'phone' => 'required',
@@ -65,7 +65,7 @@ class ProfileController extends Controller
         \Stripe\Stripe::setApiVersion("2019-10-08");
 
 
-        $user = $request->user();
+        $user = Auth::user();
 
         //dd($request);
 
@@ -123,7 +123,7 @@ class ProfileController extends Controller
     public function bankAccount(Request $request)
     {
 
-        $user = $request->user();
+        $user = Auth::user();
         $bankAccount = $request->bank_account;
 
         return createExternalAccount($bankAccount);

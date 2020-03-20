@@ -92,7 +92,7 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     public function setCountryAttribute($value)
     {
         $this->attributes['country'] = $value;
-        $this->attributes['currency'] = collect(config('custom.countries'))->get('gb')['currency'] ??
+        $this->attributes['currency'] = collect(config('custom.countries'))->get($value)['currency'] ??
             config('custom.stripe.default_currency');
     }
 

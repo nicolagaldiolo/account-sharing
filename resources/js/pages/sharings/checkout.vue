@@ -14,11 +14,11 @@
             <ul class="list-group">
               <li class="list-group-item d-flex justify-content-between align-items-center">
                 Periodo
-                <strong>{{ $moment(today).format('D MMM YYYY') }} -> {{ $moment(today).add(1, 'M').format('D MMM YYYY') }}</strong>
+                <strong>{{ renewalDate.from.format('D MMM YYYY') }} -> {{ renewalDate.to.format('D MMM YYYY') }}</strong>
               </li>
               <li class="list-group-item d-flex justify-content-between align-items-center">
-                Rinnovo
-                <strong>{{ sharing.renewal_frequency }}</strong>
+                Ricorrenza pagamento
+                <strong>{{ sharing.renewal_frequency.frequency }}</strong>
               </li>
               <li class="list-group-item d-flex justify-content-between align-items-center">
                 Contributo spese
@@ -26,7 +26,7 @@
               </li>
               <li class="list-group-item d-flex justify-content-between align-items-center">
                 Spese di gestione
-                <strong><money-format :value="fee" :locale="authUser.country" :currency-code="authUser.currency" :subunit-value=false :hide-subunits=false></money-format></strong>
+                <strong><money-format :value="sharing.fee" :locale="authUser.country" :currency-code="authUser.currency" :subunit-value=false :hide-subunits=false></money-format></strong>
               </li>
               <li class="list-group-item list-group-item-dark d-flex justify-content-between align-items-center">
                 <strong>Totale da pagare</strong>
@@ -40,6 +40,7 @@
   </div>
 </template>
 <script>
+import { helperMixin } from '~/mixins/helperMixin'
 import { mapGetters } from 'vuex'
 import axios from 'axios'
 import paymentmethods from '../settings/paymentmethods';
@@ -51,9 +52,10 @@ export default {
     MoneyFormat
   },
 
+  mixins: [ helperMixin ],
+
   data: () => ({
     today: new Date(),
-    fee: (parseInt(window.config.platformFee) + parseInt(window.config.stripeFee)) / 100,
     stripe: window.Stripe(window.config.stripeKey)
   }),
 
@@ -63,7 +65,10 @@ export default {
     ...mapGetters({
         sharing: 'sharings/sharing',
         authUser: 'auth/user'
-    })
+    }),
+    renewalDate () {
+      return this.calcRenewalData(this.sharing.renewal_frequency)
+    }
   }
 }
 </script>

@@ -30,19 +30,22 @@ trait Utility
 
         $stripeFee = floatval(config('custom.stripe.stripe_fee')) / 100;
         $platformFee = floatval(config('custom.stripe.platform_fee')) / 100;
+        $fee = $stripeFee + $platformFee;
         $netPrice = $price / $capacity;
-        $totalPrice = $netPrice + $stripeFee + $platformFee;
+        $totalPrice = $netPrice + $fee;
 
         switch ($renewalFrequency->type){
             case RenewalFrequencies::Years:
                 $netPrice = $netPrice * 12;
                 $totalPrice = $totalPrice * 12;
+                $fee = $fee * 12;
                 break;
         }
 
         return [
             'netPrice' => ($netPrice * $renewalFrequency->value),
-            'totalPrice' => ($totalPrice * $renewalFrequency->value)
+            'totalPrice' => ($totalPrice * $renewalFrequency->value),
+            'fee' => ($fee * $renewalFrequency->value)
         ];
 
     }

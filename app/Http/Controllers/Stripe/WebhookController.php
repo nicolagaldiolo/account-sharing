@@ -58,7 +58,7 @@ class WebhookController extends Controller
         $method = 'handle'.Str::studly(str_replace('.', '_', $payload['type']));
 
         logger($method);
-        //logger($payload);
+        logger($payload);
 
         //WebhookReceived::dispatch($payload);
 
@@ -178,12 +178,13 @@ class WebhookController extends Controller
 
         $subscription = DB::transaction(function() use ($sharingSubscription) {
 
-            // Retrieve the sharing
-            $sharing = Sharing::where('stripe_plan', $sharingSubscription['plan']['id'])->firstOrFail();
-
             // Retrieve the user
             $user = User::where('pl_customer_id', $sharingSubscription['customer'])->firstOrFail();
             Auth::login($user);
+
+            // Retrieve the sharing
+            $sharing = Sharing::where('stripe_plan', $sharingSubscription['plan']['id'])->firstOrFail();
+
 
             $sharingUser = $user->sharings()->find($sharing->id)->sharing_status;
 

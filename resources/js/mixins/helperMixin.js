@@ -36,6 +36,24 @@ export const helperMixin = {
       return status
     },
 
+    calcRenewalData (renewalFrequency) {
+      const today = new Date()
+      let to = null
+      switch (renewalFrequency.type) {
+        case 1: // Monthly
+          to = this.$moment(today).add(renewalFrequency.value, 'M')
+          break
+        case 2: // Annually
+          to = this.$moment(today).add(renewalFrequency.value, 'Y')
+          break
+      }
+
+      return {
+        from: this.$moment(today),
+        to: to
+      }
+    },
+
     showNotificationToast (message = 'notification_title', id) {
       const options = {
         action: {

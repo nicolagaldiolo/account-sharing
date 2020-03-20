@@ -39,7 +39,7 @@ export const mutations = {
   },
 
   [types.UPDATE_USER] (state, { user }) {
-    state.user = user
+    state.user = user.data
   }
 }
 

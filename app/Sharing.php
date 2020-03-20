@@ -70,6 +70,10 @@ class Sharing extends Model
         return $this->getPrice($this->price, $this->capacity, $this->renewalFrequency)['totalPrice'];
     }
 
+    public function getFeeAttribute(){
+        return $this->getPrice($this->price, $this->capacity, $this->renewalFrequency)['fee'];
+    }
+
     public function setImageAttribute($image){
         if($image) {
             if (Storage::exists($this->image)) Storage::delete($this->image);

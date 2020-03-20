@@ -76,7 +76,11 @@ export default {
   methods: {
     async update () {
       const { data } = await this.form.patch('/api/settings/complete-registration')
-      this.$store.dispatch('auth/updateUser', { user: data })
+
+      // Update the user.
+      await this.$store.dispatch('auth/updateUser', { user: data })
+
+      // Redirect home.
       this.$router.push({ name: 'home' })
     }
   }
