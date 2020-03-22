@@ -8,6 +8,7 @@ $config = [
     'stripeKey' => config('services.stripe.key'),
     'limitUserAge' => config('custom.limit_user_age'),
     'maxPaymentMethod' => config('custom.stripe.max_payment_method'),
+    'dayRefundLimit' => config('custom.day_refund_limit'),
     'sharingUserStatus' => \App\Enums\SharingStatus::toSelectArray(),
     'sharingsVisibility' => \App\Enums\SharingVisibility::toSelectArray(),
     'renewalFrequency' => \App\Http\Resources\RenewalFrequency::collection(\App\RenewalFrequency::all())

@@ -2,6 +2,8 @@
 
 namespace App\MyClasses;
 
+use App\Enums\RenewalFrequencies;
+use App\Http\Traits\Utility;
 use App\Sharing;
 use App\User;
 use Carbon\Carbon;
@@ -9,6 +11,8 @@ use Illuminate\Support\Facades\Auth;
 
 class Stripe
 {
+
+    use Utility;
 
     protected $user = '';
 
@@ -184,13 +188,32 @@ class Stripe
         $user = User::findOrFail($sharing->owner_id);
         $this->setUser($user);
 
+        $renewalFrequency = $sharing->renewalFrequency;
+        $price = $this->getPrice($sharing->price, $sharing->capacity, $sharing->renewalFrequency);
+
+        switch ($renewalFrequency->type){
+            case RenewalFrequencies::Months:
+                $interval = 'month';
+                break;
+            case RenewalFrequencies::Years:
+                $interval = 'year';
+                break;
+            default:
+                $interval = '';
+        }
+
         $plan = \Stripe\Plan::create([
-            'amount' => number_format((float)$sharing->price * 100., 0, '.', ''),
-            'interval' => 'month',
+            'amount' => number_format((float)$price['totalPrice'] * 100., 0, '.', ''),
+            'interval' => $interval,
+            'interval_count' => $renewalFrequency->value,
             'product' => [
                 'name' => $sharing->name
             ],
-            'currency' => $this->user->currency
+            'currency' => $this->user->currency,
+            'metadata' => [
+                'netPrice' => number_format((float)$price['netPrice'] * 100., 0, '.', ''),
+                'fee' => number_format((float)$price['fee'] * 100., 0, '.', '')
+            ]
         ]);
 
         $sharing->stripe_plan = $plan->id;
@@ -279,5 +302,13 @@ class Stripe
                 logger($e);
             }
         }
+    }
+
+    /*
+     * CHARGE
+     */
+    public function chargeRetrieve($id = null)
+    {
+        return \Stripe\Charge::retrieve($id);
     }
 }

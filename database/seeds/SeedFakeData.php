@@ -56,7 +56,7 @@ class SeedFakeData extends Seeder
             'email' => env('DEMOEMAIL', 'demouser@example.com'),
             'password' => bcrypt(env('DEMOPASS', 'password')),
             'admin' => 1
-        ])->merge(factory(\App\User::class, 9)->create());
+        ])->merge(factory(\App\User::class, 4)->create());
 
         // Create a customer for every users and attach them a default payment method
         $users->each(function($user){
@@ -64,7 +64,9 @@ class SeedFakeData extends Seeder
             $platformStripeCustomer = \App\MyClasses\Support\Facade\Stripe::getCustomer($user);
 
             $payment_method_to_attach = \Stripe\PaymentMethod::retrieve('pm_card_visa');
+
             $payment_method_to_attach->attach(['customer' => $platformStripeCustomer->id]);
+
             \Stripe\Customer::update($platformStripeCustomer->id, [
                     'invoice_settings' => [
                         'default_payment_method' => $payment_method_to_attach,
@@ -110,7 +112,9 @@ class SeedFakeData extends Seeder
 
                 $sharing = factory(Sharing::class)->create([
                     'name' => $category->name,
-                    'price' => ($category->price <= 0) ? 20.00 : $category->price, // force price for custom group
+                    'price' => ($category->price <= 0) ?
+                        (($category->freeSlot + 1) * 4) : // force price for custom group
+                        $category->price,
                     'image' => $this->generateUploadedFile($images_archive),
                     'multiaccount' => $category->multiaccount,
                     'renewal_frequency_id' => $renewalFrequencies->random(1)->pluck('id')->first(),

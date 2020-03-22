@@ -13,13 +13,15 @@ class Invoice extends Model
     protected $fillable = [
         'stripe_id',
         'customer_id',
-        'account_id',
+        'user_id',
         'subscription_id',
         'payment_intent',
         'total',
         'total_less_fee',
+        'fee',
         'currency',
-        'last4'
+        'last4',
+        'transfered'
     ];
 
     protected $with = [
@@ -30,7 +32,8 @@ class Invoice extends Model
 
     public function getServiceAttribute()
     {
-        return $this->subscription->sharingUser->sharing->name;
+        return 'Ciao';
+        //return $this->subscription->sharingUser->sharing->name;
     }
 
     public function getLast4Attribute()
@@ -41,12 +44,6 @@ class Invoice extends Model
     public function getTotalAttribute()
     {
         return $this->attributes['total'];
-    }
-
-    public function setTotalAttribute($value)
-    {
-        $this->attributes['total'] = $value;
-        $this->attributes['total_less_fee'] = $this->calcNetPrice($value);
     }
 
     public function transactions()
@@ -61,7 +58,7 @@ class Invoice extends Model
 
     public function owner()
     {
-        return $this->belongsTo(User::class, 'account_id', 'pl_account_id');
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
     public function subscription()
@@ -88,8 +85,14 @@ class Invoice extends Model
 
     public function scopeTransferable($query)
     {
-        return $query->doesntHave('transfer')->whereDoesntHave('refunds', function ($query) {
+        /*return $query->doesntHave('transfer')->whereDoesntHave('refunds', function ($query) {
             $query->approved();
-        })->where('created_at', '<=', Carbon::now()->subDays(config('custom.day_refund_limit'))->endOfDay());
+        })->where('created_at', '<=', Carbon::now()->subDays(config('custom.day_refund_limit'))->endOfDay());*/
+
+        return $query->whereDoesntHave('refunds', function ($query) {
+            $query->approved();
+        })->where('transfered',0)
+            ->where('created_at', '<=', Carbon::now()->subDays(config('custom.day_refund_limit'))->endOfDay());
+
     }
 }

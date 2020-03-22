@@ -311,7 +311,7 @@ updated_at
           <y:NodeLabel alignment="left" autoSizePolicy="content" configuration="com.yworks.entityRelationship.label.attributes" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="145.328125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="top" visible="true" width="94.298828125" x="2.0" xml:space="preserve" y="30.1328125">id
 stripe_id
 customer_id
-account_id
+user_id
 payment_intent
 total
 total_less_fee

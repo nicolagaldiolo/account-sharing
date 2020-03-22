@@ -3,7 +3,10 @@
 namespace App\Console\Commands;
 
 use App\Invoice;
+use App\Notifications\MoneyTransfered;
+use App\User;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Notification;
 
 class TransferMoney extends Command
 {
@@ -39,13 +42,18 @@ class TransferMoney extends Command
     public function handle()
     {
 
-        Invoice::transferable()->get()->each(function ($item){
-            \Stripe\Transfer::create([
-                "amount" => $item->total_less_fee,
-                "currency" => $item->currency,
-                "destination" => $item->account_id,
-                "transfer_group" => $item->payment_intent
-            ]);
-        });
+        // Get the transferible Invoice
+        $ids = Invoice::transferable()->get()->pluck('id');
+
+        // Mark them as transfered
+        Invoice::whereIn('id', $ids)->update([
+            'transfered' => 1
+        ]);
+
+        // Send Notification to owners
+        $usersIds = Invoice::whereIn('id', $ids)->with('subscription.sharingUser.sharing')->get()
+            ->pluck('subscription.sharingUser.sharing.owner_id')->unique();
+        Notification::send(User::whereIn('id', $usersIds)->get(), new MoneyTransfered());
+
     }
 }

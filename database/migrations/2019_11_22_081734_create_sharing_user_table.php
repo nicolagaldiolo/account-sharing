@@ -20,6 +20,7 @@ class CreateSharingUserTable extends Migration
             $table->tinyInteger('status')->default(\App\Enums\SharingStatus::Pending);
             $table->tinyInteger('credential_status')->default(\App\Enums\CredentialsStatus::Toverify);
             $table->timestamps();
+
             $table->unique( ['sharing_id','user_id'] );
             $table->foreign('sharing_id')->on('sharings')->references('id');
             $table->foreign('user_id')->on('users')->references('id');

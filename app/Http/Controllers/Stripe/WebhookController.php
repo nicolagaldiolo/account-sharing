@@ -80,44 +80,39 @@ class WebhookController extends Controller
      */
     protected function handleInvoicePaymentSucceeded(array $payload)
     {
-        /* FINO A QUANDO RISOLVI PROBLEMA ACCOUNT_ID
         $object = $payload['data']['object'];
-
-        logger("1");
 
         $user = User::where('pl_customer_id', $object['customer'])->firstOrFail();
         Auth::login($user);
 
-        logger("2");
-
         DB::transaction(function() use($object){
+            $sharing = Sharing::where('stripe_plan', $object['lines']['data'][0]['plan']['id'])->firstOrFail();
 
-            logger("3");
+            $total = ($object['total']) / 100;
+            $total_less_fee = ($object['lines']['data'][0]['plan']['metadata']['netPrice']) / 100;
+            $fee = ($object['lines']['data'][0]['plan']['metadata']['fee']) / 100;
 
-            $account_id = Subscription::findOrFail($object['subscription'])->sharingUser->sharing->owner->pl_account_id;
+            $charge = Stripe::chargeRetrieve($object['charge']);
 
             $invoice = Invoice::create([
                 'stripe_id' => $object['id'],
                 'customer_id' => $object['customer'],
-                'account_id' => $account_id,
+                'user_id' => $sharing->owner_id,
                 'subscription_id' => $object['subscription'],
                 'payment_intent' => $object['payment_intent'],
-                'total' => $object['total'],
+                'total' => $total,
+                'total_less_fee' => $total_less_fee,
+                'fee' => $fee,
                 'currency' => $object['currency'],
-                'last4' => '1234'
+                'last4' => $charge->payment_method_details->card->last4
             ]);
 
-            logger("4");
-
             $invoice->transactions()->create();
-
-            logger("5");
 
             // creo dei refunds fake
             //$invoice->refunds()->create()->transactions()->create();
 
         });
-        */
 
 
         /*
@@ -301,14 +296,15 @@ class WebhookController extends Controller
 
     protected function handleTransferCreated(array $payload)
     {
-        $object = $payload['data']['object'];
 
-        Invoice::where('payment_intent', $object['transfer_group'])->firstOrFail()->transfer()->create([
-            'stripe_id' => $object['id'],
-            'account_id' => $object['destination'],
-            'amount' => $object['amount'],
-            'currency' => $object['currency'],
-        ]);
+        //$object = $payload['data']['object'];
+
+        //Invoice::where('payment_intent', $object['transfer_group'])->firstOrFail()->transfer()->create([
+        //    'stripe_id' => $object['id'],
+        //    'account_id' => $object['destination'],
+        //    'amount' => $object['amount'],
+        //    'currency' => $object['currency'],
+        //]);
 
         // inviare mail all'utente che il denaro è stato trasferito
 

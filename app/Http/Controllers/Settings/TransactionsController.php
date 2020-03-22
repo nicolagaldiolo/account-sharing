@@ -25,8 +25,8 @@ class TransactionsController extends Controller
 
         $transactions_type = collect([
             'INVOICE' => 'App\Invoice',
-            'REFUNDS' => 'App\Refund',
-            'PAYOUTS' => 'App\Payout',
+            //'REFUNDS' => 'App\Refund',
+            //'PAYOUTS' => 'App\Payout',
         ]);
 
         if(array_key_exists('type', $params) && '' != $params['type']) {
@@ -50,7 +50,7 @@ class TransactionsController extends Controller
 
             if($transactions_subtype->contains('owner')) {
                 $query->orWhereHas('owner', function ($query) use ($user) {
-                    $query->where('pl_account_id', $user->pl_account_id);
+                    $query->where('user_id', $user->id);
                 });
             };
 

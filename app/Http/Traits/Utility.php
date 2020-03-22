@@ -19,13 +19,8 @@ use Illuminate\Support\Str;
 
 trait Utility
 {
-    // utlizzato per settare il campo total_less_fee del modello invoice (capire se serve)
-    protected function calcNetPrice($price = 0)
-    {
-        return (intval($price) > 0) ? (intval($price) - intval(config('custom.stripe.stripe_fee')) - intval(config('custom.stripe.platform_fee'))) : 0;
-    }
 
-    protected function getPrice($price = 0, $capacity, RenewalFrequency $renewalFrequency)
+    protected function getPrice($price = 0, $capacity = 0, RenewalFrequency $renewalFrequency)
     {
 
         $stripeFee = floatval(config('custom.stripe.stripe_fee')) / 100;

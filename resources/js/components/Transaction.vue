@@ -16,7 +16,7 @@
             <small>{{ item.created_at | moment("D/M/YYYY") }}</small>
             <div class="d-flex money_data" :class="transactionFormatted.colorClass">
               {{item.direction === 'INCOMING' ? "+" : "-"}}
-              <money-format :value="(item.total.value / 100)" locale="IT" :currency-code='item.total.currency' :subunit-value=false :hide-subunits=false></money-format>
+              <money-format :value="(item.total.value * 1)" locale="IT" :currency-code='item.total.currency' :subunit-value=false :hide-subunits=false></money-format>
             </div>
             <a v-if="item.refundable" href="#" class="btn btn-primary" @click.prevent="refundRequest">Richiedi rimborso <br><small>Entro il {{ item.refundable.within | moment("D/M/YYYY") }}</small></a>
           </div>

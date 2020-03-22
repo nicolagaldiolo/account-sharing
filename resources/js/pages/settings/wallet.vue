@@ -7,18 +7,18 @@
         <li class="list-group-item d-flex justify-content-between lh-condensed">
           <div>
             <h4 class="my-0">Saldo contabile</h4>
-            <small class="text-muted" v-if="balance.dayofdelay">Disponibili dopo <strong>{{balance.dayofdelay}}gg</strong> dalla ricezione del pagamento</small>
+            <small class="text-muted" v-if="dayRefundLimit">Disponibili dopo <strong>{{dayRefundLimit}}gg</strong> dalla ricezione del pagamento</small>
           </div>
-          <span v-for="(pending, index) in balance.pending" :key="index" class="text-muted">
-            <money-format :value="(pending.total / 100)" locale="IT" :currency-code='pending.currency' :subunit-value=false :hide-subunits=false></money-format>
+          <span class="text-muted">
+          <money-format :value="balance.pending" :locale="authUser.country" :currency-code='authUser.currency' :subunit-value=false :hide-subunits=false></money-format>
           </span>
         </li>
         <li class="list-group-item d-flex justify-content-between lh-condensed">
           <div>
             <h4 class="my-0">Saldo disponibile</h4>
           </div>
-          <span v-for="(available, index) in balance.available" :key="index" class="text-muted">
-            <money-format :value="(available.total / 100)" locale="IT" :currency-code='available.currency' :subunit-value=false :hide-subunits=false></money-format>
+          <span class="text-muted">
+            <money-format :value="balance.available" :locale="authUser.country" :currency-code='authUser.currency' :subunit-value=false :hide-subunits=false></money-format>
           </span>
         </li>
       </ul>
@@ -79,6 +79,7 @@
     import Transaction from '~/components/Transaction'
     import { helperMixin } from '~/mixins/helperMixin'
     import MoneyFormat from "vue-money-format";
+    import {mapGetters} from "vuex";
 
 export default {
   data: () => ({
@@ -94,22 +95,32 @@ export default {
       balance: {}
   }),
 
+  mixins: [
+    helperMixin
+  ],
+
   components: {
-      Transaction,
-      InfiniteLoading,
-      'money-format': MoneyFormat
+    Transaction,
+    InfiniteLoading,
+    'money-format': MoneyFormat
+  },
+
+  computed: {
+    ...mapGetters({
+      dayRefundLimit: 'config/dayRefundLimit',
+      authUser: 'auth/user'
+    })
   },
 
   created () {
     this.getBalance()
   },
 
-    watch: {
-      'search_fields.type': function (val) {
-          this.search_fields.subtype = ''
-      }
-
-    },
+  watch: {
+    'search_fields.type': function (val) {
+      this.search_fields.subtype = ''
+    }
+  },
 
   methods: {
 
@@ -118,7 +129,7 @@ export default {
           if (result.error) {
             // Display error.message in your UI.
           } else {
-            this.balance = result.data
+            this.balance = result.data.data
           }
         }.bind(this))
       },
@@ -130,7 +141,6 @@ export default {
       },
 
       async infiniteHandler ($state) {
-
           axios.get('/api/settings/transactions' + this.getQueryString(this.search_fields)).then(({ data }) => {
               if (data.data.length) {
                   this.lists.push(...data.data)
