@@ -50,15 +50,13 @@ class RefundsController extends Controller
             'payment_intent' => 'unique:refunds',
         ]);
 
-        $refund = $invoice->refunds()->create([
+        $refund = $invoice->refund()->create([
             'internal_status' => RefundApplicationStatus::Pending
         ]);
 
         $refund->transactions()->create();
 
-        $this->manage($refund, 'approve');
-
-        return $refund;
+        return new \App\Http\Resources\Refund($refund);
     }
 
     public function manage(Refund $refund, $action = null)
@@ -67,7 +65,15 @@ class RefundsController extends Controller
             case 'approve' :
                 $refund->internal_status = RefundApplicationStatus::Approved;
                 $refund->save();
-                $this->submit($refund);
+
+                $subscription = $refund->invoice->subscription_id;
+                $subscription = \Stripe\Subscription::retrieve($subscription);
+                $subscription->cancel();
+
+                \Stripe\Refund::create([
+                    'payment_intent' => $refund->invoice->payment_intent,
+                ]);
+
                 break;
             case 'refuse' :
                 $refund->internal_status = RefundApplicationStatus::Refused;
@@ -76,16 +82,9 @@ class RefundsController extends Controller
         }
     }
 
-    public function submit(Refund $refund)
+    public function refund(Refund $refund)
     {
-        $subscription = $refund->invoice->subscription_id;
 
-        $subscription = \Stripe\Subscription::retrieve($subscription);
-        $subscription->cancel();
-
-        \Stripe\Refund::create([
-            'payment_intent' => $refund->invoice->payment_intent,
-        ]);
     }
 
     /**
@@ -128,8 +127,9 @@ class RefundsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Refund $refund)
     {
-        //
+        $refund->delete();
+        return new \App\Http\Resources\Refund($refund);
     }
 }

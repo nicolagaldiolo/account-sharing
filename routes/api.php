@@ -76,7 +76,10 @@ Route::group(['middleware' => 'auth:api'], function () {
             Route::post('settings/paymentmethods', 'Stripe\PaymentMethodsController@store');
 
             // Refunds
-            Route::post('settings/refunds', 'Settings\RefundsController@store');
+            Route::post('settings/refund', 'Settings\RefundsController@store');
+            Route::patch('settings/refund/{refund}', 'Settings\RefundsController@handle');
+            Route::delete('settings/refund/{refund}', 'Settings\RefundsController@destroy');
+
     });
 });
 

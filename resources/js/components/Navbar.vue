@@ -56,6 +56,11 @@
                   {{ $t('settings') }}
                 </router-link>
 
+                <router-link :to="{ name: 'dashboard' }" class="dropdown-item pl-3">
+                  <fa icon="cog" fixed-width />
+                  Admin area
+                </router-link>
+
                 <div class="dropdown-divider" />
                 <a href="#" class="dropdown-item pl-3" @click.prevent="logout">
                   <fa icon="sign-out-alt" fixed-width />

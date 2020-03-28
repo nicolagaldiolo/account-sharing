@@ -100,6 +100,7 @@ class WebhookController extends Controller
                 'user_id' => $sharing->owner_id,
                 'subscription_id' => $object['subscription'],
                 'payment_intent' => $object['payment_intent'],
+                'service_name' => $sharing->name . '( ' . $sharing->id . ' )',
                 'total' => $total,
                 'total_less_fee' => $total_less_fee,
                 'fee' => $fee,
@@ -113,42 +114,6 @@ class WebhookController extends Controller
             //$invoice->refunds()->create()->transactions()->create();
 
         });
-
-
-        /*
-        $userSharing = Subscription::where('id', $subscription_id)->firstOrFail()->sharingUser;
-
-        $user = User::findOrFail($userSharing->user_id);
-        Auth::login($user);
-
-        $stateMachine = \StateMachine::get($userSharing, 'sharing');
-        $transition = 'pay';
-
-        if($stateMachine->can($transition)) {
-            $stateMachine->apply($transition);
-            $userSharing->save();
-        }
-        */
-
-        /*
-        $plan = $payload['data']['object']['lines']['data'][0]['plan']['id'];
-
-        $account_id = Sharing::where('stripe_plan', $plan)->firstOrFail()->owner->pl_account_id;
-        $amount = 1000;//$object['total'];
-        $currency = $object['currency'];
-        $charge = $object['charge'];
-
-        $transfer = \Stripe\Transfer::create([
-            "amount" => $amount,
-            "currency" => $currency,
-            "source_transaction" => $charge,
-            "destination" => $account_id,
-        ]);
-        */
-
-        //logger("6");
-
-        //logger('Payment successffull');
 
         return $this->successMethod();
     }

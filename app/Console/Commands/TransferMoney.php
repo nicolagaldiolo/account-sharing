@@ -55,5 +55,7 @@ class TransferMoney extends Command
             ->pluck('subscription.sharingUser.sharing.owner_id')->unique();
         Notification::send(User::whereIn('id', $usersIds)->get(), new MoneyTransfered());
 
+        logger('Lanciato script trasferimento fondi to owners');
+
     }
 }

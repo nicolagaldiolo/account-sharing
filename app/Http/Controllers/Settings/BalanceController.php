@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Settings;
 
+use App\Enums\RefundApplicationStatus;
 use App\Http\Resources\Balance;
 use App\User;
 use Illuminate\Http\Request;
@@ -18,33 +19,31 @@ class BalanceController extends Controller
      */
     public function index()
     {
-        $user_id = Auth::id();
+        $user = Auth::user();
 
-        // Calcolo il saldo in pending
+        // Get pending balance
         $invoices = DB::table('invoices')->selectRaw('total_less_fee AS total')
-            ->where('user_id', $user_id)
-            ->where('transfered', 0);
+            ->where('user_id', $user->id);
 
-        $refunds = DB::table('refunds')->select(DB::raw('total_less_fee * -1 AS total'))->join('invoices', 'refunds.payment_intent', 'invoices.payment_intent')->where('invoices.user_id', $user_id);
+        $refunds = DB::table('refunds')->select(DB::raw('total_less_fee * -1 AS total'))->join('invoices', 'refunds.payment_intent', 'invoices.payment_intent')
+            ->where('invoices.user_id', $user->id)
+            ->where('refunds.internal_status', RefundApplicationStatus::Approved);
 
-        $transfers = DB::table('invoices')->selectRaw(DB::raw('total_less_fee * -1 AS total'))
-            ->where('user_id', $user_id)
-            ->where('transfered', 1);
+        $payouts = DB::table('payouts')->select(DB::raw('amount * -1 AS total'))->where('account_id', $user->pl_account_id);
 
         $pending = DB::query()->select(DB::raw('SUM(total) as total'))->fromSub(
-            $invoices->unionAll($refunds)->unionAll($transfers), 'balance'
+            $invoices->unionAll($refunds)->unionAll($payouts), 'balance'
         )->get();
 
 
-        // Calcolo il saldo disponibile
-        $transfers_positive = DB::table('invoices')->select('total_less_fee AS total')
-            ->where('user_id', $user_id)
+        // Get available balance
+        $invoices2 = DB::table('invoices')->selectRaw('total_less_fee AS total')
+            ->where('user_id', $user->id)
             ->where('transfered', 1);
-        $payouts = DB::table('payouts')->select(DB::raw('amount * -1 AS total'))->where('account_id', $user_id);
+        $payouts2 = DB::table('payouts')->select(DB::raw('amount * -1 AS total'))->where('account_id', $user->pl_account_id);
 
         $available = DB::query()->select(DB::raw('SUM(total) as total'))->fromSub(
-            $transfers_positive->unionAll($payouts),
-            'balance'
+            $invoices2->unionAll($payouts2), 'balance'
         )->get();
 
 

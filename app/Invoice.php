@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Enums\RefundApplicationStatus;
 use App\Http\Traits\Utility;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
@@ -16,6 +17,7 @@ class Invoice extends Model
         'user_id',
         'subscription_id',
         'payment_intent',
+        'service_name',
         'total',
         'total_less_fee',
         'fee',
@@ -24,16 +26,9 @@ class Invoice extends Model
         'transfered'
     ];
 
-    protected $with = [
-        //'subscription.sharingUser.sharing',
-        //'user',
-        //'owner'
-    ];
-
     public function getServiceAttribute()
     {
-        return 'Ciao';
-        //return $this->subscription->sharingUser->sharing->name;
+        return $this->attributes['service_name'];
     }
 
     public function getLast4Attribute()
@@ -66,15 +61,20 @@ class Invoice extends Model
         return $this->belongsTo( Subscription::class);
     }
 
-    public function refunds()
+    public function refund()
     {
-        return $this->hasMany(Refund::class, 'payment_intent', 'payment_intent');
+        return $this->hasOne(Refund::class, 'payment_intent', 'payment_intent');
     }
 
-    public function transfer()
+    public function refundApproved()
     {
-        return $this->hasOne(Transfer::class);
+        return $this->hasOne(Refund::class, 'payment_intent', 'payment_intent')->approved();
     }
+
+    //public function transfer()
+    //{
+    //    return $this->hasOne(Transfer::class);
+    //}
 
     /*
      * Una fattura è trasferibile quando:
@@ -89,7 +89,7 @@ class Invoice extends Model
             $query->approved();
         })->where('created_at', '<=', Carbon::now()->subDays(config('custom.day_refund_limit'))->endOfDay());*/
 
-        return $query->whereDoesntHave('refunds', function ($query) {
+        return $query->whereDoesntHave('refund', function ($query) {
             $query->approved();
         })->where('transfered',0)
             ->where('created_at', '<=', Carbon::now()->subDays(config('custom.day_refund_limit'))->endOfDay());

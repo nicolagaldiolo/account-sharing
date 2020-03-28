@@ -20,6 +20,7 @@ class CreateInvoicesTable extends Migration
             $table->unsignedBigInteger('user_id');
             $table->string('subscription_id');
             $table->string('payment_intent')->index();
+            $table->string('service_name');
             $table->decimal('total', 10, 2);
             $table->decimal('total_less_fee', 10, 2);
             $table->decimal('fee', 10, 2);

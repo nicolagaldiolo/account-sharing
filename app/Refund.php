@@ -28,6 +28,11 @@ class Refund extends Model
         return $this->invoice->total;
     }
 
+    public function getTotalLessFeeAttribute()
+    {
+        return $this->invoice->total_less_fee;
+    }
+
     public function getCurrencyAttribute()
     {
         return $this->invoice->currency;
@@ -50,7 +55,7 @@ class Refund extends Model
 
     public function owner()
     {
-        return $this->hasOneThrough('App\User', 'App\Invoice', 'payment_intent', 'pl_account_id', 'payment_intent', 'account_id');
+        return $this->hasOneThrough('App\User', 'App\Invoice', 'payment_intent', 'id', 'payment_intent', 'user_id');
     }
 
     public function invoice()

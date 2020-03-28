@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers\Settings;
 
+use App\Enums\RefundApplicationStatus;
+use App\Invoice;
+use App\Payout;
+use App\Refund;
 use App\Transaction;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -9,6 +13,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Transaction as TransactionResource;
 use Illuminate\Support\Facades\Auth;
+
 class TransactionsController extends Controller
 {
     /**
@@ -19,58 +24,82 @@ class TransactionsController extends Controller
     public function index(Request $request)
     {
 
-        $params = $request->only(['type', 'from', 'to', 'subtype']);
+        $params = collect($request->only(['type', 'subtype', 'refundtype', 'from', 'to']));
 
         $user = Auth::user();
 
+        // Filter the transactions type
         $transactions_type = collect([
-            'INVOICE' => 'App\Invoice',
-            //'REFUNDS' => 'App\Refund',
-            //'PAYOUTS' => 'App\Payout',
+            'INVOICE' => Invoice::class,
+            'REFUNDS' => Refund::class,
+            'PAYOUTS' => Payout::class,
         ]);
 
-        if(array_key_exists('type', $params) && '' != $params['type']) {
-            $transactions_type = $transactions_type->only($params['type']);
+        if($params->has('type')){
+            $transactions_type = $transactions_type->only($params->get('type'));
         }
 
+        // Filter the transaction's direction
         $transactions_subtype = collect([
             'INCOMING' => 'owner',
             'OUTCOMING' => 'user'
         ]);
 
-        if(array_key_exists('subtype', $params) && '' != $params['subtype']) {
-            $transactions_subtype = $transactions_subtype->only($params['subtype']);
+        if($params->has('subtype')) {
+            $transactions_subtype = $transactions_subtype->only($params->get('subtype'));
         }
 
-        $transactions = Transaction::whereHasMorph('transactiontable', $transactions_type->all(), function (Builder $query, $type) use($user, $transactions_subtype){
-
-        //$transactions = Transaction::whereHasMorph('transactiontable', $transactions_type->all(), function (Builder $query, $type) use($user){
-
-            $query->whereId('');
-
-            if($transactions_subtype->contains('owner')) {
-                $query->orWhereHas('owner', function ($query) use ($user) {
-                    $query->where('user_id', $user->id);
-                });
-            };
-
-            if($transactions_subtype->contains('user')) {
-                $query->orWhereHas('user', function ($query) use($user){
-                    $query->where('pl_customer_id', $user->pl_customer_id);
-                });
+        $transactions = Transaction::whereHasMorph('transactiontable', $transactions_type->unique()->all(), function (Builder $query, $type) use($user, $transactions_subtype, $params){
+            switch ($type){
+                case Invoice::class:
+                    $query->whereNull('id');
+                    if($transactions_subtype->contains('owner')) {
+                        $query->orWhereHas('owner', function ($query) use ($user, $type) {
+                            $query->where('user_id', $user->id);
+                        });
+                    };
+                    if($transactions_subtype->contains('user')) {
+                        $query->orWhereHas('user', function ($query) use($user){
+                            $query->where('pl_customer_id', $user->pl_customer_id);
+                        });
+                    }
+                    break;
+                case Refund::class:
+                    $refundtype = collect(RefundApplicationStatus::getValues());
+                    if($params->has('refundtype')) {
+                        $refundtype = $refundtype->only($params->get('refundtype'));
+                    }
+                    $query->whereIn('internal_status', $refundtype);
+                    $query->where(function ($query) use($transactions_subtype,$user,$type){
+                        $query->whereNull('id');
+                        if($transactions_subtype->contains('user')) {
+                            $query->orWhereHas('owner', function ($query) use ($user, $type) {
+                                $query->where('user_id', $user->id);
+                            });
+                        };
+                        if($transactions_subtype->contains('owner')) {
+                            $query->orWhereHas('user', function ($query) use($user){
+                                $query->where('pl_customer_id', $user->pl_customer_id);
+                            });
+                        }
+                    });
+                    break;
+                case Payout::class:
+                    $query->where('account_id', $user->pl_account_id);
+                    break;
             }
-
         })->with('transactiontable')->latest();
 
-        if(array_key_exists('from', $params) && '' != $params['from']) {
-            $transactions = $transactions->whereDate('created_at', '>=', Carbon::createFromFormat('Y-m-d', $params['from']));
+        if($params->has('from')) {
+            $transactions = $transactions->whereDate('created_at', '>=', Carbon::createFromFormat('Y-m-d', $params->get('from')));
         }
 
-        if(array_key_exists('to', $params) && '' != $params['to']) {
-            $transactions = $transactions->whereDate('created_at', '<=', Carbon::createFromFormat('Y-m-d', $params['to']));
+        if($params->has('to')) {
+            $transactions = $transactions->whereDate('created_at', '<=', Carbon::createFromFormat('Y-m-d', $params->get('to')));
         }
 
-        return TransactionResource::collection($transactions->paginate(config('custom.paginate')));
+        //return TransactionResource::collection($transactions->paginate(config('custom.paginate')));
+        return TransactionResource::collection($transactions->paginate(1));
     }
 
     /**
