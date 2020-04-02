@@ -108,11 +108,6 @@ class WebhookController extends Controller
                 'last4' => $charge->payment_method_details->card->last4
             ]);
 
-            $invoice->transactions()->create();
-
-            // creo dei refunds fake
-            //$invoice->refunds()->create()->transactions()->create();
-
         });
 
         return $this->successMethod();

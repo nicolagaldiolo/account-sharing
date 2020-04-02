@@ -8,17 +8,17 @@
         <div class="d-flex w-100 justify-content-between align-items-center">
           <div>
             <h5 class="mb-1">{{ title }}</h5>
-            <p class="m-0">{{ item.service }}</p>
-            <p class="m-0" v-if="item.last4">{{ paymentLabel }}: <strong>{{ item.last4 }}</strong></p>
-            <p class="m-0">{{ paymentDirectionLabel }} <strong>{{ item.user }}</strong></p>
+            <p class="m-0">{{ item.obj.service }}</p>
+            <p class="m-0" v-if="item.last4">{{ paymentLabel }}: <strong>{{ item.obj.last4 }}</strong></p>
+            <p class="m-0">{{ paymentDirectionLabel }} <strong>{{ item.obj.user }}</strong></p>
           </div>
           <a v-if="cancelRefund" href="#" class="btn btn-secondary" @click.prevent="cancelRefundRequest">Annulla rimborso</a>
-          <a v-if="item.refundable" href="#" class="btn btn-primary" @click.prevent="refundRequest">Richiedi rimborso <br><small>Entro il {{ item.refundable.within | moment("D/M/YYYY") }}</small></a>
+          <a v-if="refundable" href="#" class="btn btn-primary" @click.prevent="refundRequest">Richiedi rimborso <br><small>Entro il {{ item.obj.refundable_within | moment("D/M/YYYY") }}</small></a>
           <div class="d-flex flex-column align-items-end">
-            <small>{{ item.created_at | moment("D/M/YYYY") }}</small>
+            <small>{{ item.obj.created_at | moment("D/M/YYYY") }}</small>
             <div class="d-flex money_data" :class="colorClass">
               {{sign}}
-              <money-format :value="(item.total.value * 1)" locale="IT" :currency-code='item.total.currency' :subunit-value=false :hide-subunits=false></money-format>
+              <money-format :value="(item.obj.total.value * 1)" locale="IT" :currency-code='item.obj.total.currency' :subunit-value=false :hide-subunits=false></money-format>
             </div>
           </div>
         </div>
@@ -28,6 +28,7 @@
 </template>
 
 <script>
+import { helperMixin } from '~/mixins/helperMixin'
 import MoneyFormat from 'vue-money-format'
 import axios from 'axios'
 
@@ -43,6 +44,10 @@ export default {
     'money-format': MoneyFormat
   },
 
+  mixins: [
+    helperMixin
+  ],
+
   data () {
     return {
       title: null,
@@ -51,26 +56,27 @@ export default {
       icon: null,
       paymentLabel: null,
       paymentDirectionLabel: null,
-      cancelRefund: null
+      cancelRefund: null,
+      refundable: this.item.obj.refundable
     }
   },
 
   created () {
     switch (this.item.type) {
       case 'INVOICE':
-        this.title = (this.item.refunded)
-          ? (this.item.direction === 'INCOMING') ? 'Quota annullata' : 'Quota rimborsata'
-          : (this.item.direction === 'INCOMING') ? 'Quota ricevuta' : 'Quota inviata'
-        this.sign = (this.item.refunded) ? null : this.item.direction === 'INCOMING' ? '+' : '-'
-        this.colorClass = (this.item.refunded) ? null : (this.item.direction === 'INCOMING') ? 'green' : 'red'
+        this.title = (this.item.obj.refunded)
+          ? (this.item.obj.direction === 'INCOMING') ? 'Quota annullata' : 'Quota rimborsata'
+          : (this.item.obj.direction === 'INCOMING') ? 'Quota ricevuta' : 'Quota inviata'
+        this.sign = (this.item.obj.refunded) ? null : this.item.obj.direction === 'INCOMING' ? '+' : '-'
+        this.colorClass = (this.item.obj.refunded) ? null : (this.item.obj.direction === 'INCOMING') ? 'green' : 'red'
         this.icon = 'credit-card'
         this.paymentLabel = 'Carta di credito'
-        this.paymentDirectionLabel = (this.item.direction === 'INCOMING') ? 'Da:' : 'A:'
+        this.paymentDirectionLabel = (this.item.obj.direction === 'INCOMING') ? 'Da:' : 'A:'
         break
       case 'REFUND':
         let refundStatus,
           cancelRefundBtn
-        switch (this.item.status) {
+        switch (this.item.obj.status) {
           case 0:
             refundStatus = 'Rimborso in attesa'
             cancelRefundBtn = true
@@ -88,12 +94,12 @@ export default {
         this.cancelRefund = cancelRefundBtn
         this.icon = 'coins'
         this.paymentLabel = 'Carta di credito'
-        this.paymentDirectionLabel = (this.item.direction === 'INCOMING') ? 'Da:' : 'A:'
+        this.paymentDirectionLabel = (this.item.obj.direction === 'INCOMING') ? 'Da:' : 'A:'
         break
       case 'PAYOUT':
         this.title = 'Prelievo'
-        this.sign = this.item.direction === 'INCOMING' ? '+' : '-'
-        this.colorClass = (this.item.direction === 'INCOMING') ? 'green' : 'red'
+        this.sign = this.item.obj.direction === 'INCOMING' ? '+' : '-'
+        this.colorClass = (this.item.obj.direction === 'INCOMING') ? 'green' : 'red'
         this.icon = 'wallet'
         this.paymentLabel = 'Conto corrente'
         this.paymentDirectionLabel = 'A:'
@@ -102,43 +108,23 @@ export default {
   },
   methods: {
     cancelRefundRequest () {
-      axios.delete(`/api/settings/refund/${this.item.id}`).then(({ data }) => {
-
-        /*
-        if (data.data.length) {
-            this.lists.push(...data.data)
-            $state.loaded()
-        }
-
-        if (this.search_fields.page < data.meta.last_page) {
-            this.search_fields.page += 1
-        } else {
-            $state.complete()
-        }
-
-         */
+      axios.delete(`/api/settings/refund/${this.item.obj.id}`).then(() => {
+        this.$emit('child-action')
       })
     },
 
     refundRequest () {
       axios.post('/api/settings/refund', {
-        payment_intent: this.item.refundable.payment_intent
-      }).then(({ data }) => {
-
-        /*
-        if (data.data.length) {
-            this.lists.push(...data.data)
-            $state.loaded()
-        }
-
-        if (this.search_fields.page < data.meta.last_page) {
-            this.search_fields.page += 1
-        } else {
-            $state.complete()
-        }
-
-         */
+        payment_intent: this.item.obj.payment_intent
+      }).then(() => {
+        this.$emit('child-action')
       })
+    }
+  },
+
+  watch: {
+    item (data) {
+      this.refundable = data.obj.refundable
     }
   }
 }

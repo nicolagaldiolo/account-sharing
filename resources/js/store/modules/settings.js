@@ -3,12 +3,16 @@ import * as types from '../mutation-types'
 
 // state
 export const state = {
-  transactions: [],
+  transactions: {
+    data: [],
+    links: {},
+    meta: {}
+  },
   notifications: {
     data: [],
     links: {},
-    meta: {},
-  },
+    meta: {}
+  }
 }
 
 // getters
@@ -20,20 +24,23 @@ export const getters = {
 // mutations
 export const mutations = {
   [types.FETCH_TRANSACTIONS_SUCCESS] (state, { transactions }) {
-    state.transactions = transactions
+    state.transactions = Object.assign({}, {
+      data: (transactions.meta.current_page === 1) ? transactions.data : state.transactions.data.concat(...transactions.data),
+      links: transactions.links,
+      meta: transactions.meta
+    })
   },
 
   [types.FETCH_TRANSACTIONS_FAILURE] (state) {
-    state.transactions = []
+    state.transactions = {}
   },
 
   [types.FETCH_NOTIFICATIONS_SUCCESS] (state, { notifications }) {
-    const obj = {
+    state.notifications = Object.assign({}, {
       data: state.notifications.data.concat(...notifications.data),
       links: notifications.links,
       meta: notifications.meta
-    }
-    state.notifications = Object.assign({}, obj)
+    })
   },
 
   [types.FETCH_NOTIFICATIONS_FAILURE] (state) {
@@ -55,20 +62,12 @@ export const mutations = {
 // actions
 export const actions = {
 
-  async fetchTransactions ({ commit }, params = {}) {
+  async fetchTransactions ({ commit }, params) {
     try {
-      var queryString = Object.keys(params).filter(key => {
-        if (params[key]) {
-          return key
-        }
-      }).map(key => key + '=' + params[key]).join('&')
-
-      const { data } = await axios.get('/api/settings/transactions' + ((queryString) ? '?' + queryString : ''))
+      const { data } = await axios.get('/api/settings/transactions' + params)
       commit(types.FETCH_TRANSACTIONS_SUCCESS, { transactions: data })
-      return true
     } catch (e) {
       commit(types.FETCH_TRANSACTIONS_FAILURE)
-      return false
     }
   },
 

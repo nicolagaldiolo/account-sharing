@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Settings;
 
 use App\Enums\RefundApplicationStatus;
+use App\Http\Resources\Transaction;
 use App\Invoice;
 use App\Refund;
 use Illuminate\Http\Request;
@@ -54,9 +55,9 @@ class RefundsController extends Controller
             'internal_status' => RefundApplicationStatus::Pending
         ]);
 
-        $refund->transactions()->create();
+        $transaction = $refund->transactions()->where('transactiontable_id', $refund->id)->with('transactiontable')->firstOrFail();
 
-        return new \App\Http\Resources\Refund($refund);
+        return new Transaction($transaction);
     }
 
     public function manage(Refund $refund, $action = null)
@@ -130,6 +131,8 @@ class RefundsController extends Controller
     public function destroy(Refund $refund)
     {
         $refund->delete();
-        return new \App\Http\Resources\Refund($refund);
+        $transaction = \App\Transaction::where('transactiontable_id', $refund->invoice->id)->with('transactiontable')->firstOrFail();
+
+        return new Transaction($transaction);
     }
 }

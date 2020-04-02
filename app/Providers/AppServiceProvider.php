@@ -3,8 +3,14 @@
 namespace App\Providers;
 
 use App\Http\Requests\SharingRequest;
+use App\Invoice;
+use App\Observers\InvoiceObserver;
+use App\Observers\PayoutObserver;
+use App\Observers\RefundObserver;
 use App\Observers\SharingObserver;
 use App\Observers\UserObserver;
+use App\Payout;
+use App\Refund;
 use App\Sharing;
 use App\User;
 use Carbon\Carbon;
@@ -28,6 +34,9 @@ class AppServiceProvider extends ServiceProvider
 
         User::observe(UserObserver::class);
         Sharing::observe(SharingObserver::class);
+        Invoice::observe(InvoiceObserver::class);
+        Refund::observe(RefundObserver::class);
+        Payout::observe(PayoutObserver::class);
     }
 
     /**

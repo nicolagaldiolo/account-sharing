@@ -98,8 +98,7 @@ class TransactionsController extends Controller
             $transactions = $transactions->whereDate('created_at', '<=', Carbon::createFromFormat('Y-m-d', $params->get('to')));
         }
 
-        //return TransactionResource::collection($transactions->paginate(config('custom.paginate')));
-        return TransactionResource::collection($transactions->paginate(1));
+        return TransactionResource::collection($transactions->paginate(config('custom.paginate')));
     }
 
     /**
