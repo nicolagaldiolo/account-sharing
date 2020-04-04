@@ -81,6 +81,13 @@ Route::group(['middleware' => 'auth:api'], function () {
             Route::delete('settings/refund/{refund}', 'Settings\RefundsController@destroy');
 
     });
+
+    Route::group(['middleware' => 'admin', 'prefix' => 'admin'], function () {
+        Route::resource('sharings', 'Admin\SharingsController');
+        Route::resource('refunds', 'Admin\RefundsController');
+    });
+
+
 });
 
 Route::group(['middleware' => 'guest:api'], function () {

@@ -158,6 +158,11 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
         return empty($this->phone) || empty($this->street) || empty($this->cap) || empty($this->city);
     }
 
+    public function getIsAdminAttribute()
+    {
+        return boolval($this->admin);
+    }
+
     protected function setJsonData($item, $key, $value)
     {
         $options = json_decode($this->attributes[$item]);

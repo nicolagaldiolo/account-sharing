@@ -16,10 +16,9 @@ Vue.config.productionTip = false
 Vue.use(require('vue-moment')) // Use inside component as this.$moment() or as {{ item.created_at | moment("D/M/YYYY") }} in template
 Vue.use(Clipboard)
 Vue.use(VueCurrencyInput)
-Vue.use(VModal)
+Vue.use(VModal, { dynamic: true, injectModalsContainer: true, dynamicDefaults: { clickToClose: false } })
 Vue.use(toasted)
-window.Pusher = require('pusher-js');
-
+window.Pusher = require('pusher-js')
 
 window.Echo = new Echo({
   authEndpoint: '/api/broadcasting/auth',
@@ -29,6 +28,7 @@ window.Echo = new Echo({
   encrypted: true
 })
 
+export const EventBus = new Vue()
 
 /* eslint-disable no-new */
 new Vue({

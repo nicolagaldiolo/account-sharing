@@ -1,0 +1,92 @@
+<template>
+  <div>
+    <div v-for="sharing in items" :key="sharing.id">
+      <div class="row no-gutters">
+        <div class="col-md-2 sharing_image_bg" :style="{'background-image': `url(${sharing.image})`}"></div>
+        <div class="col-md-10">
+          <div class="card-body">
+            <h5 class="card-title">{{sharing.name}} <small>{{sharing.availability}}/{{sharing.max_slot_available}} disponibili</small></h5>
+            <p>{{sharing.description}}</p>
+            <router-link :to="{ name: 'sharing.show', params: { category_id: sharing.category_id, sharing_id: sharing.id } }">Visualizza scheda</router-link>
+            <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <infinite-loading spinner="waveDots" :identifier="type" @infinite="infiniteHandler"></infinite-loading>
+
+  </div>
+</template>
+
+<script>
+  import InfiniteLoading from 'vue-infinite-loading'
+  import { helperMixin } from '~/mixins/helperMixin'
+  import { mapGetters } from 'vuex'
+
+  export default {
+    components: {
+      InfiniteLoading
+    },
+    mixins: [ helperMixin ],
+    props: {
+      type: {
+        type: String,
+        default: ''
+      }
+    },
+
+    computed: mapGetters({
+      sharings: 'admin/sharings'
+    }),
+
+    data () {
+      return {
+        items: [],
+        current_page: 1,
+        loading_state: {}
+      }
+    },
+
+    watch: {
+      sharings (data) {
+        if (data.data && data.data.length) {
+          this.items = data.data
+          this.loading_state.loaded()
+        }
+        if (this.current_page < data.meta.last_page) {
+          this.current_page += 1
+        } else {
+          this.loading_state.complete()
+        }
+      }
+    },
+
+    methods: {
+      async infiniteHandler (state) {
+        this.loading_state = state
+        this.$store.dispatch('admin/fetchSharings', this.getQueryString({
+          page: this.current_page,
+          type: this.type
+        }))
+      }
+    }
+
+  }
+</script>
+<style scoped>
+  .sharing_image_bg{
+    background-repeat: no-repeat;
+    background-size: 100%;
+  }
+  .category-item{
+    position: relative;
+  }
+  .category-item span{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
+  }
+</style>

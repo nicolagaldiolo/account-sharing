@@ -19,6 +19,7 @@ class CreateRefundsTable extends Migration
             $table->string('payment_intent')->unique()->index();
             $table->tinyInteger('internal_status')->unsigned()->default(\App\Enums\RefundApplicationStatus::Pending);
             $table->tinyInteger('status')->unsigned()->nullable();
+            $table->string('reason', 500);
             $table->timestamps();
 
             $table->foreign('payment_intent')->on('invoices')->references('payment_intent');

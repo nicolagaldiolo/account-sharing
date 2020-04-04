@@ -100,7 +100,7 @@ class WebhookController extends Controller
                 'user_id' => $sharing->owner_id,
                 'subscription_id' => $object['subscription'],
                 'payment_intent' => $object['payment_intent'],
-                'service_name' => $sharing->name . '( ' . $sharing->id . ' )',
+                'service_name' => $sharing->name,
                 'total' => $total,
                 'total_less_fee' => $total_less_fee,
                 'fee' => $fee,

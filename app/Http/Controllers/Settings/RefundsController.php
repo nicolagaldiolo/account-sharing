@@ -3,14 +3,21 @@
 namespace App\Http\Controllers\Settings;
 
 use App\Enums\RefundApplicationStatus;
+use App\Events\RefundRequest;
+use App\Events\RefundResponse;
 use App\Http\Resources\Transaction;
+use App\Http\Traits\Utility;
 use App\Invoice;
 use App\Refund;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Str;
 
 class RefundsController extends Controller
 {
+    use Utility;
+
     /**
      * Display a listing of the resource.
      *
@@ -49,11 +56,15 @@ class RefundsController extends Controller
         // Validation
         $this->validate($request, [
             'payment_intent' => 'unique:refunds',
+            'reason' => 'required|string|max:500',
         ]);
 
         $refund = $invoice->refund()->create([
-            'internal_status' => RefundApplicationStatus::Pending
+            'internal_status' => RefundApplicationStatus::Pending,
+            'reason' => $request->input('reason')
         ]);
+
+        event(new RefundRequest($refund));
 
         $transaction = $refund->transactions()->where('transactiontable_id', $refund->id)->with('transactiontable')->firstOrFail();
 
@@ -62,8 +73,10 @@ class RefundsController extends Controller
 
     public function manage(Refund $refund, $action = null)
     {
+
+        $action = Str::upper($action);
         switch ($action){
-            case 'approve' :
+            case 'APPROVE' :
                 $refund->internal_status = RefundApplicationStatus::Approved;
                 $refund->save();
 
@@ -74,18 +87,13 @@ class RefundsController extends Controller
                 \Stripe\Refund::create([
                     'payment_intent' => $refund->invoice->payment_intent,
                 ]);
-
                 break;
-            case 'refuse' :
+            case 'REFUSE' :
                 $refund->internal_status = RefundApplicationStatus::Refused;
                 $refund->save();
                 break;
         }
-    }
-
-    public function refund(Refund $refund)
-    {
-
+        event(new RefundResponse($refund, $action));
     }
 
     /**
@@ -130,8 +138,13 @@ class RefundsController extends Controller
      */
     public function destroy(Refund $refund)
     {
+        // Authorization
+        $this->authorize('delete', $refund);
         $refund->delete();
+
         $transaction = \App\Transaction::where('transactiontable_id', $refund->invoice->id)->with('transactiontable')->firstOrFail();
+
+        event(new RefundResponse($refund, 'CANCEL'));
 
         return new Transaction($transaction);
     }

@@ -11,7 +11,8 @@ class Refund extends Model
     protected $fillable = [
         'stripe_id',
         'internal_status',
-        'status'
+        'status',
+        'reason'
     ];
 
     protected $with = [

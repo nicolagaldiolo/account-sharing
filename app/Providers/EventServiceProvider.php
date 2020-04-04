@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Listeners\CredentialSubscriber;
+use App\Listeners\RefundSubscriber;
 use App\Listeners\SharingSubscriber;
 use App\Listeners\SharingTransitionSubscriber;
 use Illuminate\Support\Facades\Event;
@@ -26,7 +27,8 @@ class EventServiceProvider extends ServiceProvider
     protected $subscribe = [
         CredentialSubscriber::class,
         SharingSubscriber::class,
-        SharingTransitionSubscriber::class
+        SharingTransitionSubscriber::class,
+        RefundSubscriber::class
     ];
 
     /**

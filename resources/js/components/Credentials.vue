@@ -49,12 +49,7 @@
           </div>
         </div>
       </div>
-
-
-
     </modal>
-
-
     <div class="card">
       <div class="card-header">
         <div>

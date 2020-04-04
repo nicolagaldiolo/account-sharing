@@ -113,7 +113,8 @@ trait Utility
         return $image_file;
     }
 
-    protected function getRandomImageFromArchive($path){
+    protected function getRandomImageFromArchive($path)
+    {
         return collect(Storage::files($path))->filter(function($file){
             return !Str::endsWith($file, '.DS_Store');
         })->map(function($file){

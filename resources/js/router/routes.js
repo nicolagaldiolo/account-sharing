@@ -36,6 +36,17 @@ export default [
 
   { path: '/notifications', name: 'notifications', component: page('notifications.vue'), meta: { middleware: ['auth', 'registrationCompleted'] } },
 
+  { path: '/admin',
+    name: 'admin',
+    component: page('admin/index.vue'),
+    meta: { middleware: ['auth','admin'], },
+    children: [
+      { path: '', redirect: { name: 'admin.refunds' } },
+      { path: 'refunds', name: 'admin.refunds', component: page('admin/refunds.vue') },
+      { path: 'sharings', name: 'admin.sharings', component: page('admin/sharings.vue') },
+    ]
+  },
+
   { path: '/settings',
     component: page('settings/index.vue'),
     meta: { middleware: ['auth'] },

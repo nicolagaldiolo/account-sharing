@@ -38,7 +38,7 @@ class SharingSubscriber
         // Send Mail to owner
         $sharing->owner->notify(new \App\Notifications\SharingStatusUpdated($sharing));
 
-        // Send Mail to admin
+        // Send Mail to admins
         Notification::send(User::admin()->get(), new \App\Notifications\SharingCreated($sharing));
     }
 

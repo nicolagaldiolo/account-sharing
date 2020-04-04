@@ -12,8 +12,8 @@
             <p class="m-0" v-if="item.last4">{{ paymentLabel }}: <strong>{{ item.obj.last4 }}</strong></p>
             <p class="m-0">{{ paymentDirectionLabel }} <strong>{{ item.obj.user }}</strong></p>
           </div>
-          <a v-if="cancelRefund" href="#" class="btn btn-secondary" @click.prevent="cancelRefundRequest">Annulla rimborso</a>
-          <a v-if="refundable" href="#" class="btn btn-primary" @click.prevent="refundRequest">Richiedi rimborso <br><small>Entro il {{ item.obj.refundable_within | moment("D/M/YYYY") }}</small></a>
+          <a v-if="cancelRefund" href="#" class="btn btn-secondary" @click.prevent="cancelRefundRequest">Annulla richiesta</a>
+          <a v-if="refundable" href="#" class="btn btn-primary" @click.prevent="openRefundModal">Richiedi rimborso <br><small>Entro il {{ item.obj.refundable_within | moment("D/M/YYYY") }}</small></a>
           <div class="d-flex flex-column align-items-end">
             <small>{{ item.obj.created_at | moment("D/M/YYYY") }}</small>
             <div class="d-flex money_data" :class="colorClass">
@@ -24,6 +24,7 @@
         </div>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -31,6 +32,9 @@
 import { helperMixin } from '~/mixins/helperMixin'
 import MoneyFormat from 'vue-money-format'
 import axios from 'axios'
+import Swal from 'sweetalert2'
+import RefundRequestForm from './RefundRequestForm'
+import { EventBus } from '../app'
 
 export default {
   name: 'Transaction',
@@ -79,7 +83,7 @@ export default {
         switch (this.item.obj.status) {
           case 0:
             refundStatus = 'Rimborso in attesa'
-            cancelRefundBtn = true
+            cancelRefundBtn = (true && this.item.obj.direction === 'INCOMING')
             break
           case 1:
             refundStatus = 'Rimborso completato'
@@ -108,17 +112,31 @@ export default {
   },
   methods: {
     cancelRefundRequest () {
-      axios.delete(`/api/settings/refund/${this.item.obj.id}`).then(() => {
-        this.$emit('child-action')
-      })
+      if (this.item.type === 'REFUND') {
+        axios.delete(`/api/settings/refund/${this.item.obj.id}`).then(() => {
+          EventBus.$emit('refresh-transaction')
+          Swal.fire({
+            type: 'success',
+            title: 'Richiesta annullata con successo',
+            text: 'La richiesta di rimborso è stata annullata correttamente'
+          })
+        })
+      }
     },
 
-    refundRequest () {
-      axios.post('/api/settings/refund', {
-        payment_intent: this.item.obj.payment_intent
-      }).then(() => {
-        this.$emit('child-action')
-      })
+    openRefundModal () {
+      this.$modal.show(
+        RefundRequestForm,
+        {
+          paymentIntent: this.item.obj.payment_intent
+        },
+        {
+          adaptive: true,
+          maxWidth: 700,
+          height: 'auto'
+        },
+        ''
+      )
     }
   },
 

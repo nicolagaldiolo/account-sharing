@@ -4,15 +4,28 @@
     <list default="true" id="80fbe383-e517-4357-96d8-8ee0108f1222" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Settings/RefundsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Settings/RefundsController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Settings/TransactionsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Settings/TransactionsController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Sharings/SharingsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Sharings/SharingsController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Stripe/WebhookController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Stripe/WebhookController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Resources/Refund.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Resources/Refund.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Resources/Transaction.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Resources/Transaction.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Providers/AppServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Providers/AppServiceProvider.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Kernel.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Kernel.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Resources/User.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Resources/User.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Traits/Utility.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Traits/Utility.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Listeners/SharingSubscriber.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Listeners/SharingSubscriber.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Notifications/SharingUserNewRequest.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Notifications/SharingUserNewRequest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Providers/EventServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Providers/EventServiceProvider.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Refund.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Refund.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/User.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/User.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2019_11_30_113731_create_refunds_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2019_11_30_113731_create_refunds_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/boostrap.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/Credentials.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Credentials.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/Navbar.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Navbar.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/components/Transaction.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Transaction.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/middleware/admin.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/middleware/admin.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/pages/settings/wallet.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/settings/wallet.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/store/modules/settings.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/store/modules/settings.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/pages/sharings/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/sharings/index.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/router/routes.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/router/routes.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/store/mutation-types.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/store/mutation-types.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/api.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -333,7 +346,7 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="PHP&#10;JSON" />
     <property name="database.console.LAST_STATE" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/js/components" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/js/pages/admin" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -348,19 +361,19 @@
     <property name="ts.external.directory.path" value="$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/resources/js/pages/admin" />
+      <recent name="$PROJECT_DIR$/resources/js/store/modules" />
+      <recent name="$PROJECT_DIR$/resources/js/pages" />
+      <recent name="$PROJECT_DIR$/resources/js/components" />
+      <recent name="$PROJECT_DIR$/resources/js/pages/sharings" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/resources/js/pages/admin" />
       <recent name="$PROJECT_DIR$/resources/js/components" />
       <recent name="$PROJECT_DIR$/storage/app/public" />
       <recent name="$PROJECT_DIR$/resources/js/pages" />
       <recent name="$PROJECT_DIR$/storage" />
-      <recent name="$PROJECT_DIR$/import_data" />
-    </key>
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/resources/js/components" />
-      <recent name="$PROJECT_DIR$/resources/js/pages/sharings" />
-      <recent name="$PROJECT_DIR$/resources/js/middleware" />
-      <recent name="$PROJECT_DIR$/app/Listeners" />
-      <recent name="C:\Zweb\xampp\htdocs\account-sharing\resources\js\pages\settings" />
     </key>
   </component>
   <component name="RunManager">
@@ -541,7 +554,10 @@
       <workItem from="1585115152975" duration="53786000" />
       <workItem from="1585473617585" duration="1470000" />
       <workItem from="1585631564235" duration="6437000" />
-      <workItem from="1585805476305" duration="5486000" />
+      <workItem from="1585805476305" duration="5764000" />
+      <workItem from="1585981521492" duration="641000" />
+      <workItem from="1585983821912" duration="18988000" />
+      <workItem from="1586008121219" duration="10074000" />
     </task>
     <servers />
   </component>
@@ -578,12 +594,12 @@
       <screen x="0" y="23" width="2560" height="1417" />
     </state>
     <state x="1018" y="485" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1580193449256" />
-    <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1585471275377">
+    <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1586019079127">
       <screen x="0" y="23" width="1440" height="877" />
     </state>
-    <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1440.877/-2560.-770.2560.1417@0.23.1440.877" timestamp="1585410357576" />
+    <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1440.877/-2560.-770.2560.1417@0.23.1440.877" timestamp="1586019079127" />
     <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1440.877/-552.-1417.2560.1417@0.23.1440.877" timestamp="1583343225377" />
-    <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1440.877/-571.-1417.2560.1417@0.23.1440.877" timestamp="1584795085118" />
+    <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1440.877/-571.-1417.2560.1417@0.23.1440.877" timestamp="1586003967560" />
     <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1440.877/-644.-1417.2560.1417@0.23.1440.877" timestamp="1584104345990" />
     <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1440.877/1440.-256.1440.877@0.23.1440.877" timestamp="1583593568364" />
     <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1440.877/1440.-736.2560.1417@0.23.1440.877" timestamp="1582985681420" />
@@ -729,14 +745,15 @@
       <screen x="0" y="23" width="2560" height="1417" />
     </state>
     <state width="500" height="445" key="SwitcherDM/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1581663018191" />
-    <state x="547" y="357" key="com.intellij.ide.util.TipDialog" timestamp="1585805476653">
+    <state x="547" y="357" key="com.intellij.ide.util.TipDialog" timestamp="1586008121238">
       <screen x="0" y="23" width="1440" height="877" />
     </state>
     <state x="547" y="357" key="com.intellij.ide.util.TipDialog/0.23.1440.877/-200.-1057.1920.1057@0.23.1440.877" timestamp="1580845122877" />
+    <state x="547" y="357" key="com.intellij.ide.util.TipDialog/0.23.1440.877/-2560.-770.2560.1417@0.23.1440.877" timestamp="1586008121238" />
     <state x="547" y="357" key="com.intellij.ide.util.TipDialog/0.23.1440.877/-259.-1057.1920.1057@0.23.1440.877" timestamp="1579717267049" />
     <state x="547" y="357" key="com.intellij.ide.util.TipDialog/0.23.1440.877/-548.-1417.2560.1417/-3108.-1417.2560.1417@0.23.1440.877" timestamp="1585805476653" />
     <state x="547" y="357" key="com.intellij.ide.util.TipDialog/0.23.1440.877/-552.-1417.2560.1417@0.23.1440.877" timestamp="1583341760951" />
-    <state x="547" y="357" key="com.intellij.ide.util.TipDialog/0.23.1440.877/-571.-1417.2560.1417@0.23.1440.877" timestamp="1585631564966" />
+    <state x="547" y="357" key="com.intellij.ide.util.TipDialog/0.23.1440.877/-571.-1417.2560.1417@0.23.1440.877" timestamp="1585983824113" />
     <state x="547" y="357" key="com.intellij.ide.util.TipDialog/0.23.1440.877/1440.-256.1440.877@0.23.1440.877" timestamp="1581149138173" />
     <state x="547" y="357" key="com.intellij.ide.util.TipDialog/0.23.1440.877/1440.-736.2560.1417@0.23.1440.877" timestamp="1582961726011" />
     <state x="547" y="357" key="com.intellij.ide.util.TipDialog/0.23.1440.877@0.23.1440.877" timestamp="1585473618661" />
@@ -748,14 +765,14 @@
       <screen x="548" y="1463" width="1440" height="877" />
     </state>
     <state x="548" y="1463" width="1383" height="877" maximized="true" key="dock-window-1/548.1463.1440.877/-2560.23.2560.1417/0.23.2560.1417@0.23.2560.1417" timestamp="1584684613063" />
-    <state x="228" y="155" width="931" height="622" key="find.popup" timestamp="1585810917515">
+    <state x="106" y="114" width="1195" height="699" key="find.popup" timestamp="1586002925235">
       <screen x="0" y="23" width="1440" height="877" />
     </state>
     <state x="540" y="311" width="645" height="472" key="find.popup/0.23.1440.877/-200.-1057.1920.1057@0.23.1440.877" timestamp="1580843740096" />
     <state x="106" y="114" width="1195" height="699" key="find.popup/0.23.1440.877/-2560.-770.2560.1417@0.23.1440.877" timestamp="1584866357969" />
     <state x="228" y="155" width="931" height="622" key="find.popup/0.23.1440.877/-548.-1417.2560.1417/-3108.-1417.2560.1417@0.23.1440.877" timestamp="1585810917515" />
     <state x="540" y="311" width="789" height="534" key="find.popup/0.23.1440.877/-552.-1417.2560.1417@0.23.1440.877" timestamp="1583345414195" />
-    <state x="106" y="114" width="1195" height="699" key="find.popup/0.23.1440.877/-571.-1417.2560.1417@0.23.1440.877" timestamp="1585397173566" />
+    <state x="106" y="114" width="1195" height="699" key="find.popup/0.23.1440.877/-571.-1417.2560.1417@0.23.1440.877" timestamp="1586002925235" />
     <state x="228" y="243" width="931" height="534" key="find.popup/0.23.1440.877/1440.-256.1440.877@0.23.1440.877" timestamp="1583584837332" />
     <state x="540" y="311" width="683" height="486" key="find.popup/0.23.1440.877/1440.-736.2560.1417@0.23.1440.877" timestamp="1582981352585" />
     <state x="228" y="155" width="931" height="622" key="find.popup/0.23.1440.877@0.23.1440.877" timestamp="1585460178944" />

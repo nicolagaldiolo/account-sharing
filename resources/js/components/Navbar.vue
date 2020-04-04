@@ -56,7 +56,7 @@
                   {{ $t('settings') }}
                 </router-link>
 
-                <router-link :to="{ name: 'dashboard' }" class="dropdown-item pl-3">
+                <router-link :to="{ name: 'admin' }" class="dropdown-item pl-3">
                   <fa icon="cog" fixed-width />
                   Admin area
                 </router-link>

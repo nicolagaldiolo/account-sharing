@@ -15,32 +15,25 @@
       </transition>
     </div>
   </div>
+
 </template>
 
 <script>
 export default {
-
   computed: {
     tabs () {
       return [
         {
-          name: 'In attesa',
-          route: 'sharings.pending'
+          name: 'Rimborsi',
+          route: 'admin.refunds'
         },
         {
-          name: 'Approvate',
-          route: 'sharings.approved'
+          name: 'Sharings',
+          route: 'admin.sharings'
         },
-        {
-          name: 'A cui partecipo',
-          route: 'sharings.joined'
-        },
-        {
-          name: 'Create da me',
-          route: 'sharings.owner'
-        }
       ]
     }
   }
+
 }
 </script>

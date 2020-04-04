@@ -27,13 +27,6 @@ class SharingUserNewRequest extends Notification implements ShouldQueue
         $this->sharing = $sharing;
         $this->user = $user;
         $this->forOwner = $forOwner;
-
-        logger([
-            $this->sharing,
-            $this->user,
-            $this->forOwner
-        ]);
-
     }
 
     /**
