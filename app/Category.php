@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Http\Traits\Utility;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
@@ -53,14 +54,39 @@ class Category extends Model
         return $this->capacity -1;
     }
 
+    public function getIsForbiddenAttribute(){
+        return $this->sharingForbidden->count() > 0;
+    }
+
     public function sharings()
     {
         return $this->hasMany(Sharing::class);
     }
 
-    public function categoryForbidden()
     // I don't create a sharing if i already created one in this category
+    // (except custom groups) or i'm joiner in one of them
+    public function sharingForbidden()
     {
-        return $this->hasOne(Sharing::class)->where('owner_id', Auth::user()->id);
+        return $this->hasMany(Sharing::class)
+            ->whereDoesntHave('category', function (Builder $query){
+                $query->where('custom', 1);
+            })
+            ->where(function(Builder $query){
+                $query->where('owner_id', Auth::id())
+                    ->orWhereHas('members', function (Builder $query){
+                        $query->where('user_id', Auth::id());
+                    });
+            });
+    }
+
+    //public function scopeAllowed()
+    //{
+    //    return $this->whereHas('sharings', function (Builder $query){
+    //       $query->where('owner_id', Auth::id());
+    //    });
+    //}
+
+    public function scopeCountry($query){
+        return $query->where('country', Auth::user()->country);
     }
 }

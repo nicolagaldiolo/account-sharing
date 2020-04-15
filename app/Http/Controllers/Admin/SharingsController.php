@@ -19,7 +19,11 @@ class SharingsController extends Controller
      */
     public function index()
     {
-        return SharingResource::collection(Sharing::with(['renewalFrequency'])->paginate(config('custom.paginate')));
+        return SharingResource::collection(Sharing::withoutGlobalScopes(['country'])
+            ->with(['owner','renewalFrequency','category'])
+            ->toApprove()
+            ->paginate(config('custom.paginate'))
+        );
     }
 
     /**
@@ -72,9 +76,9 @@ class SharingsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Sharing $sharing, $action)
+    public function update(Request $request, Sharing $sharing)
     {
-        $action = intval($action);
+        $action = intval($request->get('action', 0));
 
         $this->authorize('change-sharing-status', [$sharing, $action]);
 

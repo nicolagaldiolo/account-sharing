@@ -1,21 +1,5 @@
 <template>
   <div v-if="loaded">
-    <div v-if="authUser.admin && sharingPending" class="pt-2 pb-2 mb-4 text-white bg-danger">
-      <div class="container">
-        <div class="d-flex align-items-center">
-          <div>
-            <h4 class="mb-0 pb-0">Approva condivisione</h4>
-            <span>Approva o rifiuta la condivisione</span>
-          </div>
-
-          <div class="ml-auto">
-            <v-link class="btn-sm" type="light" :data-action=1 :loading="confirmStatus" :action="changeStatus">Approva condivisione</v-link>
-            <v-link class="btn-sm" type="outline-light" :data-action=2 :loading="refusedStatus" :action="changeStatus">Rifiuta condivisione</v-link>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <section class="jumbotron" :style="{'background-image': 'url(' + sharing.image + ')'}">
       <div class="container">
         <div class="row">
@@ -51,18 +35,18 @@
                   </li>
                   <li v-if="sharing.owner.id === authUser.id" class="list-group-item list-group-item-dark d-flex justify-content-between align-items-center">
                     <strong>Riceverai</strong>
-                    <h4><money-format :value="sharing.price_no_fee" :locale="authUser.country" :currency-code="authUser.currency" :subunit-value=false :hide-subunits=false></money-format></h4>
+                    <h4><money-format :value="sharing.price_no_fee" :locale="sharing.owner.country" :currency-code="sharing.owner.currency" :subunit-value=false :hide-subunits=false></money-format></h4>
                   </li>
                   <li v-else class="list-group-item list-group-item-dark d-flex justify-content-between align-items-center">
                     <strong>Totale da pagare</strong>
-                    <h4><money-format :value="sharing.price_with_fee" :locale="authUser.country" :currency-code="authUser.currency" :subunit-value=false :hide-subunits=false></money-format></h4>
+                    <h4><money-format :value="sharing.price_with_fee" :locale="sharing.owner.country" :currency-code="sharing.owner.currency" :subunit-value=false :hide-subunits=false></money-format></h4>
                   </li>
                 </ul>
 
                 <div v-if="sharingApproved" class="mt-4">
 
                   <div v-if="foreign">
-                    <v-link class="btn-lg btn-block" type="success" :loading="confirmStatus" :action="doTransition">Entra nel gruppo</v-link>
+                    <v-link class="btn-lg btn-block" type="success" :action="doTransition">Entra nel gruppo</v-link>
                   </div>
                   <div v-else>
 
@@ -130,10 +114,7 @@ import MemberItem from '~/components/MemberItem'
 import Chat from '~/components/Chat'
 import Credentials from '~/components/Credentials'
 import MoneyFormat from 'vue-money-format'
-import Form from 'vform'
 import UpdateSharingForm from '../../components/Updatesharingform'
-
-const objectToFormData = window.objectToFormData
 
 export default {
   components: {
@@ -148,9 +129,7 @@ export default {
 
   data: () => ({
     loaded: false,
-    globalMembers: [],
-    confirmStatus: false,
-    refusedStatus: false
+    globalMembers: []
   }),
 
   created () {
@@ -195,51 +174,15 @@ export default {
 
   watch: {
     sharing (obj) {
-      this.loaded = true;
+      this.loaded = true
       this.globalMembers = [obj.owner]
       if (obj.members) this.globalMembers.push(...obj.members)
     }
   },
 
   methods: {
-
-    async changeStatus (event) {
-      const action = parseInt(event.target.getAttribute('data-action'))
-
-      if (action === 1) {
-        this.confirmStatus = true
-      } else if (action === 2) {
-        this.refusedStatus = true
-      }
-
-      axios.patch(`/api/sharings/${this.sharing.id}/status/${action}`).then(response => {
-        this.$store.dispatch('sharings/updateSharing', { sharing: response.data.data })
-
-        if (action === 1) {
-          this.confirmStatus = false
-          Swal.fire({
-            type: 'success',
-            title: 'Gruppo confermato',
-            text: 'Il gruppo è stato confermato'
-          })
-        } else if (action === 2) {
-          this.refusedStatus = false
-          Swal.fire({
-            type: 'success',
-            title: 'Gruppo rifiutato',
-            text: 'Il gruppo è stato rifiutato'
-          }).then(result => {
-            if (result.value) this.$router.push({ name: 'home' })
-          })
-        }
-
-      })
-    },
-
     doTransition (event) {
-
-      const action = event.target.getAttribute('data-action');
-
+      const action = event.target.getAttribute('data-action')
       if (action === 'pay') {
         const category = this.$route.params.category_id
         const sharing = this.$route.params.sharing_id

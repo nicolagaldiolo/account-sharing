@@ -32,7 +32,11 @@ class SharingStatusUpdated extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return ['mail'];
+        return [
+            'mail',
+            'database',
+            'broadcast'
+        ];
     }
 
     /**
@@ -81,8 +85,23 @@ class SharingStatusUpdated extends Notification implements ShouldQueue
      */
     public function toArray($notifiable)
     {
+
+        $desc = '';
+        switch ($this->sharing->status){
+            case SharingApprovationStatus::Pending:
+                $desc = 'Gruppo ' . $this->sharing->name . ' in fase di verifica';
+                break;
+            case SharingApprovationStatus::Approved:
+                $desc = 'Gruppo ' . $this->sharing->name . ' approvato, inizia a condividere.';
+                break;
+            case SharingApprovationStatus::Refused:
+                $desc = 'Gruppo ' . $this->sharing->name . ' Rifiutato';
+                break;
+        }
+
         return [
-            //
+            'icon' => $notifiable->photo_url,
+            'desc' => $desc,
         ];
     }
 }

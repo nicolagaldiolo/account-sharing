@@ -3,11 +3,12 @@
 namespace App;
 
 use App\Enums\RefundApplicationStatus;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Refund extends Model
 {
+
     protected $fillable = [
         'stripe_id',
         'internal_status',
@@ -67,5 +68,10 @@ class Refund extends Model
     public function scopeApproved($query)
     {
         return $query->where('internal_status', RefundApplicationStatus::Approved);
+    }
+
+    public function scopePending($query)
+    {
+        return $query->where('internal_status', RefundApplicationStatus::Pending);
     }
 }

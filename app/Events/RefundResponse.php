@@ -22,12 +22,10 @@ class RefundResponse
      */
 
     public $refund;
-    public $action;
 
-    public function __construct(Refund $refund, $action)
+    public function __construct(Refund $refund)
     {
         $this->refund = $refund;
-        $this->action = $action;
     }
 
     /**

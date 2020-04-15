@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex justify-content-between align-items-center">
     <div class="media align-items-center">
-      <img src="https://lorempixel.com/40/40/?28787" class="mr-3 rounded-circle" alt="">
+      <img :src="user.photo_url" width="40" class="mr-3 rounded-circle" alt="">
       <div class="media-body align-items-centeri">
         <h6 class="mt-0">{{user.username}}<br>
           <small class="text-muted">{{ sharingUserStatus }}</small>

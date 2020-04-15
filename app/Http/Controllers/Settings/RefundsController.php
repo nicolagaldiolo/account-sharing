@@ -46,11 +46,10 @@ class RefundsController extends Controller
      */
     public function store(Request $request)
     {
+        // Get the Invoice
+        $invoice = Invoice::where('payment_intent', $request->only('payment_intent'))->firstOrFail();
 
-        $payment_intent = $request->only('payment_intent');
-        $invoice = Invoice::where('payment_intent', $payment_intent)->firstOrFail();
-
-        // Authorization
+        // Authorization Request
         $this->authorize('refund', $invoice);
 
         // Validation
@@ -64,36 +63,9 @@ class RefundsController extends Controller
             'reason' => $request->input('reason')
         ]);
 
-        event(new RefundRequest($refund));
-
         $transaction = $refund->transactions()->where('transactiontable_id', $refund->id)->with('transactiontable')->firstOrFail();
 
         return new Transaction($transaction);
-    }
-
-    public function manage(Refund $refund, $action = null)
-    {
-
-        $action = Str::upper($action);
-        switch ($action){
-            case 'APPROVE' :
-                $refund->internal_status = RefundApplicationStatus::Approved;
-                $refund->save();
-
-                $subscription = $refund->invoice->subscription_id;
-                $subscription = \Stripe\Subscription::retrieve($subscription);
-                $subscription->cancel();
-
-                \Stripe\Refund::create([
-                    'payment_intent' => $refund->invoice->payment_intent,
-                ]);
-                break;
-            case 'REFUSE' :
-                $refund->internal_status = RefundApplicationStatus::Refused;
-                $refund->save();
-                break;
-        }
-        event(new RefundResponse($refund, $action));
     }
 
     /**
@@ -143,9 +115,6 @@ class RefundsController extends Controller
         $refund->delete();
 
         $transaction = \App\Transaction::where('transactiontable_id', $refund->invoice->id)->with('transactiontable')->firstOrFail();
-
-        event(new RefundResponse($refund, 'CANCEL'));
-
         return new Transaction($transaction);
     }
 }

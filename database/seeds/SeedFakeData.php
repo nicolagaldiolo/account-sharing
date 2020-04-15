@@ -128,7 +128,6 @@ class SeedFakeData extends Seeder
                 // Assign random user for every sharing
                 $usersToManage = $users->where('country', $me->country)->where('id', '<>', $me->id);
 
-                // Set a credential_updated_at field if is set in the sharing
                 $usersToAttach = $usersToManage->random(min($usersToManage->count(), 4))->pluck('id')->mapWithKeys(function($id){
 
                     $sharing_status = SharingStatus::getValues();

@@ -37,7 +37,8 @@ class InvoicePolicy
     public function refund(User $user, Invoice $invoice)
     {
         return $user->pl_customer_id === $invoice->customer_id &&
-            $invoice->created_at->addDays(config('custom.day_refund_limit'))->gte(Carbon::now()->endOfDay());
+            $invoice->created_at->addDays(config('custom.day_refund_limit'))->gte(Carbon::now()->endOfDay()) &&
+            is_null($invoice->refund);
     }
 
     /**

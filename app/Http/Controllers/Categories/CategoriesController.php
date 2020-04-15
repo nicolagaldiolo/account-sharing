@@ -21,7 +21,7 @@ class CategoriesController extends Controller
      */
     public function index(Request $request)
     {
-        return \App\Http\Resources\Category::collection(Category::with('categoryForbidden')->get());
+        return \App\Http\Resources\Category::collection(Category::with('sharingForbidden')->get());
     }
 
     /**

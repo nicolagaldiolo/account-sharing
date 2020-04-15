@@ -31,6 +31,8 @@ class Member extends JsonResource
             'id' => $this->id,
             'photo_url' => $this->photo_url,
             'username' => $this->username,
+            'currency' => $this->currency,
+            'country' => $this->country,
             'created_at' => $this->created_at,
             $this->mergeWhen($status, [
                 'subscription' => $subscription,

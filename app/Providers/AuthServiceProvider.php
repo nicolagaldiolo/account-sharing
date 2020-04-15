@@ -24,7 +24,7 @@ class AuthServiceProvider extends ServiceProvider
      * @var array
      */
     protected $policies = [
-        'App\Chat' => 'App\Policies\ChatPolicy',
+        'App\Chat' => 'App\Policies\ChatPolicy'
     ];
 
     /**
@@ -60,11 +60,14 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         Gate::define('can-pay', function(User $user, SharingUser $sharingUser){
-            return ($user->id === $sharingUser->user_id) && ($sharingUser->status === SharingStatus::Approved);
+            return $user->id === $sharingUser->user_id
+                && $sharingUser->status === SharingStatus::Approved
+                && (!$sharingUser->sharing->category->isForbidden);
         });
 
         Gate::define('restore', function(User $user, SharingUser $sharingUser){
-            return $user->id === $sharingUser->user_id && ($sharingUser->subscription && $sharingUser->subscription->status === SubscriptionStatus::getValue('past_due'));
+            return $user->id === $sharingUser->user_id &&
+                ($sharingUser->subscription && $sharingUser->subscription->status === SubscriptionStatus::getValue('past_due'));
         });
 
         Gate::define('left-subscription', function (User $user, SharingUser $sharingUser){
@@ -78,7 +81,7 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         Gate::define('create-sharing', function(User $user, Category $category){
-            return !$user->additional_data_needed && (is_null($category->categoryForbidden) || $category->custom);
+            return !$user->additional_data_needed && (!$category->isForbidden);
         });
 
         Gate::define('manage-sharing', function(User $user, $sharing){

@@ -27,11 +27,6 @@ class Subscription extends Model
         return $this->belongsTo(SharingUser::class);
     }
 
-    public function sharing()
-    {
-        return $this->hasOneThrough('App\Sharing', 'App\SharingUser');
-    }
-
     public function invoices()
     {
         return $this->hasMany(Invoice::class);

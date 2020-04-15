@@ -8,6 +8,7 @@ use App\Enums\RefundApplicationStatus;
 use App\Enums\RefundStripeStatus;
 use App\Enums\SharingStatus;
 use App\Enums\SubscriptionStatus;
+use App\Events\RefundResponse;
 use App\Events\SubscriptionNewMember;
 use App\Events\SubscriptionChanged;
 use App\Http\Middleware\VerifyWebhookSignature;
@@ -227,8 +228,7 @@ class WebhookController extends Controller
                 $userSharing->save();
             }
 
-            $this->updateSubscription($userSharing->subscription, $payload['data']['object']);
-
+            //$this->updateSubscription($userSharing->subscription, $payload['data']['object']);
             logger("Avvisare della cancellazione sia admin che user, avvertire admin di cambiare le password");
         });
 
@@ -239,10 +239,16 @@ class WebhookController extends Controller
     {
         $object = $payload['data']['object']['refunds']['data'][0];
 
-        Invoice::where('payment_intent', $object['payment_intent'])->firstOrFail()->refunds()->firstOrFail()->update([
+        $refund = Refund::where('payment_intent', $object['payment_intent'])->firstOrFail();
+
+        $refund->update([
             'stripe_id' => $object['id'],
-            'status' => RefundStripeStatus::getValue($object['status'])
+            'status' => RefundStripeStatus::getValue($object['status']),
+            'internal_status' => RefundApplicationStatus::Approved
         ]);
+
+        $subscription = \Stripe\Subscription::retrieve($refund->invoice->subscription_id);
+        $subscription->cancel();
 
         return $this->successMethod();
     }

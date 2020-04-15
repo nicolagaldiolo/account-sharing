@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Enums\RefundApplicationStatus;
 use App\Refund;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
@@ -19,13 +20,11 @@ class RefundResponse extends Notification
      */
 
     public $refund;
-    public $action;
     public $userType;
 
-    public function __construct(Refund $refund, $action, $userType)
+    public function __construct(Refund $refund, $userType)
     {
         $this->refund = $refund;
-        $this->action = $action;
         $this->userType = $userType;
     }
 
@@ -48,8 +47,9 @@ class RefundResponse extends Notification
      */
     public function toMail($notifiable)
     {
-        switch ($this->action){
-            case 'APPROVE':
+
+        switch ($this->refund->internal_status){
+            case RefundApplicationStatus::Approved:
                 switch ($this->userType){
                     case 'USER':
                         return (new MailMessage)
@@ -64,9 +64,14 @@ class RefundResponse extends Notification
                             ->line('Fai attenzione! Se il tuo gruppo genera troppe richieste di rimborso, perderai la fiducia degli altri utenti e potresti ricevere delle penalità.')
                             ->line('Buona condivisione');
                         break;
+                    case 'ADMIN':
+                        return (new MailMessage)
+                            ->subject(config('app.name') . ' - Rimborso accettato')
+                            ->line('La richiesta di rimborso per la condivisione ' . $this->refund->service . ' di ' . $this->refund->owner->username . ' è stata accettata.');
+                        break;
                 }
                 break;
-            case 'REFUSE':
+            case RefundApplicationStatus::Refused:
                 switch ($this->userType){
                     case 'USER':
                         return (new MailMessage)
@@ -79,9 +84,14 @@ class RefundResponse extends Notification
                             ->line('Ciao ' . $this->refund->owner->username . ', abbiamo valutato le motivazioni fornite da ' . $this->refund->user->username . ', che fa parte del tuo gruppo di ' . $this->refund->service . ' e abbiamo rifiutato la sua richiesta di rimborso')
                             ->line('Buona condivisione');
                         break;
+                    case 'ADMIN':
+                        return (new MailMessage)
+                            ->subject(config('app.name') . ' - Rimborso rifiutato')
+                            ->line('La richiesta di rimborso per la condivisione ' . $this->refund->service . ' di ' . $this->refund->owner->username . ' è stata rifiutata.');
+                        break;
                 }
                 break;
-            case 'CANCEL':
+            case RefundApplicationStatus::Pending:
                 switch ($this->userType){
                     case 'USER':
                         return (new MailMessage)

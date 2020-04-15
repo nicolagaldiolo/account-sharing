@@ -2,6 +2,8 @@
 
 namespace App\Observers;
 
+use App\Events\RefundRequest;
+use App\Events\RefundResponse;
 use App\Refund;
 
 class RefundObserver
@@ -15,6 +17,8 @@ class RefundObserver
     public function created(Refund $refund)
     {
         $refund->transactions()->create();
+
+        event(new RefundRequest($refund));
     }
 
     /**
@@ -25,7 +29,7 @@ class RefundObserver
      */
     public function updated(Refund $refund)
     {
-        //
+        event(new RefundResponse($refund));
     }
 
     /**
@@ -37,6 +41,8 @@ class RefundObserver
     public function deleted(Refund $refund)
     {
         $refund->transactions()->delete();
+
+        event(new RefundResponse($refund));
     }
 
     /**

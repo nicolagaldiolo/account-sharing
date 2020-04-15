@@ -42,13 +42,13 @@ class RefundSubscriber
         $refund = $event->refund;
 
         // Send mail to owner
-        $refund->owner->notify( new \App\Notifications\RefundResponse($refund, $event->action, 'OWNER'));
+        $refund->owner->notify( new \App\Notifications\RefundResponse($refund, 'OWNER'));
 
         // Send mail to user
-        $refund->user->notify( new \App\Notifications\RefundResponse($refund, $event->action, 'USER'));
+        $refund->user->notify( new \App\Notifications\RefundResponse($refund, 'USER'));
 
         // Send mail to admins
-        Notification::send(User::admin()->get(), new \App\Notifications\RefundResponse($refund, $event->action, 'ADMIN'));
+        Notification::send(User::admin()->get(), new \App\Notifications\RefundResponse($refund, 'ADMIN'));
     }
 
     /**

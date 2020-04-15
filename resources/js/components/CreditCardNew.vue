@@ -129,6 +129,7 @@
       },
 
       paymentMethodAdded () {
+        alert("Eccolo");
         Swal.fire({
           type: 'success',
           title: 'Fantastico',

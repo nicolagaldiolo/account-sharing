@@ -92,4 +92,10 @@ class RefundPolicy
     {
         //
     }
+
+    public function adminUpdate(User $user, Refund $refund)
+    {
+        logger("passo di qui");
+        return $user->isAdmin && $refund->internal_status === RefundApplicationStatus::Pending;
+    }
 }

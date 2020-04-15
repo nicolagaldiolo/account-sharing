@@ -91,6 +91,9 @@ class SharingsController extends Controller
 
     public function prova(Request $request)
     {
+        Auth::login(User::find(6));
+        $category = Category::get();
+        return;
     }
 
     /**
@@ -114,25 +117,6 @@ class SharingsController extends Controller
         $sharing = $user->sharingOwners()->create($dataValidated);
 
         event(New SharingCreated($sharing));
-
-        return new SharingResource($sharing);
-    }
-
-    public function changeStatus(Sharing $sharing, $action)
-    {
-        $action = intval($action);
-
-        $this->authorize('change-sharing-status', [$sharing, $action]);
-
-        // Update the sharing
-        $sharing->status = $action;
-        $sharing->save();
-
-        event(New SharingStatusUpdated($sharing));
-
-        if($sharing->status === SharingApprovationStatus::Refused){
-            $sharing->delete();
-        }
 
         return new SharingResource($sharing);
     }
@@ -178,8 +162,6 @@ class SharingsController extends Controller
             'cancel_at_period_end' => !boolval($subscription->cancel_at_period_end),
         ]);
 
-        $this->updateSubscription($object->toArray());
-
         $sharing->load(['members','owner']);
 
         return new SharingResource($sharing);
@@ -208,7 +190,9 @@ class SharingsController extends Controller
 
         if($stateMachine->can('pay') || $user->can('restore', $userSharing)) {
             // If an incomplete subscription exist, manage them, otherwise create newone
-            !$userSharing->subscription ? Stripe::createSubscription($sharing, $user) : Stripe::payInvoice($userSharing->subscription->id);
+            !$userSharing->subscription ?
+                Stripe::createSubscription($sharing, $user) :
+                Stripe::payInvoice($userSharing->subscription->id);
 
             return new SharingResource($sharing->load(['members','owner']));
         }else{

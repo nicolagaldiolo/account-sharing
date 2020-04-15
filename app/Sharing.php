@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Enums\SharingApprovationStatus;
 use App\Enums\SharingStatus;
 use App\Enums\SharingVisibility;
 use App\Http\Traits\Utility;
@@ -87,7 +88,7 @@ class Sharing extends Model
     }
 
     public function category(){
-        return $this->belongsTo(Category::class)->withoutGlobalScopes();
+        return $this->belongsTo(Category::class);
     }
 
     public function chats(){
@@ -174,6 +175,11 @@ class Sharing extends Model
     public function scopeApproved($query)
     {
         return $query->where('sharing_user.status', SharingStatus::Approved);
+    }
+
+    public function scopeToApprove($query)
+    {
+        return $query->whereStatus(SharingApprovationStatus::Pending);
     }
 
     public function scopePublic($query)
