@@ -3,18 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="80fbe383-e517-4357-96d8-8ee0108f1222" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Events/SubscriptionChanged.php" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Sharings/SharingsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Sharings/SharingsController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Stripe/WebhookController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Stripe/WebhookController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Traits/Utility.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Traits/Utility.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Listeners/SharingTransitionSubscriber.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Listeners/SharingTransitionSubscriber.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/MyClasses/Stripe.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/MyClasses/Stripe.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Providers/EventServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Providers/EventServiceProvider.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Subscription.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Subscription.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/CreditCardNew.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/CreditCardNew.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/pages/settings/paymentmethods.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/settings/paymentmethods.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/pages/sharings/show.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/sharings/show.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/api.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -823,15 +814,6 @@
     <state x="945" y="348" width="670" height="676" key="search.everywhere.popup/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1582003150186" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="php">
-          <url>file://$PROJECT_DIR$/app/Http/Controllers/Sharings/SharingsController.php</url>
-          <line>203</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
     <watches-manager>
       <configuration name="artisan">
         <watch expression="$account" language="PHP" />

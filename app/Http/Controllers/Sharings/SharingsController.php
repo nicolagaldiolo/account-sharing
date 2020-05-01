@@ -210,6 +210,7 @@ class SharingsController extends Controller
 
             $status = null;
             $clientSecret = null;
+            $subId = null;
 
             if(!$userSharing->subscription){ // If an incomplete subscription exist, manage them, otherwise create newone
                 $subscription = Stripe::createSubscription($sharing, $user);
@@ -226,6 +227,13 @@ class SharingsController extends Controller
                         if($subscription->latest_invoice->status === 'paid' && $subscription->latest_invoice->payment_intent->status === 'succeeded'){
                             $status = SubscriptionSharingStatus::succeeded;
                         }
+
+                        $transition = 'pay';
+                        if ($sharingUser->canApply($transition)) {
+                            $sharingUser->apply($transition);
+                            $sharingUser->save();
+                        };
+
                         break;
                     case 'trialing':
                         // Doesn't handle this case
@@ -242,6 +250,7 @@ class SharingsController extends Controller
                         break;
                 }
 
+                $subId = $subscription->id;
                 $clientSecret = $subscription->latest_invoice->payment_intent->client_secret;
 
             }else{
@@ -257,6 +266,13 @@ class SharingsController extends Controller
                 switch ($invoice->payment_intent->status){
                     case 'succeeded':
                         $status = SubscriptionSharingStatus::succeeded;
+
+                        $transition = 'pay';
+                        if ($sharingUser->canApply($transition)) {
+                            $sharingUser->apply($transition);
+                            $sharingUser->save();
+                        };
+
                         break;
                     case 'requires_payment_method':
                         $status = SubscriptionSharingStatus::requires_payment_method;
@@ -267,12 +283,13 @@ class SharingsController extends Controller
                 }
 
                 $clientSecret = $invoice->payment_intent->client_secret;
-
+                $subId = $userSharing->subscription->id;
             }
 
             return new SubscriptionSharing([
                 'status' => $status,
-                'client_secret' => $clientSecret
+                'client_secret' => $clientSecret,
+                'sub_id' => $subId
             ]);
 
         }else{
@@ -281,29 +298,10 @@ class SharingsController extends Controller
 
     }
 
-    /*
-    public function subscribeRestore(Request $request, Sharing $sharing)
+    public function confirm3dSecure()
     {
-        $user = Auth::user();
-        $userSharing = $user->sharings()->find($sharing->id)->sharing_status;
-        $stateMachine = \StateMachine::get($userSharing, 'sharing');
-
-        if($stateMachine->can('pay') || $user->can('restore', $userSharing)) {
-
-            // If an incomplete subscription exist, manage them, otherwise create newone
-            if(!$userSharing->subscription){
-                Stripe::createSubscription($sharing, $user);
-            }else{
-                Stripe::payInvoice($userSharing->subscription->id);
-            }
-
-            return new SharingResource($sharing->load(['members','owner']));
-        }else{
-            abort(403);
-        }
 
     }
-    */
 
     public function transition(Request $request, Sharing $sharing, $transition = null)
     {
