@@ -2,27 +2,23 @@
 
 namespace App\Http\Controllers\Stripe;
 
-use App\ConnectCustomer;
 use App\Enums\PaymentIntentStatus;
 use App\Enums\RefundApplicationStatus;
 use App\Enums\RefundStripeStatus;
-use App\Enums\SharingStatus;
 use App\Enums\SubscriptionStatus;
-use App\Events\RefundResponse;
+use App\Events\PaymentSucceeded;
+use App\Events\SubscriptionDeleted;
 use App\Events\SubscriptionNewMember;
-use App\Events\SubscriptionChanged;
+use App\Events\SubscriptionPastDue;
+use App\Events\SubscriptionProvideService;
 use App\Http\Middleware\VerifyWebhookSignature;
-use App\Http\Resources\Subscription as SubscriptionResource;
+use App\Http\Traits\Utility;
 use App\Invoice;
 use App\MyClasses\Support\Facade\Stripe;
 use App\Refund;
 use App\Sharing;
-use App\SharingUser;
 use App\Subscription;
-use App\Transaction;
-use App\Transfer;
 use App\User;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -32,6 +28,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class WebhookController extends Controller
 {
+    use Utility;
+
     /**
      * Create a new WebhookController instance.
      *
@@ -81,19 +79,59 @@ class WebhookController extends Controller
      */
     protected function handleInvoicePaymentSucceeded(array $payload)
     {
+
+        logger(1);
+
         $object = $payload['data']['object'];
 
         $user = User::where('pl_customer_id', $object['customer'])->firstOrFail();
         Auth::login($user);
 
         DB::transaction(function() use($object){
+
+            logger(2);
+
+            $subscription = Subscription::findOrFail($object['subscription']);
+            $sharingUser = $subscription->sharingUser;
+
+            logger("-------1-------");
+            logger($sharingUser);
+            logger("-------1-------");
+
+            if($object['billing_reason'] === 'subscription_create'){
+                $subscription->update(['status' => SubscriptionStatus::active]);
+
+                logger(3);
+
+                $transition = 'pay';
+                if ($sharingUser->canApply($transition)) {
+                    $sharingUser->apply($transition);
+                    $sharingUser->save();
+
+                    logger(4);
+
+                };
+            }
+
+            logger("-------2-------");
+            logger($sharingUser);
+            logger("-------2-------");
+
+            logger("-------3-------");
+            logger($subscription->sharingUser);
+            logger("-------3-------");
+
             $sharing = Sharing::where('stripe_plan', $object['lines']['data'][0]['plan']['id'])->firstOrFail();
 
-            $total = ($object['total']) / 100;
-            $total_less_fee = ($object['lines']['data'][0]['plan']['metadata']['netPrice']) / 100;
-            $fee = ($object['lines']['data'][0]['plan']['metadata']['fee']) / 100;
+            $total = $this->convertStripePrice($object['total']);
+            $total_less_fee = $this->convertStripePrice($object['lines']['data'][0]['plan']['metadata']['netPrice']);
+            $fee = $this->convertStripePrice($object['lines']['data'][0]['plan']['metadata']['fee']);
+
+            logger(5);
 
             $charge = Stripe::chargeRetrieve($object['charge']);
+
+            logger(6);
 
             $invoice = Invoice::create([
                 'stripe_id' => $object['id'],
@@ -109,58 +147,17 @@ class WebhookController extends Controller
                 'last4' => $charge->payment_method_details->card->last4
             ]);
 
+            logger(7);
+
+            logger("-------4-------");
+            logger($sharingUser);
+            logger("-------4-------");
+
+            event( New PaymentSucceeded($invoice, $sharingUser));
+
+            logger(8);
+
         });
-
-        return $this->successMethod();
-    }
-
-    protected function handleInvoicePaymentFailed(array $payload)
-    {
-        logger('Payment failed');
-        //logger($payload);
-    }
-
-    protected function handleInvoicePaymentActionRequired(array $payload)
-    {
-        logger('Payment action required');
-        //logger($payload);
-    }
-
-
-    protected function handleCustomerSubscriptionCreated(array $payload)
-    {
-
-        $sharingSubscription = $payload['data']['object'];
-
-        $subscription = DB::transaction(function() use ($sharingSubscription) {
-
-            // Retrieve the user
-            $user = User::where('pl_customer_id', $sharingSubscription['customer'])->firstOrFail();
-            Auth::login($user);
-
-            // Retrieve the sharing
-            $sharing = Sharing::where('stripe_plan', $sharingSubscription['plan']['id'])->firstOrFail();
-
-
-            $sharingUser = $user->sharings()->find($sharing->id)->sharing_status;
-
-            // Create the subscription
-            $subscription = $sharingUser->subscription()->create([
-                'id' => $sharingSubscription['id'],
-                'status' => SubscriptionStatus::getValue($sharingSubscription['status']),
-                'current_period_end_at' => $sharingSubscription['current_period_end']
-            ]);
-
-            $transition = 'pay';
-            if ($sharingUser->canApply($transition)) {
-                $sharingUser->apply($transition);
-                $sharingUser->save();
-            };
-
-            return $subscription;
-        });
-
-        event(New SubscriptionChanged($sharingSubscription, $subscription));
 
         return $this->successMethod();
     }
@@ -172,33 +169,25 @@ class WebhookController extends Controller
      */
     protected function handleCustomerSubscriptionUpdated(array $payload)
     {
-        $sharingSubscription = $payload['data']['object'];
+        $stripeSubscription = $payload['data']['object'];
 
-        $subscription = DB::transaction(function() use ($sharingSubscription) {
+        $subscription = Subscription::findOrFail($stripeSubscription['id']);
 
-            $subscription = Subscription::findOrFail($sharingSubscription['id']);
+        $subscription->update([
+            'status' => SubscriptionStatus::getValue($stripeSubscription['status']),
+            'cancel_at_period_end' => $stripeSubscription['cancel_at_period_end'],
+            'ended_at' => $stripeSubscription['ended_at'],
+            'current_period_end_at' => $stripeSubscription['current_period_end']
+        ]);
 
-            $subscription->update([
-                'status' => SubscriptionStatus::getValue($sharingSubscription['status']),
-                'cancel_at_period_end' => $sharingSubscription['cancel_at_period_end'],
-                'ended_at' => $sharingSubscription['ended_at'],
-                'current_period_end_at' => $sharingSubscription['current_period_end']
-            ]);
+        $stripeSubscriptionData = collect([
+            'total' => $this->convertStripePrice($stripeSubscription['items']['data'][0]['plan']['amount']),
+            'currency' => $stripeSubscription['items']['data'][0]['plan']['currency']
+        ]);
 
-            $sharingUser = $subscription->sharingUser;
-            $user = User::findOrFail($sharingUser->user_id);
-            Auth::login($user);
-
-            $transition = 'pay';
-            if ($sharingUser->canApply($transition)) {
-                $sharingUser->apply($transition);
-                $sharingUser->save();
-            };
-
-            return $subscription;
-        });
-
-        event(New SubscriptionChanged($sharingSubscription, $subscription));
+        if($stripeSubscription['status'] === 'past_due'){
+            event( New SubscriptionPastDue($subscription->sharingUser, $stripeSubscriptionData));
+        }
 
         return $this->successMethod();
     }
@@ -222,18 +211,18 @@ class WebhookController extends Controller
 
         DB::transaction(function() use ($stateMachine, $userSharing, $payload) {
             $transition = 'left';
-
             if ($stateMachine->can($transition)) {
                 $stateMachine->apply($transition);
                 $userSharing->save();
             }
-
-            //$this->updateSubscription($userSharing->subscription, $payload['data']['object']);
-            logger("Avvisare della cancellazione sia admin che user, avvertire admin di cambiare le password");
+            event( New SubscriptionDeleted());
         });
 
         return $this->successMethod();
     }
+
+
+
 
     protected function handleChargeRefunded(array $payload)
     {

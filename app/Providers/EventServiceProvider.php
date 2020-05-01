@@ -6,7 +6,7 @@ use App\Listeners\CredentialSubscriber;
 use App\Listeners\RefundSubscriber;
 use App\Listeners\SharingSubscriber;
 use App\Listeners\SharingTransitionSubscriber;
-use Illuminate\Support\Facades\Event;
+use App\Listeners\SubscriptionSubscriber;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -26,9 +26,10 @@ class EventServiceProvider extends ServiceProvider
 
     protected $subscribe = [
         CredentialSubscriber::class,
+        RefundSubscriber::class,
         SharingSubscriber::class,
         SharingTransitionSubscriber::class,
-        RefundSubscriber::class
+        SubscriptionSubscriber::class
     ];
 
     /**

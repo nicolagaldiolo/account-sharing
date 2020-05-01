@@ -39,8 +39,7 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::get('sharings/{sharing}/getcredentials/', 'Sharings\CredentialController@get')->name('sharings.getcredentials');
         Route::patch('sharings/{sharing}/credential/{recipient?}', 'Sharings\CredentialController@update')->name('sharings.credentials.update');
         Route::post('sharings/{sharing}/credential/{type}', 'Sharings\CredentialController@confirm')->name('sharings.credentials.confirm');
-        Route::post('sharings/{sharing}/subscribeRestore/', 'Sharings\SharingsController@subscribeRestore')->name('sharings.credentials.subscribeRestore');
-        Route::post('sharings/{sharing}/restore/', 'Sharings\SharingsController@restore')->name('sharings.credentials.restore');
+        Route::post('sharings/{sharing}/subscribe/', 'Sharings\SharingsController@subscribe')->name('sharings.credentials.subscribe');
 
         // Chat
         Route::get('sharings/{sharing}/chats', 'Sharings\ChatsController@index')->name('sharings.chats');

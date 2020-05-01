@@ -23,8 +23,8 @@ trait Utility
     protected function getPrice($price = 0, $capacity = 0, RenewalFrequency $renewalFrequency)
     {
 
-        $stripeFee = floatval(config('custom.stripe.stripe_fee')) / 100;
-        $platformFee = floatval(config('custom.stripe.platform_fee')) / 100;
+        $stripeFee = $this->convertStripePrice(floatval(config('custom.stripe.stripe_fee')));
+        $platformFee = $this->convertStripePrice(floatval(config('custom.stripe.platform_fee')));
         $fee = $stripeFee + $platformFee;
         $netPrice = $price / $capacity;
         $totalPrice = $netPrice + $fee;
@@ -43,6 +43,11 @@ trait Utility
             'fee' => ($fee * $renewalFrequency->value)
         ];
 
+    }
+
+    protected function convertStripePrice($price = 0)
+    {
+        return $price / 100;
     }
 
     protected function getCredentials(Sharing $sharing)

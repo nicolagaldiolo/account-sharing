@@ -286,22 +286,23 @@ class Stripe
 
         $stripeSubscription = \Stripe\Subscription::retrieve($id);
 
-        if($stripeSubscription->status === 'incomplete' || $stripeSubscription->status === 'past_due') {
+        $invoice = \Stripe\Invoice::retrieve(['id' => $stripeSubscription->latest_invoice]);
+
+        try {
+            $invoice->pay(['expand' => ['payment_intent','subscription']]);
+        }catch (\Exception $e){
+
+            // If the call to pay the invoice fails with an HTTP 402 error,
+            // you need to retrieve the invoice manually and expand the PaymentIntent.
 
             $invoice = \Stripe\Invoice::retrieve([
-                'id' => $stripeSubscription->latest_invoice
+                'id' => $stripeSubscription->latest_invoice,
+                'expand' => ['payment_intent','subscription']
             ]);
-
-            try {
-                $invoice->pay([
-                    'expand' => [
-                        'payment_intent'
-                    ]
-                ]);
-            }catch (\Exception $e){
-                logger($e);
-            }
         }
+
+        return $invoice;
+
     }
 
     /*

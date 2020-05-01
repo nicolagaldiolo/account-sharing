@@ -11,7 +11,7 @@
       <div v-if="maxPaymentMethod > paymentmethods.length">
         <button class="mt-5 btn btn btn-outline-secondary btn-lg btn-block" @click.prevent="newCardForm">Nuova carta</button>
         <div v-if="showCardForm">
-          <credit-card-new :checkoutMode="checkoutMode" v-on:payment-method-added="subscribe"/>
+          <credit-card-new :checkoutMode="checkoutMode" v-on:payment-method-added="paymentMethodAdded"/>
         </div>
       </div>
       <template v-slot:footer>
@@ -27,7 +27,7 @@
       <div v-if="maxPaymentMethod > paymentmethods.length">
         <button class="mt-5 btn btn btn-outline-secondary btn-lg btn-block" @click.prevent="newCardForm">Nuova carta</button>
         <div v-if="showCardForm">
-          <credit-card-new :checkoutMode="checkoutMode" v-on:payment-method-added="subscribe"/>
+          <credit-card-new :checkoutMode="checkoutMode" v-on:payment-method-added="paymentMethodAdded"/>
         </div>
       </div>
     </card>
@@ -74,27 +74,38 @@ export default {
   created () {
     this.$store.dispatch('stripe/fetchPaymentMethods')
 
-    if (this.sharing && this.sharing.user_status) {
-      window.Echo.private(`sharingUser.${this.sharing.user_status.id}`).listen('SubscriptionChanged', ({ payload }) => {
-        if (payload.status === 1 && payload.latest_invoice.payment_intent.status === 'succeeded') {
-          // Outcome 1: Payment succeeds (Subscription active)
-          this.redirectToSharing()
-        } else if (payload.status === 2 && payload.latest_invoice.payment_intent.status === 'requires_payment_method') {
-          // Outcome 2: Payment fails (Subscription incomplete)
-          this.paymentFailed()
-        } else if ((payload.status === 2 || payload.status === 4) && payload.latest_invoice.payment_intent.status === 'requires_action') {
-          // Outcome 3: Subscription incomplete or past_due and action require
-          this.stripe.handleCardPayment(payload.latest_invoice.payment_intent.client_secret).then((result) => {
-            if (result.error) this.paymentFailed()
-          })
-        } else { // Outcome 4: other cases
-          this.genericError()
-        }
+    if (this.sharing && this.sharing.user_status && this.checkoutMode) {
+
+      console.log("Sono dentro");
+
+      window.Echo.private(`sharingUser.${this.sharing.user_status.id}`).listen('PaymentSucceeded', () => {
+        console.log("recevuto evento");
+        this.$router.push({
+          name: 'sharing.show',
+          params: {
+            category_id: this.$route.params.category_id,
+            sharing_id: this.$route.params.sharing_id
+          }
+        })
       })
     }
   },
 
   methods: {
+    paymentMethodAdded () {
+      if (this.checkoutMode) {
+        this.subscribe()
+      } else {
+        Swal.fire({
+          type: 'success',
+          title: 'Fantastico',
+          text: 'Hai aggiunto un nuovo metodo di pagamento'
+        }).then(result => {
+          this.showCardForm = false
+        })
+      }
+    },
+
     newCardForm () {
       this.showCardForm = !this.showCardForm
     },
@@ -102,7 +113,27 @@ export default {
     subscribe () {
       this.showCardForm = false
       this.loading = true
-      axios.post(`/api/sharings/${this.$route.params.sharing_id}/subscribeRestore`).then((response) => {})
+      axios.post(`/api/sharings/${this.$route.params.sharing_id}/subscribe`).then((response) => {
+        let data = response.data.data
+        switch (data.status) {
+          case 0: // Outcome 0: Payment succeeds (Subscription active)
+            // Don't do nothing, Webhook event is raised
+            break
+          case 1: // Outcome 1: Subscription incomplete or past_due and action require
+            this.stripe.confirmCardPayment(data.client_secret).then((result) => {
+              if (result.error) {
+                this.paymentFailed()
+              }
+            })
+            break
+          case 2: // Outcome 2: Payment fails (Subscription incomplete)
+            this.paymentFailed()
+            break
+          default: // Outcome 3: other cases
+            this.genericError()
+            break
+        }
+      })
     },
 
     redirectToSharing () {

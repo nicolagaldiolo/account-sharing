@@ -4,6 +4,7 @@
     <div id="card-errors" role="alert"></div>
     <template v-slot:footer>
       <v-link :class="[{ 'disabled': disabled }, 'btn-lg btn-block']" type="primary" :loading="loading" :action="(checkoutMode ? createPaymentMethod : createSetupIntent)">{{ checkoutMode ? 'Completa pagamento' : 'Aggiungi carta' }}</v-link>
+      <!--<v-link :class="[{ 'disabled': disabled }, 'btn-lg btn-block']" type="primary" :loading="loading" :action="createSetupIntent">{{ checkoutMode ? 'Completa pagamento' : 'Aggiungi carta' }}</v-link>-->
     </template>
   </card>
 </template>
@@ -79,14 +80,19 @@
 
       // Create a new payment method (if in checkout mode)
       createPaymentMethod () {
+        console.log("Invoco metodo createPaymentMethod");
+        console.log(1);
         this.loading = true;
         this.stripe.createPaymentMethod({
           type: 'card',
           card: this.cardInstance
         }).then((result) => {
+          console.log(2);
           if (result.error) {
             this.paymentMethodFailed()
+            console.log(4);
           } else {
+            console.log(3);
             this.addPaymentMethod(result.paymentMethod.id)
           }
         })
@@ -94,8 +100,10 @@
 
       // Create a setup intent for future use and add the payment method
       createSetupIntent () {
+        console.log("Invoco metodo createSetupIntent");
         this.loading = true
         axios.get('/api/settings/setupintent').then((result) => {
+          console.log(1);
           try{
             this.stripe.confirmCardSetup(result.data.data.client_secret, {
                 payment_method: {
@@ -106,9 +114,12 @@
                 }
               }
             ).then((result) => {
+                console.log(2);
               if (result.error) {
                 this.paymentMethodFailed()
+                console.log(4);
               } else {
+                console.log(3);
                 this.addPaymentMethod(result.setupIntent.payment_method)
               }
             })
@@ -119,16 +130,20 @@
       },
 
       addPaymentMethod (paymentMethod) {
+        console.log(5);
         this.$store.dispatch('stripe/addPaymentMethod', paymentMethod).then((result) => {
+          console.log(6, result);
           if (result) {
             this.$emit('payment-method-added')
           } else {
+            console.log("Si eccomi qui");
+            console.log(result);
             this.genericError()
           }
         })
       },
 
-      paymentMethodAdded () {
+      /*paymentMethodAdded () {
         alert("Eccolo");
         Swal.fire({
           type: 'success',
@@ -138,6 +153,8 @@
           this.loading = false
         })
       },
+
+       */
       paymentMethodFailed () {
         Swal.fire({
           type: 'error',

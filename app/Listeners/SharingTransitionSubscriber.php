@@ -27,15 +27,15 @@ class SharingTransitionSubscriber
 
     public function onPreTransition(TransitionEvent $event)
     {
-        $sharingUser = $event->getStateMachine()->getObject();
+        //$sharingUser = $event->getStateMachine()->getObject();
 
-        switch ($event->getTransition()){
-            case 'pay':
-                if(!$sharingUser->subscription || $sharingUser->subscription->status !== SubscriptionStatus::active){
-                    $event->setRejected();
-                }
-                break;
-        }
+        //switch ($event->getTransition()){
+        //    case 'pay':
+        //        if(!$sharingUser->subscription || $sharingUser->subscription->status !== SubscriptionStatus::active){
+        //            $event->setRejected();
+        //        }
+        //        break;
+        //}
     }
 
     public function onPostTransition(TransitionEvent $event)

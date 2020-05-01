@@ -134,8 +134,13 @@ export default {
 
   created () {
     this.$store.dispatch('sharings/fetchSharing', this.$route.params.sharing_id).then(() => {
+
+      console.log("UNO", this.sharing);
+
       if (!this.$store.getters['sharings/sharing'].id || this.$store.getters['sharings/sharing'].category_id !== +this.$route.params.category_id) {
         this.$router.push({ name: '404' })
+      }else{
+        console.log("DUE", this.sharing);
       }
     })
   },

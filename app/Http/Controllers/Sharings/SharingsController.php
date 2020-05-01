@@ -5,12 +5,15 @@ namespace App\Http\Controllers\Sharings;
 use App\Category;
 use App\Enums\RenewalStatus;
 use App\Enums\SharingApprovationStatus;
+use App\Enums\SubscriptionSharingStatus;
+use App\Enums\SubscriptionStatus;
 use App\Events\SharingCreated;
 use App\Events\SharingStatusUpdated;
 use App\Http\Requests\CredentialRequest;
 use App\Http\Requests\SharingRequest;
 use App\Http\Resources\Sharing as SharingResource;
 use App\Http\Resources\SharingCollection;
+use App\Http\Resources\SubscriptionSharing;
 use App\Http\Traits\Utility;
 use App\MyClasses\Support\Facade\Stripe;
 use App\Sharing;
@@ -18,6 +21,7 @@ use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
@@ -91,9 +95,22 @@ class SharingsController extends Controller
 
     public function prova(Request $request)
     {
-        Auth::login(User::find(6));
-        $category = Category::get();
-        return;
+
+        /*\Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+        \Stripe\Stripe::setApiVersion("2019-10-08");
+
+        collect(\Stripe\Subscription::all(['limit' => 99])->data)->each(function($item){
+            $item->delete();
+        });
+        */
+
+        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+        \Stripe\Stripe::setApiVersion("2019-10-08");
+        \Stripe\Subscription::update('sub_H9dkorjbcN6kWT', [
+                'trial_end' => Carbon::now()->addSeconds(10)->timestamp,
+                'prorate' => false
+            ]
+        );
     }
 
     /**
@@ -182,6 +199,89 @@ class SharingsController extends Controller
         return new SharingResource($sharing);
     }
 
+    public function subscribe(Request $request, Sharing $sharing)
+    {
+        $user = Auth::user();
+        $userSharing = $user->sharings()->find($sharing->id)->sharing_status;
+        $stateMachine = \StateMachine::get($userSharing, 'sharing');
+        $sharingUser = $user->sharings()->find($sharing->id)->sharing_status;
+
+        if($stateMachine->can('pay') || $user->can('restore', $userSharing)) {
+
+            $status = null;
+            $clientSecret = null;
+
+            if(!$userSharing->subscription){ // If an incomplete subscription exist, manage them, otherwise create newone
+                $subscription = Stripe::createSubscription($sharing, $user);
+
+                // Create the subscription
+                $sharingUser->subscription()->create([
+                    'id' => $subscription->id,
+                    'status' => SubscriptionStatus::getValue($subscription->status),
+                    'current_period_end_at' => $subscription->current_period_end
+                ]);
+
+                switch ($subscription->status){
+                    case 'active':
+                        if($subscription->latest_invoice->status === 'paid' && $subscription->latest_invoice->payment_intent->status === 'succeeded'){
+                            $status = SubscriptionSharingStatus::succeeded;
+                        }
+                        break;
+                    case 'trialing':
+                        // Doesn't handle this case
+                        abort(403);
+                        break;
+                    case 'incomplete':
+                        if($subscription->latest_invoice->status === 'open'){
+                            if($subscription->latest_invoice->payment_intent->status === 'requires_payment_method'){
+                                $status = SubscriptionSharingStatus::requires_payment_method;
+                            }else if($subscription->latest_invoice->payment_intent->status === 'requires_action'){
+                                $status = SubscriptionSharingStatus::requires_action;
+                            }
+                        }
+                        break;
+                }
+
+                $clientSecret = $subscription->latest_invoice->payment_intent->client_secret;
+
+            }else{
+
+                $invoice = Stripe::payInvoice($userSharing->subscription->id);
+
+                // Update the subscription
+                $userSharing->subscription->update([
+                    'status' => SubscriptionStatus::getValue($invoice->subscription->status),
+                    'current_period_end_at' => $invoice->subscription->current_period_end
+                ]);
+
+                switch ($invoice->payment_intent->status){
+                    case 'succeeded':
+                        $status = SubscriptionSharingStatus::succeeded;
+                        break;
+                    case 'requires_payment_method':
+                        $status = SubscriptionSharingStatus::requires_payment_method;
+                        break;
+                    case 'requires_action':
+                        $status = SubscriptionSharingStatus::requires_action;
+                        break;
+                }
+
+                $clientSecret = $invoice->payment_intent->client_secret;
+
+            }
+
+            return new SubscriptionSharing([
+                'status' => $status,
+                'client_secret' => $clientSecret
+            ]);
+
+        }else{
+            abort(403);
+        }
+
+    }
+
+    /*
     public function subscribeRestore(Request $request, Sharing $sharing)
     {
         $user = Auth::user();
@@ -189,10 +289,13 @@ class SharingsController extends Controller
         $stateMachine = \StateMachine::get($userSharing, 'sharing');
 
         if($stateMachine->can('pay') || $user->can('restore', $userSharing)) {
+
             // If an incomplete subscription exist, manage them, otherwise create newone
-            !$userSharing->subscription ?
-                Stripe::createSubscription($sharing, $user) :
+            if(!$userSharing->subscription){
+                Stripe::createSubscription($sharing, $user);
+            }else{
                 Stripe::payInvoice($userSharing->subscription->id);
+            }
 
             return new SharingResource($sharing->load(['members','owner']));
         }else{
@@ -200,6 +303,7 @@ class SharingsController extends Controller
         }
 
     }
+    */
 
     public function transition(Request $request, Sharing $sharing, $transition = null)
     {

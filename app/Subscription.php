@@ -31,12 +31,4 @@ class Subscription extends Model
     {
         return $this->hasMany(Invoice::class);
     }
-
-
-    /*
-     * public function subscription()
-    {
-        return $this->hasOneThrough('App\Subscription', 'App\SharingUser', 'sharing_id', 'sharing_user_id', 'id', 'id');
-    }
-     */
 }
