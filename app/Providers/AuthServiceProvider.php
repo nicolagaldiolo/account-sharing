@@ -10,6 +10,7 @@ use App\Enums\SubscriptionStatus;
 use App\Invoice;
 use App\Sharing;
 use App\SharingUser;
+use App\Subscription;
 use App\User;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Notifications\DatabaseNotification;
@@ -78,6 +79,10 @@ class AuthServiceProvider extends ServiceProvider
             }else{
                 return false;
             }
+        });
+
+        Gate::define('confirm3DSecure', function (User $user, Subscription $subscription){
+            return $subscription->sharingUser->user_id === $user->id;
         });
 
         Gate::define('create-sharing', function(User $user, Category $category){

@@ -7,9 +7,8 @@
           <credit-card :paymentmethod="paymentmethod" :defaultPaymentmethod="defaultPaymentmethod" :eraseable="paymentmethods.length > 1"/>
         </div>
       </div>
-
-      <div v-if="maxPaymentMethod > paymentmethods.length">
-        <button class="mt-5 btn btn btn-outline-secondary btn-lg btn-block" @click.prevent="newCardForm">Nuova carta</button>
+      <div>
+        <button v-if="maxPaymentMethod > paymentmethods.length" class="mt-5 btn btn btn-outline-secondary btn-lg btn-block" @click.prevent="newCardForm">Nuova carta</button>
         <div v-if="showCardForm">
           <credit-card-new :checkoutMode="checkoutMode" v-on:payment-method-added="paymentMethodAdded"/>
         </div>
@@ -23,9 +22,8 @@
         <fa icon="credit-card" size="4x"/>
         <h5 class="mt-2">Non hai metodi di pagamento configurati<br>aggiungine uno</h5>
       </div>
-
-      <div v-if="maxPaymentMethod > paymentmethods.length">
-        <button class="mt-5 btn btn btn-outline-secondary btn-lg btn-block" @click.prevent="newCardForm">Nuova carta</button>
+      <div>
+        <button v-if="maxPaymentMethod > paymentmethods.length" class="mt-5 btn btn btn-outline-secondary btn-lg btn-block" @click.prevent="newCardForm">Nuova carta</button>
         <div v-if="showCardForm">
           <credit-card-new :checkoutMode="checkoutMode" v-on:payment-method-added="paymentMethodAdded"/>
         </div>
@@ -72,32 +70,11 @@ export default {
   }),
 
   created () {
-
-    console.log("Checkout Mode: ", this.checkoutMode);
-
     this.$store.dispatch('stripe/fetchPaymentMethods')
-
-    if (this.sharing && this.sharing.user_status && this.checkoutMode) {
-
-      console.log("Sono dentro");
-
-      //window.Echo.private(`sharingUser.${this.sharing.user_status.id}`).listen('PaymentSucceeded', () => {
-      //  console.log("recevuto evento");
-      //  this.$router.push({
-      //    name: 'sharing.show',
-      //    params: {
-
-      //      category_id: this.$route.params.category_id,
-      //      sharing_id: this.$route.params.sharing_id
-      //    }
-      //  })
-      //})
-    }
   },
 
   methods: {
     paymentMethodAdded () {
-      console.log("FIN QUI ARRIVATO");
       if (this.checkoutMode) {
         this.subscribe()
       } else {
@@ -119,27 +96,20 @@ export default {
       this.showCardForm = false
       this.loading = true
 
-      console.log('Invoco Subacribe');
-
       axios.post(`/api/sharings/${this.$route.params.sharing_id}/subscribe`).then((response) => {
-
-        console.log('Chiamo server');
-
         let data = response.data.data
         switch (data.status) {
           case 0: // Outcome 0: Payment succeeds (Subscription active)
-            // Don't do nothing, Webhook event is raised
-                  console.log("PAGAMENTO CONFERMATO");
+            this.redirectToSharing();
             break
           case 1: // Outcome 1: Subscription incomplete or past_due and action require
             this.stripe.confirmCardPayment(data.client_secret).then((result) => {
-              console.log("AZIONE RICHIESTA", result);
               if (result.error) {
-                console.log("FALLITO");
                 this.paymentFailed()
               } else {
-                console.log("TUTTO OK PYOI ANDARE", data);
-
+                axios.patch(`/api/sharings/${this.$route.params.sharing_id}/subscription/${data.sub_id}/confirm3DSecure`).then((response) => {
+                  this.redirectToSharing();
+                })
               }
             })
             break

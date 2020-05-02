@@ -14,9 +14,6 @@ class SubscriptionSharing extends JsonResource
      */
     public function toArray($request)
     {
-        return [
-            'status' => $this->resource['status'],
-            'client_secret' => $this->resource['client_secret']
-        ];
+        return $this->resource;
     }
 }

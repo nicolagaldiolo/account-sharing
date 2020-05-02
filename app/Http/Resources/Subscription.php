@@ -15,6 +15,7 @@ class Subscription extends JsonResource
     public function toArray($request)
     {
         return [
+            "id" => $this->id,
             "status" => $this->status,
             "cancel_at_period_end" => $this->cancel_at_period_end,
             "current_period_end_at" => $this->current_period_end_at,

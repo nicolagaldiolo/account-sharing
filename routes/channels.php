@@ -11,7 +11,6 @@
 |
 */
 
-use App\Chat;
 use App\Sharing;
 use App\User;
 use Illuminate\Support\Facades\Broadcast;
@@ -19,10 +18,6 @@ use Illuminate\Support\Facades\Gate;
 
 Broadcast::channel('App.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
-});
-
-Broadcast::channel('sharingUser.{sharingUser}', function($user, \App\SharingUser $sharingUser) {
-    return $user->id === $sharingUser->user_id;
 });
 
 Broadcast::channel('chatSharing.{sharing}', function(User $user, Sharing $sharing){

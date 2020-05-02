@@ -11,9 +11,6 @@
 |
 */
 
-Route::get('/prova', 'Sharings\SharingsController@prova');
-
-
 Route::any('stripe', 'Stripe\WebhookController@handleWebhook');
 
 Route::get('{path}', function () {

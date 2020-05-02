@@ -280,6 +280,11 @@ class Stripe
         ]);
     }
 
+    public function retrieveSubscription($id = null)
+    {
+        return \Stripe\Subscription::retrieve($id);
+    }
+
     public function payInvoice($id){
 
         // Reattempt payment https://stripe.com/docs/billing/subscriptions/payment#failure-4

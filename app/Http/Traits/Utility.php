@@ -9,6 +9,7 @@ use App\Enums\RenewalFrequencies;
 use App\Enums\SharingStatus;
 use App\RenewalFrequency;
 use App\Sharing;
+use App\SharingUser;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -125,5 +126,18 @@ trait Utility
         })->map(function($file){
             return Storage::url($file);
         })->random();
+    }
+
+    protected function applyTransition(SharingUser $sharingUser, $transition)
+    {
+
+        logger(['zzzzzz LO STATO è:', $sharingUser->stateIs()]);
+
+        if ($sharingUser->canApply($transition)) {
+            logger(['zzzzzz POSSO APPLICARE:', $sharingUser->stateIs()]);
+            $sharingUser->apply($transition);
+            $sharingUser->save();
+            logger(['zzzzzz POSSO APPLICATO E SALVATO:', $sharingUser->stateIs()]);
+        };
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Subscription;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -19,9 +20,12 @@ class SubscriptionDeleted
      *
      * @return void
      */
-    public function __construct()
+
+    public $subscription;
+
+    public function __construct(Subscription $subscription)
     {
-        //
+        $this->subscription = $subscription;
     }
 
     /**

@@ -17,6 +17,7 @@ use App\Http\Resources\SubscriptionSharing;
 use App\Http\Traits\Utility;
 use App\MyClasses\Support\Facade\Stripe;
 use App\Sharing;
+use App\Subscription;
 use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -93,26 +94,6 @@ class SharingsController extends Controller
         //
     }
 
-    public function prova(Request $request)
-    {
-
-        /*\Stripe\Stripe::setApiKey(config('services.stripe.secret'));
-        \Stripe\Stripe::setApiVersion("2019-10-08");
-
-        collect(\Stripe\Subscription::all(['limit' => 99])->data)->each(function($item){
-            $item->delete();
-        });
-        */
-
-        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
-        \Stripe\Stripe::setApiVersion("2019-10-08");
-        \Stripe\Subscription::update('sub_H9dkorjbcN6kWT', [
-                'trial_end' => Carbon::now()->addSeconds(10)->timestamp,
-                'prorate' => false
-            ]
-        );
-    }
-
     /**
      * Store a newly created resource in storage.
      *
@@ -175,13 +156,18 @@ class SharingsController extends Controller
 
         $subscription = $sharing->sharingUser($user)->first()->subscription;
 
-        $object = \Stripe\Subscription::update($subscription->id, [
+        $stripeSubscription = \Stripe\Subscription::update($subscription->id, [
             'cancel_at_period_end' => !boolval($subscription->cancel_at_period_end),
         ]);
 
-        $sharing->load(['members','owner']);
+        $subscription->update([
+            'status' => SubscriptionStatus::getValue($stripeSubscription->status),
+            'cancel_at_period_end' => $stripeSubscription->cancel_at_period_end,
+            'ended_at' => $stripeSubscription->ended_at,
+            'current_period_end_at' => $stripeSubscription->current_period_end
+        ]);
 
-        return new SharingResource($sharing);
+        return new \App\Http\Resources\Subscription($subscription);
 
     }
 
@@ -226,14 +212,8 @@ class SharingsController extends Controller
                     case 'active':
                         if($subscription->latest_invoice->status === 'paid' && $subscription->latest_invoice->payment_intent->status === 'succeeded'){
                             $status = SubscriptionSharingStatus::succeeded;
+                            $this->applyTransition($sharingUser, 'pay');
                         }
-
-                        $transition = 'pay';
-                        if ($sharingUser->canApply($transition)) {
-                            $sharingUser->apply($transition);
-                            $sharingUser->save();
-                        };
-
                         break;
                     case 'trialing':
                         // Doesn't handle this case
@@ -266,13 +246,7 @@ class SharingsController extends Controller
                 switch ($invoice->payment_intent->status){
                     case 'succeeded':
                         $status = SubscriptionSharingStatus::succeeded;
-
-                        $transition = 'pay';
-                        if ($sharingUser->canApply($transition)) {
-                            $sharingUser->apply($transition);
-                            $sharingUser->save();
-                        };
-
+                        $this->applyTransition($sharingUser, 'pay');
                         break;
                     case 'requires_payment_method':
                         $status = SubscriptionSharingStatus::requires_payment_method;
@@ -298,8 +272,25 @@ class SharingsController extends Controller
 
     }
 
-    public function confirm3dSecure()
+    public function confirm3DSecure(Sharing $sharing, Subscription $subscription)
     {
+
+        $this->authorize('confirm3DSecure', $subscription);
+
+        $stripeSubscription = Stripe::retrieveSubscription($subscription->id);
+
+        if(SubscriptionStatus::hasKey($stripeSubscription->status) &&
+            SubscriptionStatus::getValue($stripeSubscription->status) === SubscriptionStatus::active
+        ){
+            $subscription->update(['status' => SubscriptionStatus::getValue($stripeSubscription->status)]);
+
+            $this->applyTransition($subscription->sharingUser, 'pay');
+
+            return new \App\Http\Resources\Subscription($subscription);
+
+        }else{
+            abort(403);
+        }
 
     }
 
@@ -319,13 +310,7 @@ class SharingsController extends Controller
             $user->notify(new \App\Notifications\SharingUserNewRequest($sharing, $user));
         }
 
-        $sharingStatus = $userSharing->sharing_status;
-        $stateMachine = \StateMachine::get($sharingStatus, 'sharing');
-
-        if($transition && $stateMachine->can($transition)) {
-            $stateMachine->apply($transition);
-            $sharingStatus->save();
-        }
+        $this->applyTransition($userSharing->sharing_status, $transition);
 
         $userSharing->load(['members','owner']);
         return new SharingResource($userSharing);
@@ -335,12 +320,8 @@ class SharingsController extends Controller
     public function transitionUser(Request $request, Sharing $sharing, User $user, $transition)
     {
         $sharing_status = $user->sharings()->findOrFail($sharing->id)->sharing_status;
-        $stateMachine = \StateMachine::get($sharing_status, 'sharing');
 
-        if($stateMachine->can($transition)) {
-            $stateMachine->apply($transition);
-            $sharing_status->save();
-        }
+        $this->applyTransition($sharing_status, $transition);
 
         $sharing->load('users');
 

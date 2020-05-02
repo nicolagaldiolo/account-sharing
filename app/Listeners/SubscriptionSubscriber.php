@@ -41,8 +41,17 @@ class SubscriptionSubscriber
 
     public function onSubscriptionDeleted($event)
     {
-        logger('$$$$$$$ SOTTOSCRIZIONE CANCELLATA');
-        logger("Avvisare della cancellazione sia admin che user, avvertire admin di cambiare le password");
+        $subscription = $event->subscription;
+        $sharingUser = $subscription->sharingUser;
+
+        // Send mail to user
+        $subscription->sharingUser->user->notify( new \App\Notifications\SubscriptionDeleted($sharingUser, 'USER'));
+
+        // Send mail to owner
+        $subscription->sharingUser->sharing->owner->notify( new \App\Notifications\SubscriptionDeleted($sharingUser, 'OWNER'));
+
+        // Send mail to admins
+        Notification::send(User::admin()->get(), new \App\Notifications\SubscriptionDeleted($sharingUser, 'ADMIN'));
     }
 
     /**

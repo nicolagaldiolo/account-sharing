@@ -11,7 +11,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class PaymentSucceeded implements ShouldBroadcast
+class PaymentSucceeded
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -22,12 +22,10 @@ class PaymentSucceeded implements ShouldBroadcast
      */
 
     public $invoice;
-    private $sharingUser;
 
-    public function __construct(Invoice $invoice, $sharingUser)
+    public function __construct(Invoice $invoice)
     {
         $this->invoice = $invoice;
-        $this->sharingUser = $sharingUser;
     }
 
     /**
@@ -37,6 +35,6 @@ class PaymentSucceeded implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('sharingUser.' . $this->sharingUser->id);
+        return new PrivateChannel('channel-name');
     }
 }

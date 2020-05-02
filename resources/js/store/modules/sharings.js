@@ -89,6 +89,12 @@ export const mutations = {
 
     // Re-assign the state with Object.assign because vuex state doesn't react at change in deph
     state.sharings = Object.assign({}, state.sharings)
+  },
+
+  [types.UPDATE_SUBSCRIPTION] (state, { member, subscription }) {
+    let indexOfData = state.sharing.members.map(e => e.id).indexOf(member)
+    state.sharing.members[indexOfData].subscription = subscription
+    state.sharing = Object.assign({}, state.sharing)
   }
 }
 
@@ -109,6 +115,10 @@ export const actions = {
 
   syncSharings ({ commit }, payload) {
     commit(types.SYNC_SHARINGS, payload)
+  },
+
+  updateSubscription ({ commit }, payload) {
+    commit(types.UPDATE_SUBSCRIPTION, payload)
   },
 
   async fetchSharing ({ commit }, id) {

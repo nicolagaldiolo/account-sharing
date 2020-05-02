@@ -80,8 +80,6 @@ class WebhookController extends Controller
     protected function handleInvoicePaymentSucceeded(array $payload)
     {
 
-        logger(1);
-
         $object = $payload['data']['object'];
 
         $user = User::where('pl_customer_id', $object['customer'])->firstOrFail();
@@ -89,50 +87,21 @@ class WebhookController extends Controller
 
         DB::transaction(function() use($object){
 
-            logger(2);
-
             $subscription = Subscription::findOrFail($object['subscription']);
-            $sharingUser = $subscription->sharingUser;
-
-            logger("-------1-------");
-            logger($sharingUser);
-            logger("-------1-------");
 
             if($object['billing_reason'] === 'subscription_create'){
-                $subscription->update(['status' => SubscriptionStatus::active]);
-
-                logger(3);
-
-                $transition = 'pay';
-                if ($sharingUser->canApply($transition)) {
-                    $sharingUser->apply($transition);
-                    $sharingUser->save();
-
-                    logger(4);
-
-                };
+                if($subscription->status !== SubscriptionStatus::active){
+                    $subscription->update(['status' => SubscriptionStatus::active]);
+                }
+                $this->applyTransition($subscription->sharingUser, 'pay');
             }
-
-            logger("-------2-------");
-            logger($sharingUser);
-            logger("-------2-------");
-
-            logger("-------3-------");
-            logger($subscription->sharingUser);
-            logger("-------3-------");
 
             $sharing = Sharing::where('stripe_plan', $object['lines']['data'][0]['plan']['id'])->firstOrFail();
 
             $total = $this->convertStripePrice($object['total']);
             $total_less_fee = $this->convertStripePrice($object['lines']['data'][0]['plan']['metadata']['netPrice']);
             $fee = $this->convertStripePrice($object['lines']['data'][0]['plan']['metadata']['fee']);
-
-            logger(5);
-
             $charge = Stripe::chargeRetrieve($object['charge']);
-
-            logger(6);
-
             $invoice = Invoice::create([
                 'stripe_id' => $object['id'],
                 'customer_id' => $object['customer'],
@@ -147,16 +116,7 @@ class WebhookController extends Controller
                 'last4' => $charge->payment_method_details->card->last4
             ]);
 
-            logger(7);
-
-            logger("-------4-------");
-            logger($sharingUser);
-            logger("-------4-------");
-
-            event( New PaymentSucceeded($invoice, $sharingUser));
-
-            logger(8);
-
+            event( New PaymentSucceeded($invoice));
         });
 
         return $this->successMethod();
@@ -169,23 +129,25 @@ class WebhookController extends Controller
      */
     protected function handleCustomerSubscriptionUpdated(array $payload)
     {
+
         $stripeSubscription = $payload['data']['object'];
 
-        $subscription = Subscription::findOrFail($stripeSubscription['id']);
-
-        $subscription->update([
-            'status' => SubscriptionStatus::getValue($stripeSubscription['status']),
-            'cancel_at_period_end' => $stripeSubscription['cancel_at_period_end'],
-            'ended_at' => $stripeSubscription['ended_at'],
-            'current_period_end_at' => $stripeSubscription['current_period_end']
-        ]);
-
-        $stripeSubscriptionData = collect([
-            'total' => $this->convertStripePrice($stripeSubscription['items']['data'][0]['plan']['amount']),
-            'currency' => $stripeSubscription['items']['data'][0]['plan']['currency']
-        ]);
-
         if($stripeSubscription['status'] === 'past_due'){
+
+            $subscription = Subscription::findOrFail($stripeSubscription['id']);
+
+            $subscription->update([
+                'status' => SubscriptionStatus::getValue($stripeSubscription['status']),
+                'cancel_at_period_end' => $stripeSubscription['cancel_at_period_end'],
+                'ended_at' => $stripeSubscription['ended_at'],
+                'current_period_end_at' => $stripeSubscription['current_period_end']
+            ]);
+
+            $stripeSubscriptionData = collect([
+                'total' => $this->convertStripePrice($stripeSubscription['items']['data'][0]['plan']['amount']),
+                'currency' => $stripeSubscription['items']['data'][0]['plan']['currency']
+            ]);
+
             event( New SubscriptionPastDue($subscription->sharingUser, $stripeSubscriptionData));
         }
 
@@ -200,29 +162,24 @@ class WebhookController extends Controller
     protected function handleCustomerSubscriptionDeleted(array $payload)
     {
 
-        $subscription_id = $payload['data']['object']['id'];
-        $userSharing = Subscription::where('id', $subscription_id)->firstOrFail()->sharingUser;
+        $object = $payload['data']['object'];
+        $subscription = Subscription::findOrFail($object['id']);
 
-        $stateMachine = \StateMachine::get($userSharing, 'sharing');
+        $subscription->update([
+            'status' => SubscriptionStatus::getValue($object['status']),
+            'cancel_at_period_end' => $object['cancel_at_period_end'],
+            'ended_at' => $object['ended_at'],
+            'current_period_end_at' => $object['current_period_end']
+        ]);
 
-
-        $user = User::findOrFail($userSharing->user_id);
+        $user = User::findOrFail($subscription->sharingUser->user_id);
         Auth::login($user);
 
-        DB::transaction(function() use ($stateMachine, $userSharing, $payload) {
-            $transition = 'left';
-            if ($stateMachine->can($transition)) {
-                $stateMachine->apply($transition);
-                $userSharing->save();
-            }
-            event( New SubscriptionDeleted());
-        });
+        $this->applyTransition($subscription->sharingUser, 'left');
+        event( New SubscriptionDeleted($subscription));
 
         return $this->successMethod();
     }
-
-
-
 
     protected function handleChargeRefunded(array $payload)
     {

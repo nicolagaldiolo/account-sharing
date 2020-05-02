@@ -133,17 +133,9 @@ export default {
   }),
 
   created () {
-
-    console.log("Creato");
-
     this.$store.dispatch('sharings/fetchSharing', this.$route.params.sharing_id).then(() => {
-
-      console.log("Dispachato", this.sharing.user_status.state.value);
-
       if (!this.$store.getters['sharings/sharing'].id || this.$store.getters['sharings/sharing'].category_id !== +this.$route.params.category_id) {
         this.$router.push({ name: '404' })
-      }else{
-        console.log("Dispachato step 2", this.sharing.user_status.state.value);
       }
     })
   },
@@ -185,7 +177,6 @@ export default {
       this.loaded = true
       this.globalMembers = [obj.owner]
       if (obj.members) this.globalMembers.push(...obj.members)
-      console.log("watch", obj.user_status.state.value);
     }
   },
 
