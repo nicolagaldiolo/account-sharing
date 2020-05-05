@@ -263,6 +263,18 @@ class Stripe
     /*
      * SUBSCRIPTION
      */
+
+    public function deleteAllSubscriptions()
+    {
+        $subscription = collect(\Stripe\Subscription::all(['limit' => 99])->data);
+        if($subscription->isNotEmpty()){
+            $subscription->each(function($item){
+                $item->delete();
+            });
+            $this->deleteAllSubscriptions();
+        }
+    }
+
     public function createSubscription($sharing, $user = null)
     {
         $customer = $this->getCustomer($user);

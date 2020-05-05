@@ -29,14 +29,14 @@ class Category extends Model
      *
      * @return void
      */
-    protected static function boot()
-    {
-        parent::boot();
+    //protected static function boot()
+    //{
+    //    parent::boot();
 
-        static::addGlobalScope('country', function ($builder) {
-            $builder->where('country', Auth::user()->country);
-        });
-    }
+    //    static::addGlobalScope('country', function ($builder) {
+    //        $builder->where('country', Auth::user()->country);
+    //    });
+    //}
 
     public function setImageAttribute($image){
         if($image) {

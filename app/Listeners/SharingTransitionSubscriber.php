@@ -27,6 +27,7 @@ class SharingTransitionSubscriber
 
     public function onPreTransition(TransitionEvent $event)
     {
+
         //$sharingUser = $event->getStateMachine()->getObject();
 
         //switch ($event->getTransition()){

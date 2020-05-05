@@ -17,6 +17,7 @@ use App\Http\Resources\SubscriptionSharing;
 use App\Http\Traits\Utility;
 use App\MyClasses\Support\Facade\Stripe;
 use App\Sharing;
+use App\SharingUser;
 use App\Subscription;
 use App\User;
 use Illuminate\Http\Request;

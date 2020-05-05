@@ -14,6 +14,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
@@ -130,14 +131,12 @@ trait Utility
 
     protected function applyTransition(SharingUser $sharingUser, $transition)
     {
-
-        logger(['zzzzzz LO STATO è:', $sharingUser->stateIs()]);
+        $sharingUser->refresh(); //Refresh the object because it isn't updated
 
         if ($sharingUser->canApply($transition)) {
-            logger(['zzzzzz POSSO APPLICARE:', $sharingUser->stateIs()]);
             $sharingUser->apply($transition);
             $sharingUser->save();
-            logger(['zzzzzz POSSO APPLICATO E SALVATO:', $sharingUser->stateIs()]);
         };
+
     }
 }

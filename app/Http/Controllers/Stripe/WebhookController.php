@@ -93,6 +93,7 @@ class WebhookController extends Controller
                 if($subscription->status !== SubscriptionStatus::active){
                     $subscription->update(['status' => SubscriptionStatus::active]);
                 }
+
                 $this->applyTransition($subscription->sharingUser, 'pay');
             }
 

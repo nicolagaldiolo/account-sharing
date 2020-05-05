@@ -68,7 +68,7 @@ class SharingNewMember extends Notification implements ShouldQueue
             $message->subject(config('app.name') . ' - Benvenuto nel gruppo ' . $this->sharing->name)
                 ->greeting('Ciao ' . $notifiable->name)
                 ->line('Ora fai parte del tuo gruppo di condivisione ' . $this->sharing->name . '.')
-                ->line($this->sharing->owner->username . ' Vanny ha accettato la tua richiesta di condivisione per ' . $this->sharing->name . ' e la tua prima quota è stata inviata con successo.')
+                ->line($this->sharing->owner->username . ' Vanny ha accettato la tua richiesta di condivisione per ' . $this->sharing->name)
                 ->action('Vai al gruppo', $sharing_url);
         }
 

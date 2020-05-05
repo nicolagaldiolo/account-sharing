@@ -14,6 +14,7 @@ class SharingUser extends Pivot
 
     protected $casts = [
         'canceled_at' => 'datetime',
+        'looked_at' => 'datetime'
     ];
 
     protected function getGraph()
