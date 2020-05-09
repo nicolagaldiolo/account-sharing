@@ -10,6 +10,7 @@ use App\Enums\SharingStatus;
 use App\RenewalFrequency;
 use App\Sharing;
 use App\SharingUser;
+use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -133,7 +134,12 @@ trait Utility
     {
         $sharingUser->refresh(); //Refresh the object because it isn't updated
 
-        if ($sharingUser->canApply($transition)) {
+        if(is_null(Auth::id())){
+            $user = User::findOrFail($sharingUser->user_id);
+            Auth::login($user);
+        }
+
+        if ($transition && $sharingUser->canApply($transition)) {
             $sharingUser->apply($transition);
             $sharingUser->save();
         };

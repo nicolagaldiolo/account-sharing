@@ -4,12 +4,9 @@
     <list default="true" id="80fbe383-e517-4357-96d8-8ee0108f1222" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Category.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Category.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Sharings/SharingsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Sharings/SharingsController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Stripe/WebhookController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Stripe/WebhookController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Traits/Utility.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Traits/Utility.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Listeners/SharingTransitionSubscriber.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Listeners/SharingTransitionSubscriber.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/MyClasses/Stripe.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/MyClasses/Stripe.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Notifications/PaymentSucceeded.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Notifications/PaymentSucceeded.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Notifications/SharingNewMember.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Notifications/SharingNewMember.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/SharingUser.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/SharingUser.php" afterDir="false" />
     </list>
@@ -230,7 +227,22 @@
           <mapping local-root="$PROJECT_DIR$" remote-root="/Users/chloe/.composer/vendor/laravel/valet" />
         </path_mappings>
       </server>
-      <server host="" id="3323b518-a804-4335-9c6b-2e29b2a42a71" use_path_mappings="true">
+      <server id="3323b518-a804-4335-9c6b-2e29b2a42a71" use_path_mappings="true">
+        <path_mappings>
+          <mapping local-root="$PROJECT_DIR$" remote-root="/Users/chloe/.composer/vendor/laravel/valet" />
+        </path_mappings>
+      </server>
+      <server id="18d4a553-7734-4891-9a97-91b2845e17fc" use_path_mappings="true">
+        <path_mappings>
+          <mapping local-root="$PROJECT_DIR$" remote-root="/Users/chloe/.composer/vendor/laravel/valet" />
+        </path_mappings>
+      </server>
+      <server id="af96fdae-dbf2-4455-a32c-1bd8399c40a6" use_path_mappings="true">
+        <path_mappings>
+          <mapping local-root="$PROJECT_DIR$" remote-root="/Users/chloe/.composer/vendor/laravel/valet" />
+        </path_mappings>
+      </server>
+      <server host="" id="2d9b5e5e-f48e-4c8f-ad68-dd28b0decf6a" use_path_mappings="true">
         <path_mappings>
           <mapping local-root="$PROJECT_DIR$" remote-root="/Users/chloe/.composer/vendor/laravel/valet" />
         </path_mappings>
@@ -598,7 +610,10 @@
       <workItem from="1588311341815" duration="1015000" />
       <workItem from="1588313141957" duration="11000" />
       <workItem from="1588409091040" duration="17375000" />
-      <workItem from="1588430721512" duration="17538000" />
+      <workItem from="1588430721512" duration="17894000" />
+      <workItem from="1588690097334" duration="1646000" />
+      <workItem from="1588914573356" duration="3243000" />
+      <workItem from="1588917838127" duration="7491000" />
     </task>
     <servers />
   </component>
@@ -625,21 +640,16 @@
       <screen x="0" y="23" width="1440" height="877" />
     </state>
     <state x="592" y="344" key="#com.intellij.fileTypes.FileTypeChooser/0.23.1440.877/1440.-256.1440.877@0.23.1440.877" timestamp="1581184191810" />
-    <state x="1052" y="542" key="#com.intellij.fileTypes.FileTypeChooser/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1580192962873" />
     <state x="321" y="23" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1582386469266">
       <screen x="0" y="23" width="1440" height="877" />
     </state>
     <state x="321" y="23" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.23.1440.877@0.23.1440.877" timestamp="1582386469266" />
-    <state x="1018" y="485" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1580193449256">
-      <screen x="0" y="23" width="2560" height="1417" />
-    </state>
-    <state x="1018" y="485" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/2560.279.1440.877/0.23.2560.1417/-1440.448.1440.877@0.23.2560.1417" timestamp="1580193449256" />
-    <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1588685625986">
+    <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1589009617800">
       <screen x="0" y="23" width="1440" height="877" />
     </state>
     <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1440.877/-2560.-770.2560.1417@0.23.1440.877" timestamp="1587216029424" />
     <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1440.877/-552.-1417.2560.1417@0.23.1440.877" timestamp="1583343225377" />
-    <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1440.877/-571.-1417.2560.1417@0.23.1440.877" timestamp="1588685625986" />
+    <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1440.877/-571.-1417.2560.1417@0.23.1440.877" timestamp="1589009617800" />
     <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1440.877/-644.-1417.2560.1417@0.23.1440.877" timestamp="1584104345990" />
     <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1440.877/1440.-256.1440.877@0.23.1440.877" timestamp="1583593568364" />
     <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1440.877/1440.-736.2560.1417@0.23.1440.877" timestamp="1582985681420" />
@@ -813,14 +823,14 @@
       <screen x="548" y="1463" width="1440" height="877" />
     </state>
     <state x="548" y="1463" width="1383" height="877" maximized="true" key="dock-window-1/548.1463.1440.877/-2560.23.2560.1417/0.23.2560.1417@0.23.2560.1417" timestamp="1584684613063" />
-    <state x="106" y="114" width="1195" height="699" key="find.popup" timestamp="1588686935835">
+    <state x="106" y="114" width="1195" height="699" key="find.popup" timestamp="1589008760272">
       <screen x="0" y="23" width="1440" height="877" />
     </state>
     <state x="540" y="311" width="645" height="472" key="find.popup/0.23.1440.877/-200.-1057.1920.1057@0.23.1440.877" timestamp="1580843740096" />
     <state x="106" y="114" width="1195" height="699" key="find.popup/0.23.1440.877/-2560.-770.2560.1417@0.23.1440.877" timestamp="1586355377600" />
     <state x="228" y="155" width="931" height="622" key="find.popup/0.23.1440.877/-548.-1417.2560.1417/-3108.-1417.2560.1417@0.23.1440.877" timestamp="1585810917515" />
     <state x="540" y="311" width="789" height="534" key="find.popup/0.23.1440.877/-552.-1417.2560.1417@0.23.1440.877" timestamp="1583345414195" />
-    <state x="106" y="114" width="1195" height="699" key="find.popup/0.23.1440.877/-571.-1417.2560.1417@0.23.1440.877" timestamp="1588686935835" />
+    <state x="106" y="114" width="1195" height="699" key="find.popup/0.23.1440.877/-571.-1417.2560.1417@0.23.1440.877" timestamp="1589008760272" />
     <state x="228" y="243" width="931" height="534" key="find.popup/0.23.1440.877/1440.-256.1440.877@0.23.1440.877" timestamp="1583584837332" />
     <state x="540" y="311" width="683" height="486" key="find.popup/0.23.1440.877/1440.-736.2560.1417@0.23.1440.877" timestamp="1582981352585" />
     <state x="139" y="78" width="1156" height="709" key="find.popup/0.23.1440.877@0.23.1440.877" timestamp="1588430802829" />

@@ -29,14 +29,16 @@ class Category extends Model
      *
      * @return void
      */
-    //protected static function boot()
-    //{
-    //    parent::boot();
+    protected static function boot()
+    {
+        parent::boot();
 
-    //    static::addGlobalScope('country', function ($builder) {
-    //        $builder->where('country', Auth::user()->country);
-    //    });
-    //}
+        if(Auth::id()){
+            static::addGlobalScope('country', function ($builder) {
+                $builder->where('country', Auth::user()->country);
+            });
+        }
+    }
 
     public function setImageAttribute($image){
         if($image) {
@@ -78,13 +80,6 @@ class Category extends Model
                     });
             });
     }
-
-    //public function scopeAllowed()
-    //{
-    //    return $this->whereHas('sharings', function (Builder $query){
-    //       $query->where('owner_id', Auth::id());
-    //    });
-    //}
 
     public function scopeCountry($query){
         return $query->where('country', Auth::user()->country);

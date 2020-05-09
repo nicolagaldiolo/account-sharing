@@ -27,16 +27,6 @@ class SharingTransitionSubscriber
 
     public function onPreTransition(TransitionEvent $event)
     {
-
-        //$sharingUser = $event->getStateMachine()->getObject();
-
-        //switch ($event->getTransition()){
-        //    case 'pay':
-        //        if(!$sharingUser->subscription || $sharingUser->subscription->status !== SubscriptionStatus::active){
-        //            $event->setRejected();
-        //        }
-        //        break;
-        //}
     }
 
     public function onPostTransition(TransitionEvent $event)
@@ -47,6 +37,7 @@ class SharingTransitionSubscriber
         switch ($event->getTransition()){
             case 'pay':
                 // Send Mail to owner and user
+
                 $sharingUser->sharing->owner->notify(new \App\Notifications\SharingNewMember($sharingUser->sharing, $sharingUser->user, true));
                 $sharingUser->user->notify(new \App\Notifications\SharingNewMember($sharingUser->sharing, $sharingUser->user));
                 break;

@@ -82,9 +82,6 @@ class WebhookController extends Controller
 
         $object = $payload['data']['object'];
 
-        $user = User::where('pl_customer_id', $object['customer'])->firstOrFail();
-        Auth::login($user);
-
         DB::transaction(function() use($object){
 
             $subscription = Subscription::findOrFail($object['subscription']);
@@ -172,9 +169,6 @@ class WebhookController extends Controller
             'ended_at' => $object['ended_at'],
             'current_period_end_at' => $object['current_period_end']
         ]);
-
-        $user = User::findOrFail($subscription->sharingUser->user_id);
-        Auth::login($user);
 
         $this->applyTransition($subscription->sharingUser, 'left');
         event( New SubscriptionDeleted($subscription));

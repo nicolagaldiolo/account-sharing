@@ -23,7 +23,7 @@ class SharingUser extends Pivot
     }
 
     public function sharing(){
-        return $this->belongsTo(Sharing::class)->withoutGlobalScopes();
+        return $this->belongsTo(Sharing::class);
     }
 
     public function user(){
